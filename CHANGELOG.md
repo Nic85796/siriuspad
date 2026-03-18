@@ -7,6 +7,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+## [1.0.2] - 2026-03-18
+
 ### Adicionado
 - Suporte inicial a i18n com interface em Inglês, Português (Brasil) e Espanhol
 - Tela cheia nativa, Focus Mode e Zen Mode
