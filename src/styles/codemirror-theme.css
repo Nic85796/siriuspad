@@ -1,0 +1,41 @@
+.cm-editor {
+  height: 100%;
+}
+
+.cm-editor .cm-line {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.cm-editor .cm-variable-token {
+  border-radius: 0.375rem;
+  background: rgba(96, 165, 250, 0.16);
+  color: var(--blue);
+  padding: 0 0.18rem;
+}
+
+.command-group {
+  margin-top: 0.5rem;
+}
+
+.command-group [cmdk-group-heading] {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.command-item {
+  margin: 0.125rem 0;
+  border-radius: 0.875rem;
+  padding: 0.75rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  transition: background-color 120ms ease, color 120ms ease;
+}
+
+.command-item[data-selected='true'] {
+  background: var(--bg-active);
+  color: var(--text-primary);
+}

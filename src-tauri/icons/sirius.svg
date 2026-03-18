@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="112" fill="#050505" />
+  <circle cx="256" cy="256" r="150" fill="url(#halo)" />
+  <circle cx="256" cy="256" r="82" fill="url(#core)" />
+  <path
+    d="M256 88L284 212L424 256L284 300L256 424L228 300L88 256L228 212L256 88Z"
+    fill="white"
+    fill-opacity=".96"
+  />
+  <circle cx="256" cy="256" r="34" fill="white" />
+  <defs>
+    <radialGradient id="halo" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(150)">
+      <stop stop-color="#60A5FA" stop-opacity=".55" />
+      <stop offset=".55" stop-color="#60A5FA" stop-opacity=".2" />
+      <stop offset="1" stop-color="#60A5FA" stop-opacity="0" />
+    </radialGradient>
+    <radialGradient id="core" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(256 256) rotate(90) scale(82)">
+      <stop stop-color="#FFFFFF" />
+      <stop offset=".58" stop-color="#BFDBFE" />
+      <stop offset="1" stop-color="#60A5FA" stop-opacity=".45" />
+    </radialGradient>
+  </defs>
+</svg>
