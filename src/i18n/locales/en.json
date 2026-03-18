@@ -196,6 +196,16 @@
     "restored": "Version restored",
     "restoreFailed": "Unable to restore version"
   },
+  "updater": {
+    "available": "SiriusPad {{version}} is available",
+    "description": "A new version is ready to install.",
+    "updateNow": "Update now",
+    "viewRelease": "Release notes",
+    "later": "Later",
+    "installing": "Installing...",
+    "installedRestart": "Update installed. Restart to apply.",
+    "installFailed": "Update failed"
+  },
   "toasts": {
     "copied": "Copied note content",
     "copiedAsCode": "Copied as code block",

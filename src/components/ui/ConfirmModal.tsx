@@ -26,6 +26,8 @@ export function ConfirmModal({
   onCancel,
   onSecondary,
 }: ConfirmModalProps) {
+  const cancelButtonRef = useRef<HTMLButtonElement | null>(null)
+  const secondaryButtonRef = useRef<HTMLButtonElement | null>(null)
   const confirmButtonRef = useRef<HTMLButtonElement | null>(null)
 
   useEffect(() => {
@@ -46,6 +48,20 @@ export function ConfirmModal({
 
       if (event.key === 'Enter') {
         event.preventDefault()
+        const focused = document.activeElement
+        const action =
+          focused instanceof HTMLElement ? focused.dataset.confirmAction : undefined
+
+        if (action === 'cancel') {
+          onCancel()
+          return
+        }
+
+        if (action === 'secondary' && onSecondary) {
+          void onSecondary()
+          return
+        }
+
         void onConfirm()
       }
     }
@@ -56,7 +72,7 @@ export function ConfirmModal({
       window.clearTimeout(timeoutId)
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [open, onCancel, onConfirm])
+  }, [onCancel, onConfirm, onSecondary, open])
 
   if (!open || typeof document === 'undefined') {
     return null
@@ -79,7 +95,9 @@ export function ConfirmModal({
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-4">
           <button
+            ref={cancelButtonRef}
             type="button"
+            data-confirm-action="cancel"
             className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
             onClick={onCancel}
           >
@@ -87,7 +105,9 @@ export function ConfirmModal({
           </button>
           {secondaryLabel && onSecondary ? (
             <button
+              ref={secondaryButtonRef}
               type="button"
+              data-confirm-action="secondary"
               className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
               onClick={() => void onSecondary()}
             >

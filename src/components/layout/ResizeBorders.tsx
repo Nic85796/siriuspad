@@ -44,7 +44,7 @@ export function ResizeBorders({ platform }: ResizeBordersProps) {
   }
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-[90]">
+    <div className="pointer-events-none fixed inset-0 z-[10]">
       {handles.map((handle) => (
         <div
           key={handle.direction}

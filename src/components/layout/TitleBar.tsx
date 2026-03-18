@@ -23,6 +23,10 @@ interface TitleBarProps {
 }
 
 function WindowControls({ platform }: { platform: AppPlatform }) {
+  if (platform === 'macos') {
+    return null
+  }
+
   const runWindowAction = async (
     action: (windowHandle: ReturnType<typeof getCurrentWindow>) => Promise<void>,
   ) => {
@@ -60,10 +64,6 @@ function WindowControls({ platform }: { platform: AppPlatform }) {
     </>
   )
 
-  if (platform === 'macos') {
-    return <div className="flex items-stretch">{controls}</div>
-  }
-
   return <div className="flex items-stretch">{controls}</div>
 }
 
@@ -78,12 +78,14 @@ export function TitleBar({
   const { t } = useTranslation()
 
   return (
-    <header className="relative flex h-8 items-stretch border-b border-border bg-surface/95 pl-2">
+    <header
+      className={`relative flex h-8 items-stretch border-b border-border bg-surface/95 ${
+        platform === 'macos' ? 'pl-20' : 'pl-2'
+      }`}
+    >
       <div className="absolute inset-0" data-tauri-drag-region />
 
       <div className="relative z-10 flex min-w-0 flex-1 items-center gap-3">
-        {platform === 'macos' ? <WindowControls platform={platform} /> : null}
-
         <button
           type="button"
           className="flex h-6 w-6 items-center justify-center rounded-md text-text-secondary transition hover:bg-hover hover:text-text-primary"
@@ -131,7 +133,7 @@ export function TitleBar({
         </button>
       </div>
 
-      {platform !== 'macos' ? <WindowControls platform={platform} /> : null}
+      <WindowControls platform={platform} />
     </header>
   )
 }

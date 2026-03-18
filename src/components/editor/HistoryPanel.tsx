@@ -187,7 +187,7 @@ export function HistoryPanel({
           <pre className="grid gap-1 whitespace-pre-wrap font-mono text-xs leading-5">
             {diffLines.map((line, index) => (
               <span
-                key={`${line.kind}-${index}-${line.text}`}
+                key={index}
                 className={
                   line.kind === 'added'
                     ? 'rounded bg-green/10 px-2 py-1 text-green'

@@ -23,6 +23,37 @@ fn now_iso() -> String {
     Utc::now().to_rfc3339_opts(chrono::SecondsFormat::Secs, true)
 }
 
+fn system_language() -> String {
+    std::env::var("LC_ALL")
+        .or_else(|_| std::env::var("LANG"))
+        .unwrap_or_default()
+        .to_lowercase()
+}
+
+fn welcome_note_seed() -> (&'static str, Vec<String>, &'static str) {
+    let lang = system_language();
+
+    if lang.starts_with("pt") {
+        (
+            "Bem-vindo ao SiriusPad",
+            vec!["bem-vindo".into(), "atalhos".into()],
+            "# Bem-vindo ao SiriusPad\n\nSeu bloco rápido para notas técnicas, snippets e comandos.\n\n## Atalhos\n\n- `Ctrl+N` nova nota\n- `Ctrl+K` paleta de comandos\n- `Ctrl+F` focar busca\n- `Ctrl+S` salvar\n- `Ctrl+Enter` executar snippet\n- `Ctrl+Shift+C` copiar com variáveis\n- `Ctrl+Shift+G` exportar Gist\n\n```bash\necho \"SiriusPad está pronto\"\n```\n",
+        )
+    } else if lang.starts_with("es") {
+        (
+            "Bienvenido a SiriusPad",
+            vec!["bienvenida".into(), "atajos".into()],
+            "# Bienvenido a SiriusPad\n\nTu bloc rápido para notas técnicas, snippets y comandos.\n\n## Atajos\n\n- `Ctrl+N` nueva nota\n- `Ctrl+K` paleta de comandos\n- `Ctrl+F` enfocar búsqueda\n- `Ctrl+S` guardar\n- `Ctrl+Enter` ejecutar snippet\n- `Ctrl+Shift+C` copiar con variables\n- `Ctrl+Shift+G` exportar Gist\n\n```bash\necho \"SiriusPad está listo\"\n```\n",
+        )
+    } else {
+        (
+            "Welcome to SiriusPad",
+            vec!["welcome".into(), "shortcuts".into()],
+            "# Welcome to SiriusPad\n\nYour fast scratchpad for technical notes, snippets, and commands.\n\n## Shortcuts\n\n- `Ctrl+N` new note\n- `Ctrl+K` command palette\n- `Ctrl+F` focus search\n- `Ctrl+S` save\n- `Ctrl+Enter` run snippet\n- `Ctrl+Shift+C` copy with variables\n- `Ctrl+Shift+G` export Gist\n\n```bash\necho \"SiriusPad is ready\"\n```\n",
+        )
+    }
+}
+
 pub fn build_excerpt(content: &str) -> String {
     let normalized = content.split_whitespace().collect::<Vec<_>>().join(" ");
     if normalized.chars().count() <= 160 {
@@ -298,16 +329,17 @@ pub fn ensure_directories() -> Result<(), String> {
 
     if list_note_paths(None)?.is_empty() {
         let now = now_iso();
+        let (title, tags, content) = welcome_note_seed();
         let note = Note {
             id: Uuid::new_v4().to_string(),
-            title: "Welcome to SiriusPad".into(),
+            title: title.into(),
             workspace: DEFAULT_WORKSPACE.into(),
             language: "markdown".into(),
-            tags: vec!["welcome".into(), "shortcuts".into()],
+            tags,
             created_at: now.clone(),
             updated_at: now,
             pinned: true,
-            content: "# Welcome to SiriusPad\n\nSiriusPad is your technical scratchpad for notes, snippets, bugs, and quick commands.\n\n## Shortcuts\n\n- `Ctrl+N` new note\n- `Ctrl+K` command palette\n- `Ctrl+F` focus search\n- `Ctrl+S` save\n- `Ctrl+Enter` run snippet\n- `Ctrl+Shift+C` copy with variables\n- `Ctrl+Shift+G` export Gist\n\n```bash\necho \"SiriusPad is ready\"\n```\n".into(),
+            content: content.into(),
         };
         let welcome_note_path = note_path_for(DEFAULT_WORKSPACE, &note.id)?;
         write_note_to_path(&note, &welcome_note_path)?;

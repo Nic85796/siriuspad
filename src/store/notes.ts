@@ -164,7 +164,9 @@ export const useNotesStore = create<NotesState>((set, get) => ({
         nextTabs.find((tab) => tab.id !== state.activeNoteId) ?? nextTabs[0] ?? null
 
       if (evictedTab) {
-        if (evictedTab.isDirty) {
+        const evictedDirty = get().saveStatuses[evictedTab.id] === 'dirty'
+
+        if (evictedDirty) {
           await get().saveNote(evictedTab.id)
         }
 
@@ -400,8 +402,7 @@ export const useNotesStore = create<NotesState>((set, get) => ({
     const nextTabs = state.openTabs.filter((tab) => tab.id !== current.id)
     const nextDrafts = removeFromRecord(state.noteDrafts, current.id)
     const nextStatuses = removeFromRecord(state.saveStatuses, current.id)
-    const nextActiveId =
-      nextTabs[0]?.id ?? remainingNotes.find((note) => note.id !== current.id)?.id ?? null
+    const nextActiveId = nextTabs[0]?.id ?? remainingNotes[0]?.id ?? null
 
     set({
       notes: remainingNotes,

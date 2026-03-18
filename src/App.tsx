@@ -11,6 +11,7 @@ import { exportAsJson, exportAsMarkdown, exportAsTxt } from '@/lib/export'
 import { useNotes } from '@/hooks/useNotes'
 import { useRunner } from '@/hooks/useRunner'
 import { useSearch } from '@/hooks/useSearch'
+import { useUpdater } from '@/hooks/useUpdater'
 import {
   DEFAULT_WORKSPACE_ID,
   WORKSPACE_COLORS,
@@ -28,6 +29,7 @@ import { ConfirmModal } from '@/components/ui/ConfirmModal'
 import { PromptModal } from '@/components/ui/PromptModal'
 import { SettingsModal } from '@/components/ui/SettingsModal'
 import { ToastViewport } from '@/components/ui/Toast'
+import { UpdateToast } from '@/components/ui/UpdateToast'
 import { useNotesStore } from '@/store/notes'
 import { useSettingsStore } from '@/store/settings'
 import { useUiStore } from '@/store/ui'
@@ -71,6 +73,47 @@ export default function App() {
 
   const bootstrappedRef = useRef(false)
   const allowWindowCloseRef = useRef(false)
+  const shortcutHandlersRef = useRef<{
+    toggleFullscreen: () => Promise<void>
+    toggleZenMode: () => void
+    toggleFocusMode: () => void
+    cyclePreviewMode: () => void
+    openFindReplace: () => void
+    openCommandPalette: () => void
+    createNote: () => Promise<void>
+    focusSearch: () => void
+    saveCurrentNote: () => Promise<void>
+    runSnippet: () => Promise<void>
+    activeNoteId: string | null
+    requestCloseTab: (tabId: string) => Promise<void>
+    openSettings: () => void
+    copyCurrentNote: () => Promise<void>
+    exportCurrentNoteToGist: () => Promise<void>
+    duplicateActiveNote: () => Promise<void>
+    togglePin: () => Promise<void>
+    workspaces: Array<{ id: string }>
+    setActiveWorkspace: (workspaceId: string | null) => void
+  }>({
+    toggleFullscreen: async () => {},
+    toggleZenMode: () => {},
+    toggleFocusMode: () => {},
+    cyclePreviewMode: () => {},
+    openFindReplace: () => {},
+    openCommandPalette: () => {},
+    createNote: async () => {},
+    focusSearch: () => {},
+    saveCurrentNote: async () => {},
+    runSnippet: async () => {},
+    activeNoteId: null,
+    requestCloseTab: async () => {},
+    openSettings: () => {},
+    copyCurrentNote: async () => {},
+    exportCurrentNoteToGist: async () => {},
+    duplicateActiveNote: async () => {},
+    togglePin: async () => {},
+    workspaces: [],
+    setActiveWorkspace: () => {},
+  })
 
   const notes = useNotes()
   const settingsState = useSettingsStore()
@@ -81,6 +124,7 @@ export default function App() {
     notes.activeNote,
     settingsState.settings.variables,
   )
+  useUpdater()
 
   const visibleNotes = notes.notes.filter((note) => {
     const matchesWorkspace = workspaceState.activeWorkspaceId
@@ -713,121 +757,144 @@ export default function App() {
     }
   }, [t])
 
+  shortcutHandlersRef.current = {
+    toggleFullscreen,
+    toggleZenMode: () => useUiStore.getState().toggleZenMode(),
+    toggleFocusMode: () => useUiStore.getState().toggleFocusMode(),
+    cyclePreviewMode: () => useUiStore.getState().cyclePreviewMode(),
+    openFindReplace: () => setFindReplaceNonce((current) => current + 1),
+    openCommandPalette: () => useUiStore.getState().setCommandPaletteOpen(true),
+    createNote: () => createNote(),
+    focusSearch: () => useUiStore.getState().focusSearch(),
+    saveCurrentNote,
+    runSnippet: runner.run,
+    activeNoteId: notes.activeNoteId,
+    requestCloseTab,
+    openSettings: () => useUiStore.getState().setSettingsOpen(true),
+    copyCurrentNote,
+    exportCurrentNoteToGist,
+    duplicateActiveNote,
+    togglePin,
+    workspaces: workspaceState.workspaces,
+    setActiveWorkspace: workspaceState.setActiveWorkspace,
+  }
+
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
+      const handlers = shortcutHandlersRef.current
       const meta = event.ctrlKey || event.metaKey
       const editable = isEditableTarget(event.target)
 
       if (event.key === 'F11') {
         event.preventDefault()
-        void toggleFullscreen()
+        void handlers.toggleFullscreen()
         return
       }
 
       if (meta && event.shiftKey && event.key.toLowerCase() === 'z') {
         event.preventDefault()
-        uiState.toggleZenMode()
+        handlers.toggleZenMode()
         return
       }
 
       if (meta && event.shiftKey && event.key.toLowerCase() === 'f') {
         event.preventDefault()
-        uiState.toggleFocusMode()
+        handlers.toggleFocusMode()
         return
       }
 
       if (meta && event.shiftKey && event.key.toLowerCase() === 'm') {
         event.preventDefault()
-        uiState.cyclePreviewMode()
+        handlers.cyclePreviewMode()
         return
       }
 
       if (meta && event.key.toLowerCase() === 'h') {
         event.preventDefault()
-        setFindReplaceNonce((current) => current + 1)
+        handlers.openFindReplace()
         return
       }
 
       if (meta && event.key.toLowerCase() === 'k') {
         event.preventDefault()
-        uiState.setCommandPaletteOpen(true)
+        handlers.openCommandPalette()
         return
       }
 
       if (meta && event.key.toLowerCase() === 'n') {
         event.preventDefault()
-        void createNote()
+        void handlers.createNote()
         return
       }
 
       if (meta && event.key.toLowerCase() === 'f') {
         event.preventDefault()
-        uiState.focusSearch()
+        handlers.focusSearch()
         return
       }
 
       if (meta && event.key.toLowerCase() === 's') {
         event.preventDefault()
-        void saveCurrentNote()
+        void handlers.saveCurrentNote()
         return
       }
 
       if (event.ctrlKey && event.key === 'Enter') {
         event.preventDefault()
-        void runner.run()
+        void handlers.runSnippet()
         return
       }
 
       if (meta && event.key.toLowerCase() === 'w') {
         event.preventDefault()
-        if (notes.activeNoteId) {
-          void requestCloseTab(notes.activeNoteId)
+        if (handlers.activeNoteId) {
+          void handlers.requestCloseTab(handlers.activeNoteId)
         }
         return
       }
 
       if (meta && event.key === ',') {
         event.preventDefault()
-        uiState.setSettingsOpen(true)
+        handlers.openSettings()
         return
       }
 
       if (meta && event.shiftKey && event.key.toLowerCase() === 'c') {
         event.preventDefault()
-        void copyCurrentNote()
+        void handlers.copyCurrentNote()
         return
       }
 
       if (meta && event.shiftKey && event.key.toLowerCase() === 'g') {
         event.preventDefault()
-        void exportCurrentNoteToGist()
+        void handlers.exportCurrentNoteToGist()
         return
       }
 
       if (meta && event.key.toLowerCase() === 'p' && !event.shiftKey) {
         event.preventDefault()
-        uiState.setCommandPaletteOpen(true)
+        handlers.openCommandPalette()
         return
       }
 
       if (meta && event.key.toLowerCase() === 'd') {
         event.preventDefault()
-        void duplicateActiveNote()
+        void handlers.duplicateActiveNote()
         return
       }
 
       if (meta && event.shiftKey && event.key.toLowerCase() === 'p') {
         event.preventDefault()
-        void togglePin()
+        void handlers.togglePin()
         return
       }
 
       if (event.altKey && !meta) {
         const workspaceIndex = Number(event.key) - 1
-        const workspace = workspaceState.workspaces[workspaceIndex]
+        const workspace = handlers.workspaces[workspaceIndex]
         if (workspace) {
           event.preventDefault()
-          workspaceState.setActiveWorkspace(workspace.id)
+          handlers.setActiveWorkspace(workspace.id)
         }
         return
       }
@@ -841,13 +908,7 @@ export default function App() {
     return () => {
       window.removeEventListener('keydown', onKeyDown)
     }
-  }, [
-    duplicateActiveNote,
-    exportCurrentNoteToGist,
-    notes.activeNoteId,
-    runner,
-    workspaceState.workspaces,
-  ])
+  }, [])
 
   useEffect(() => {
     const onDragOver = (event: DragEvent) => {
@@ -1018,6 +1079,8 @@ export default function App() {
         onConfirm={(value) => void uiState.prompt?.onConfirm(value)}
         onCancel={uiState.closePrompt}
       />
+
+      <UpdateToast />
 
       <CommandPalette
         open={uiState.commandPaletteOpen}

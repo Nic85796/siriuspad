@@ -67,13 +67,7 @@ fn prepare_script(language: &str, code: &str) -> String {
         return code.to_string();
     }
 
-    let import_line = if code.contains("fmt.") {
-        "import \"fmt\"\n"
-    } else {
-        ""
-    };
-
-    format!("package main\n\n{import_line}\nfunc main() {{\n{code}\n}}\n")
+    format!("package main\n\nfunc main() {{\n{code}\n}}\n")
 }
 
 #[tauri::command]

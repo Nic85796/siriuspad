@@ -8,6 +8,7 @@ import type {
   PreviewMode,
   PromptDialogOptions,
   ToastItem,
+  UpdateInfo,
 } from '@/types'
 
 interface UiState {
@@ -24,6 +25,7 @@ interface UiState {
   previewMode: PreviewMode
   previewSplitRatio: number
   historyPanelOpen: boolean
+  updateAvailable: UpdateInfo | null
   confirm: (ConfirmDialogOptions & { open: boolean }) | null
   prompt: (PromptDialogOptions & { open: boolean }) | null
   initialize: () => Promise<void>
@@ -38,6 +40,8 @@ interface UiState {
   cyclePreviewMode: () => void
   setPreviewSplitRatio: (ratio: number) => void
   setHistoryPanelOpen: (open: boolean) => void
+  setUpdateAvailable: (info: UpdateInfo) => void
+  clearUpdate: () => void
   focusSearch: () => void
   pushToast: (toast: Omit<ToastItem, 'id'>) => void
   dismissToast: (id: string) => void
@@ -68,6 +72,7 @@ export const useUiStore = create<UiState>((set, get) => ({
   previewMode: 'editor',
   previewSplitRatio: 0.5,
   historyPanelOpen: false,
+  updateAvailable: null,
   confirm: null,
   prompt: null,
   async initialize() {
@@ -124,6 +129,12 @@ export const useUiStore = create<UiState>((set, get) => ({
   },
   setHistoryPanelOpen(open) {
     set({ historyPanelOpen: open })
+  },
+  setUpdateAvailable(info) {
+    set({ updateAvailable: info })
+  },
+  clearUpdate() {
+    set({ updateAvailable: null })
   },
   focusSearch() {
     set((state) => ({

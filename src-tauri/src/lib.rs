@@ -2,7 +2,7 @@ mod commands;
 mod models;
 mod storage;
 
-use commands::{fs, history, platform, runner, search};
+use commands::{fs, history, platform, runner, search, updater};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -11,6 +11,7 @@ pub fn run() {
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_store::Builder::default().build())
+        .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
             tauri_plugin_log::Builder::default()
                 .level(log::LevelFilter::Info)
@@ -43,6 +44,8 @@ pub fn run() {
             platform::get_platform,
             runner::run_snippet,
             search::search_notes,
+            updater::check_for_update,
+            updater::install_update,
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

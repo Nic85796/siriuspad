@@ -37,6 +37,12 @@ export interface NoteHistoryEntry {
   size_bytes: number
 }
 
+export interface UpdateInfo {
+  version: string
+  body: string | null
+  date: string | null
+}
+
 export interface NoteTab {
   id: string
   title: string

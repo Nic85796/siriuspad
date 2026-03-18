@@ -7,6 +7,22 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+### Adicionado
+- Checagem silenciosa de atualização em background com toast de instalação
+- Configuração de updater assinada com `latest.json` automática no release workflow
+- Ajuste específico de macOS com config dedicada para title bar overlay
+
+### Corrigido
+- Workflow de release voltou para `actions/checkout@v4` e `actions/setup-node@v4`
+- `get_platform` agora tem fallback de compilação seguro
+- Bordas de resize no Linux não ficam mais acima dos modais
+- Enter no modal de confirmação agora respeita o botão focado
+- Handler global de atalhos no `App.tsx` não sofre mais com stale closures
+- Boilerplate de Go no runner não gera mais quebras de linha extras
+- Aba inteira voltou a ser clicável, sem conflito com o botão de fechar
+- Diff do histórico usa chave estável
+- Remoção de nota ativa usa fallback mais simples e previsível
+
 ## [1.0.2] - 2026-03-18
 
 ### Adicionado
