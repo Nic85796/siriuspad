@@ -7,12 +7,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+## [1.0.3] - 2026-03-18
+
 ### Adicionado
 - Checagem silenciosa de atualização em background com toast de instalação
 - Configuração de updater assinada com `latest.json` automática no release workflow
 - Ajuste específico de macOS com config dedicada para title bar overlay
 
 ### Corrigido
+- CI do GitHub agora volta a disparar em `push` no `main` e continua publicando releases em tags `v*`
+- Workflow ficou compatível com Windows ao usar `bash` na validação de versão
+- Referência do `tauri-action` corrigida para uma versão existente
 - Workflow de release voltou para `actions/checkout@v4` e `actions/setup-node@v4`
 - `get_platform` agora tem fallback de compilação seguro
 - Bordas de resize no Linux não ficam mais acima dos modais
@@ -22,6 +27,8 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 - Aba inteira voltou a ser clicável, sem conflito com o botão de fechar
 - Diff do histórico usa chave estável
 - Remoção de nota ativa usa fallback mais simples e previsível
+- Detecção inicial de idioma agora usa o idioma do sistema no primeiro boot
+- TitleBar e estados vazios ficaram mais claros para primeira execução
 
 ## [1.0.2] - 2026-03-18
 
