@@ -54,6 +54,7 @@ jobs:
         run: npm ci
 
       - name: Verify version sync
+        shell: bash
         run: |
           node - <<'NODE'
           const fs = require('fs')
