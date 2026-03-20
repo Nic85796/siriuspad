@@ -101,7 +101,7 @@ jobs:
           args: ${{ matrix.args }}
 
       - name: Prune auxiliary release assets
-        if: startsWith(github.ref, 'refs/tags/v')
+        if: startsWith(github.ref, 'refs/tags/v') && matrix.platform == 'windows-latest'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
