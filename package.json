@@ -1,7 +1,7 @@
 {
   "name": "siriuspad",
   "private": true,
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "Bloco de notas desktop local para desenvolvedores, com Markdown, terminal embutido e organização por workspaces.",
   "author": "SiriusX",
   "license": "MIT",

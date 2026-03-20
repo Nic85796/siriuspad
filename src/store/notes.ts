@@ -73,6 +73,7 @@ function upsertTab(tabs: NoteTab[], note: Note, isDirty: boolean) {
     id: note.id,
     title: note.title,
     isDirty,
+    color: note.color,
   }
   const existingIndex = tabs.findIndex((tab) => tab.id === note.id)
 

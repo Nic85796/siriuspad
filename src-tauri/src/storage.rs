@@ -50,19 +50,19 @@ fn welcome_note_seed() -> (&'static str, Vec<String>, &'static str) {
         (
             "Bem-vindo ao SiriusPad",
             vec!["bem-vindo".into(), "atalhos".into()],
-            "# Bem-vindo ao SiriusPad\n\nSeu bloco rápido para notas técnicas, snippets e comandos.\n\n## Atalhos\n\n- `Ctrl+N` nova nota\n- `Ctrl+K` paleta de comandos\n- `Ctrl+F` focar busca\n- `Ctrl+S` salvar\n- `Ctrl+Enter` executar snippet\n- `Ctrl+Shift+C` copiar com variáveis\n- `Ctrl+Shift+G` exportar Gist\n\n```bash\necho \"SiriusPad está pronto\"\n```\n",
+            "# Bem-vindo ao SiriusPad\n\nSeu bloco rápido para notas técnicas, snippets, checklists e comandos.\n\n## Teste rápido\n\n- [ ] Criar uma nova nota\n- [ ] Adicionar um item na checklist da nota\n- [ ] Inserir um callout com os blocos rápidos\n- [ ] Abrir o terminal com Ctrl+`\n\n> [!TIP] Callouts funcionam no preview\n> Use blocos como `> [!NOTE]` e `> [!WARNING]` para destacar contexto importante na nota.\n\n## Atalhos\n\n- `Ctrl+N` nova nota\n- `Ctrl+K` paleta de comandos\n- `Ctrl+F` focar busca\n- `Ctrl+S` salvar\n- `Ctrl+Enter` executar snippet\n- `Ctrl+Shift+C` copiar com variáveis\n- `Ctrl+Shift+G` exportar Gist\n\n```bash\necho \"SiriusPad está pronto\"\n```\n",
         )
     } else if lang.starts_with("es") {
         (
             "Bienvenido a SiriusPad",
             vec!["bienvenida".into(), "atajos".into()],
-            "# Bienvenido a SiriusPad\n\nTu bloc rápido para notas técnicas, snippets y comandos.\n\n## Atajos\n\n- `Ctrl+N` nueva nota\n- `Ctrl+K` paleta de comandos\n- `Ctrl+F` enfocar búsqueda\n- `Ctrl+S` guardar\n- `Ctrl+Enter` ejecutar snippet\n- `Ctrl+Shift+C` copiar con variables\n- `Ctrl+Shift+G` exportar Gist\n\n```bash\necho \"SiriusPad está listo\"\n```\n",
+            "# Bienvenido a SiriusPad\n\nTu bloc rápido para notas técnicas, snippets, checklists y comandos.\n\n## Prueba rápida\n\n- [ ] Crear una nota nueva\n- [ ] Añadir un ítem al checklist de la nota\n- [ ] Insertar un callout con los bloques rápidos\n- [ ] Abrir el terminal con Ctrl+`\n\n> [!TIP] Los callouts funcionan en la vista previa\n> Usa bloques como `> [!NOTE]` y `> [!WARNING]` para destacar contexto importante en la nota.\n\n## Atajos\n\n- `Ctrl+N` nueva nota\n- `Ctrl+K` paleta de comandos\n- `Ctrl+F` enfocar búsqueda\n- `Ctrl+S` guardar\n- `Ctrl+Enter` ejecutar snippet\n- `Ctrl+Shift+C` copiar con variables\n- `Ctrl+Shift+G` exportar Gist\n\n```bash\necho \"SiriusPad está listo\"\n```\n",
         )
     } else {
         (
             "Welcome to SiriusPad",
             vec!["welcome".into(), "shortcuts".into()],
-            "# Welcome to SiriusPad\n\nYour fast scratchpad for technical notes, snippets, and commands.\n\n## Shortcuts\n\n- `Ctrl+N` new note\n- `Ctrl+K` command palette\n- `Ctrl+F` focus search\n- `Ctrl+S` save\n- `Ctrl+Enter` run snippet\n- `Ctrl+Shift+C` copy with variables\n- `Ctrl+Shift+G` export Gist\n\n```bash\necho \"SiriusPad is ready\"\n```\n",
+            "# Welcome to SiriusPad\n\nYour fast scratchpad for technical notes, snippets, checklists, and commands.\n\n## Quick test\n\n- [ ] Create a new note\n- [ ] Add an item to the note checklist\n- [ ] Insert a callout with the quick blocks\n- [ ] Open the terminal with Ctrl+`\n\n> [!TIP] Callouts work in preview\n> Use blocks like `> [!NOTE]` and `> [!WARNING]` to highlight important context in a note.\n\n## Shortcuts\n\n- `Ctrl+N` new note\n- `Ctrl+K` command palette\n- `Ctrl+F` focus search\n- `Ctrl+S` save\n- `Ctrl+Enter` run snippet\n- `Ctrl+Shift+C` copy with variables\n- `Ctrl+Shift+G` export Gist\n\n```bash\necho \"SiriusPad is ready\"\n```\n",
         )
     }
 }
@@ -386,6 +386,47 @@ pub fn ensure_directories() -> Result<(), String> {
     if list_note_paths(None)?.is_empty() {
         let now = now_iso();
         let (title, tags, content) = welcome_note_seed();
+        let lang = system_language();
+        let checklist = if lang.starts_with("pt") {
+            vec![
+                ChecklistItem {
+                    id: "welcome-check-1".into(),
+                    text: "Criar uma nova nota".into(),
+                    done: true,
+                },
+                ChecklistItem {
+                    id: "welcome-check-2".into(),
+                    text: "Inserir um callout e abrir o preview".into(),
+                    done: false,
+                },
+            ]
+        } else if lang.starts_with("es") {
+            vec![
+                ChecklistItem {
+                    id: "welcome-check-1".into(),
+                    text: "Crear una nota nueva".into(),
+                    done: true,
+                },
+                ChecklistItem {
+                    id: "welcome-check-2".into(),
+                    text: "Insertar un callout y abrir la vista previa".into(),
+                    done: false,
+                },
+            ]
+        } else {
+            vec![
+                ChecklistItem {
+                    id: "welcome-check-1".into(),
+                    text: "Create a new note".into(),
+                    done: true,
+                },
+                ChecklistItem {
+                    id: "welcome-check-2".into(),
+                    text: "Insert a callout and open preview".into(),
+                    done: false,
+                },
+            ]
+        };
         let note = Note {
             id: Uuid::new_v4().to_string(),
             title: title.into(),
@@ -397,7 +438,7 @@ pub fn ensure_directories() -> Result<(), String> {
             pinned: true,
             priority: Some("media".into()),
             color: None,
-            checklist: vec![],
+            checklist,
             content: content.into(),
         };
         let welcome_note_path = note_path_for(DEFAULT_WORKSPACE, &note.id)?;

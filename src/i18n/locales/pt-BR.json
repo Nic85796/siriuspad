@@ -59,7 +59,32 @@
     "noActive": "Nenhuma nota ativa",
     "noActiveDescription": "Crie uma nota pela sidebar ou use Ctrl+N para começar.",
     "createFirstAction": "Criar sua primeira nota",
-    "open": "Abrir nota: {{title}}"
+    "open": "Abrir nota: {{title}}",
+    "checklistTitle": "Checklist",
+    "checklistHint": "Checklist local da nota para acompanhar próximos passos sem sair do fluxo.",
+    "checklistPlaceholder": "Adicionar item na checklist",
+    "checklistAdd": "Adicionar item",
+    "checklistEmpty": "Nenhum item ainda. Adicione tarefas rápidas para acompanhar correções, testes ou pendências.",
+    "checklistRemove": "Remover item da checklist",
+    "checklistMarkDone": "Marcar como concluído",
+    "checklistMarkPending": "Marcar como pendente",
+    "calloutsTitle": "Blocos de destaque",
+    "calloutsHint": "Insira callouts no Markdown sem decorar sintaxe. Eles viram cards no preview.",
+    "calloutNote": "Callout de nota",
+    "calloutNoteHint": "Para contexto, resumo, observação ou documentação rápida.",
+    "calloutTip": "Callout de dica",
+    "calloutTipHint": "Ótimo para atalhos, comandos úteis e lembretes práticos.",
+    "calloutWarning": "Callout de atenção",
+    "calloutWarningHint": "Use quando algo exigir cuidado antes de rodar ou alterar.",
+    "calloutsFooter": "Sintaxe suportada: `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!BUG]` e similares. O editor continua em Markdown; o visual aparece no preview.",
+    "calloutTemplateNoteTitle": "Contexto",
+    "calloutTemplateNoteBody": "Resuma aqui uma observação importante da nota.",
+    "calloutTemplateTipTitle": "Dica rápida",
+    "calloutTemplateTipBody": "Guarde aqui um atalho, comando ou insight útil.",
+    "calloutTemplateWarningTitle": "Atenção",
+    "calloutTemplateWarningBody": "Descreva algo que exige cuidado antes de seguir.",
+    "calloutTemplateDangerTitle": "Ponto crítico",
+    "calloutTemplateDangerBody": "Registre impacto, suspeita e próximo passo."
   },
   "workspace": {
     "default": "Geral",
@@ -373,7 +398,7 @@
       },
       "notes": {
         "title": "Notas rápidas, mas organizadas",
-        "description": "Cada nota combina título, Markdown, tags, prioridade, cor e workspace. Dá para usar como backlog pessoal, bloco de debug ou base de snippets."
+        "description": "Cada nota combina título, Markdown, checklist, tags, prioridade, cor e workspace. Use o checklist para tarefas rápidas e os callouts para destacar contexto no preview."
       },
       "tags": {
         "title": "Leia contexto em segundos",
@@ -395,6 +420,10 @@
         "title": "Atalhos que valem decorar",
         "description": "Esses são os atalhos que mais aceleram o uso diário. Você não precisa lembrar de todos agora, mas eles já ficam à mão na UI."
       },
+      "practice": {
+        "title": "Teste na prática",
+        "description": "Depois de fechar o tutorial, siga esse roteiro curto para validar as principais promessas do app no uso real."
+      },
       "ready": {
         "title": "Pronto para começar",
         "description": "Se esquecer alguma coisa, o tutorial pode ser aberto de novo nas configurações. A ideia é ser rápido para começar e confortável para continuar."
@@ -408,6 +437,19 @@
       "welcomePoint2": "Workspaces para separar contexto sem bagunça.",
       "welcomePoint3": "Terminal, histórico e atalhos integrados ao fluxo.",
       "welcomePoint4": "Projeto público, mantido por SiriusX e focado em uso prático.",
+      "notesChecklist1": "Escrever roteiro de teste do updater",
+      "notesChecklist2": "Validar restart automático da release",
+      "notesCalloutTitle": "Contexto visível no preview",
+      "notesCalloutBody": "Use blocos > [!TIP] e > [!WARNING] para destacar informação importante.",
+      "practiceStep1Title": "Crie uma nota nova",
+      "practiceStep1Body": "Use Ctrl+N, dê um título para a nota e escolha uma cor. A cor precisa aparecer no header, na aba e na lista lateral.",
+      "practiceStep2Title": "Adicione uma checklist",
+      "practiceStep2Body": "Crie pelo menos 2 itens no checklist da nota e marque 1 como concluído. O contador no painel e na própria nota deve acompanhar isso.",
+      "practiceStep3Title": "Insira um callout",
+      "practiceStep3Body": "Use um dos blocos rápidos de callout, mude para preview ou dividido e confirme se ele vira um card destacado com barrinha lateral.",
+      "practiceStep4Title": "Teste o terminal",
+      "practiceStep4Body": "Abra com Ctrl+`, rode um comando simples como `pwd`, `ls` ou `dir` e confirme se ele está na pasta da nota ativa.",
+      "practiceFooter": "Se esse roteiro funcionar, você já validou cor da nota, checklist, callouts, preview e terminal sem depender de promessa vaga.",
       "terminalSnippetLabel": "Bloco com linguagem",
       "terminalCommandLabel": "Comando de shell",
       "projectPoint1": "Desenvolvido por SiriusX e distribuído como projeto público no GitHub.",
@@ -415,7 +457,7 @@
       "projectPoint3": "Notas ficam locais; integrações externas são opcionais.",
       "projectPoint4": "Terminal e snippets rodam na sua máquina, então revise antes de executar.",
       "readyBadge": "Tudo fica salvo localmente e o app abre pronto para continuar.",
-      "readyHint": "Comece com Ctrl+N, use Ctrl+K quando não lembrar uma ação e abra o terminal com Ctrl+` para rodar comandos na pasta da nota ou executar blocos com linguagem.",
+      "readyHint": "Comece com Ctrl+N, adicione um item na checklist, insira um callout com um clique e abra o terminal com Ctrl+` para testar o fluxo completo.",
       "readyPoint1": "Configurações agora mostram versão, licença, links do projeto e política de segurança.",
       "readyPoint2": "Você pode reabrir este tutorial a qualquer momento nas configurações.",
       "readyPoint3": "Se achar bug, use as issues. Se achar vulnerabilidade, use advisory privada."

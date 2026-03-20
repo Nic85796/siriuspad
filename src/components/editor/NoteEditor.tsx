@@ -14,6 +14,7 @@ import {
   NOTE_COLOR_SWATCHES,
   NOTE_LANGUAGES,
 } from '@/lib/constants'
+import { withAlpha } from '@/lib/color'
 import { getWorkspaceDisplayName } from '@/lib/workspaceLabel'
 import {
   createEditorCompartments,
@@ -49,6 +50,7 @@ interface NoteEditorHeaderProps {
 interface NoteEditorProps {
   noteId: string
   value: string
+  accentColor?: string
   settings: Settings
   findReplaceNonce?: number
   onChange: (value: string) => void
@@ -75,9 +77,18 @@ export function NoteEditorHeader({
 }: NoteEditorHeaderProps) {
   const { t } = useTranslation()
   const [tagValue, setTagValue] = useState('')
+  const headerBackground = withAlpha(note.color, 0.06)
 
   return (
-    <div className="border-b border-border bg-[#111111] px-4 py-3">
+    <div
+      className="border-b border-border bg-[#111111] px-4 py-3"
+      style={{
+        backgroundImage: headerBackground
+          ? `linear-gradient(180deg, ${headerBackground}, transparent 80%)`
+          : undefined,
+        boxShadow: note.color ? `inset 3px 0 0 ${note.color}` : undefined,
+      }}
+    >
       <div className="flex flex-wrap items-start gap-3">
         <div className="min-w-0 flex-1">
           <input
@@ -234,8 +245,9 @@ export function NoteEditorHeader({
                         : 'border-border hover:border-focus'
                     }`}
                     style={{ backgroundColor: swatch }}
-                    onClick={() => onChange({ color: swatch })}
+                    onClick={() => onChange({ color: selected ? undefined : swatch })}
                     aria-label={`${t('note.colorLabel')}: ${swatch}`}
+                    aria-pressed={selected}
                   />
                 )
               })}
@@ -282,6 +294,7 @@ export function NoteEditorHeader({
 export function NoteEditor({
   noteId,
   value,
+  accentColor,
   settings,
   findReplaceNonce = 0,
   onChange,
@@ -405,6 +418,10 @@ export function NoteEditor({
         {
           '--editor-font-family': `"${settings.fontFamily}", monospace`,
           '--editor-font-size': `${settings.fontSize}px`,
+          boxShadow: accentColor ? `inset 3px 0 0 ${accentColor}` : undefined,
+          backgroundImage: withAlpha(accentColor, 0.05)
+            ? `linear-gradient(180deg, ${withAlpha(accentColor, 0.05)}, transparent 55%)`
+            : undefined,
         } as CSSProperties
       }
     >

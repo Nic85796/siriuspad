@@ -1,6 +1,7 @@
 import { X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 
+import { withAlpha } from '@/lib/color'
 import type { NoteTab } from '@/types'
 
 interface TabBarProps {
@@ -36,10 +37,23 @@ export function TabBar({
                   ? 'bg-[#161616] text-text-primary'
                   : 'bg-transparent text-text-secondary hover:bg-hover hover:text-text-primary'
               }`}
+              style={{
+                boxShadow: tab.color ? `inset 0 -2px 0 ${tab.color}` : undefined,
+                backgroundImage:
+                  isActive && withAlpha(tab.color, 0.08)
+                    ? `linear-gradient(180deg, ${withAlpha(tab.color, 0.08)}, transparent 70%)`
+                    : undefined,
+              }}
               title={t('note.open', { title: tab.title })}
               onClick={() => void onTabClick(tab.id)}
             >
               <span className="inline-flex min-w-0 items-center gap-2">
+                {tab.color ? (
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: tab.color }}
+                  />
+                ) : null}
                 {tab.isDirty ? <span className="text-red">●</span> : null}
                 <span className="max-w-[160px] truncate">{tab.title}</span>
               </span>

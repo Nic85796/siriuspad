@@ -47,6 +47,8 @@
     "workspaceLabel": "Espacio",
     "languageLabel": "Lenguaje",
     "tagsLabel": "Etiquetas",
+    "colorLabel": "Color de la nota",
+    "priorityLabel": "Prioridad",
     "deleteConfirm": "¿Mover \"{{title}}\" a la papelera?",
     "deleteDirtyDescription": "Esta nota tiene cambios sin guardar. Se guardarán antes de moverla a la papelera.",
     "closeDirtyTitle": "Esta nota tiene cambios sin guardar.",
@@ -57,7 +59,32 @@
     "noActive": "No hay nota activa",
     "noActiveDescription": "Crea una nota desde la barra lateral o usa Ctrl+N para empezar.",
     "createFirstAction": "Crear tu primera nota",
-    "open": "Abrir nota: {{title}}"
+    "open": "Abrir nota: {{title}}",
+    "checklistTitle": "Checklist",
+    "checklistHint": "Checklist local de la nota para seguir próximos pasos sin salir del flujo.",
+    "checklistPlaceholder": "Añadir ítem al checklist",
+    "checklistAdd": "Añadir ítem",
+    "checklistEmpty": "Todavía no hay ítems. Añade tareas rápidas para seguir correcciones, pruebas o pendientes.",
+    "checklistRemove": "Eliminar ítem del checklist",
+    "checklistMarkDone": "Marcar como hecho",
+    "checklistMarkPending": "Marcar como pendiente",
+    "calloutsTitle": "Bloques destacados",
+    "calloutsHint": "Inserta callouts en Markdown sin memorizar la sintaxis. Se convierten en tarjetas en la vista previa.",
+    "calloutNote": "Callout de nota",
+    "calloutNoteHint": "Úsalo para contexto, resumen, observaciones o documentación rápida.",
+    "calloutTip": "Callout de consejo",
+    "calloutTipHint": "Ideal para atajos, comandos útiles y recordatorios prácticos.",
+    "calloutWarning": "Callout de atención",
+    "calloutWarningHint": "Úsalo cuando algo requiera cuidado antes de ejecutar o cambiar.",
+    "calloutsFooter": "Sintaxis soportada: `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!BUG]` y similares. El editor sigue en Markdown; la tarjeta visual aparece en la vista previa.",
+    "calloutTemplateNoteTitle": "Contexto",
+    "calloutTemplateNoteBody": "Resume aquí un detalle importante de la nota.",
+    "calloutTemplateTipTitle": "Consejo rápido",
+    "calloutTemplateTipBody": "Guarda aquí un atajo, comando o idea útil.",
+    "calloutTemplateWarningTitle": "Atención",
+    "calloutTemplateWarningBody": "Describe algo que requiere cuidado antes de continuar.",
+    "calloutTemplateDangerTitle": "Punto crítico",
+    "calloutTemplateDangerBody": "Registra impacto, sospecha y siguiente paso."
   },
   "workspace": {
     "default": "General",
@@ -371,7 +398,7 @@
       },
       "notes": {
         "title": "Notas rápidas, pero organizadas",
-        "description": "Cada nota combina título, Markdown, etiquetas, prioridad, color y espacio. Sirve como backlog personal, bloc de depuración o base de snippets."
+        "description": "Cada nota combina título, Markdown, checklist, etiquetas, prioridad, color y espacio. Usa el checklist para tareas rápidas y los callouts para destacar contexto en la vista previa."
       },
       "tags": {
         "title": "Lee contexto de un vistazo",
@@ -393,6 +420,10 @@
         "title": "Atajos que vale la pena recordar",
         "description": "Estos son los que más aceleran el uso diario. No necesitas memorizarlos todos ahora, pero quedan visibles en la UI."
       },
+      "practice": {
+        "title": "Pruébalo en la práctica",
+        "description": "Después de cerrar el tutorial, sigue esta guía corta para validar las principales promesas de la app en uso real."
+      },
       "ready": {
         "title": "Listo para empezar",
         "description": "Si olvidas algo, puedes volver a abrir el tutorial desde configuración. La idea es empezar rápido y seguir cómodo."
@@ -406,6 +437,19 @@
       "welcomePoint2": "Espacios para separar contexto sin desorden.",
       "welcomePoint3": "Terminal, historial y atajos integrados al flujo.",
       "welcomePoint4": "Proyecto público mantenido por SiriusX con foco real en productividad para desarrolladores.",
+      "notesChecklist1": "Escribir flujo de prueba del updater",
+      "notesChecklist2": "Validar reinicio automático de la release",
+      "notesCalloutTitle": "Contexto visible en la vista previa",
+      "notesCalloutBody": "Usa bloques > [!TIP] y > [!WARNING] para destacar información importante.",
+      "practiceStep1Title": "Crea una nota nueva",
+      "practiceStep1Body": "Usa Ctrl+N, ponle un título a la nota y elige un color. Ese color debe aparecer en el header, la pestaña y la lista lateral.",
+      "practiceStep2Title": "Añade un checklist",
+      "practiceStep2Body": "Crea al menos 2 ítems en el checklist y marca 1 como hecho. El contador del panel y de la nota debe reflejarlo.",
+      "practiceStep3Title": "Inserta un callout",
+      "practiceStep3Body": "Usa uno de los bloques rápidos de callout, cambia a preview o modo dividido y confirma que se convierte en una tarjeta destacada con barra lateral.",
+      "practiceStep4Title": "Prueba el terminal",
+      "practiceStep4Body": "Ábrelo con Ctrl+`, ejecuta un comando simple como `pwd`, `ls` o `dir`, y confirma que arranca en la carpeta de la nota activa.",
+      "practiceFooter": "Si esta guía funciona, ya validaste color de nota, checklist, callouts, preview y terminal sin depender de promesas vagas.",
       "terminalSnippetLabel": "Bloque con lenguaje",
       "terminalCommandLabel": "Comando de shell",
       "projectPoint1": "Desarrollado por SiriusX y distribuido como proyecto público en GitHub.",
@@ -413,7 +457,7 @@
       "projectPoint3": "Las notas se quedan locales; las integraciones externas son opcionales.",
       "projectPoint4": "El terminal y los snippets corren en tu máquina, así que revisa antes de ejecutar.",
       "readyBadge": "Todo queda local y la app abre lista para continuar.",
-      "readyHint": "Empieza con Ctrl+N, usa Ctrl+K cuando olvides una acción y abre el terminal con Ctrl+` para ejecutar comandos en la carpeta de la nota o correr bloques con lenguaje.",
+      "readyHint": "Empieza con Ctrl+N, añade un ítem al checklist, inserta un callout con un clic y abre el terminal con Ctrl+` para probar el flujo completo.",
       "readyPoint1": "Configuración ahora muestra versión, licencia, enlaces del proyecto y política de seguridad.",
       "readyPoint2": "Puedes volver a abrir este tutorial en cualquier momento desde configuración.",
       "readyPoint3": "Usa issues para bugs y advisory privada para vulnerabilidades."

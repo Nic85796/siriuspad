@@ -97,12 +97,18 @@ jobs:
           releaseBody: |
             Nova versão pública do SiriusPad.
 
-            Esta release mantém a distribuição oficial do app em:
+            Destaques desta versão:
+            - checklist real por nota
+            - callout blocks no preview com sintaxe estilo `> [!TIP]`
+            - cor da nota aplicada de forma visível no layout
+            - tutorial de primeiro uso mais prático, com roteiro real de teste
+
+            Distribuição oficial:
             - `.deb` para Linux
             - `.exe` para Windows
             - `latest.json` para o fluxo de auto-update
 
-            Consulte o `CHANGELOG.md` para ver os detalhes da versão.
+            Consulte o `CHANGELOG.md` para os detalhes completos da versão.
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: true

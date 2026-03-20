@@ -13,7 +13,7 @@ interface RightPanelProps {
   notes: NoteMetadata[]
   activeTag: string | null
   onTagClick: (tag: string | null) => void
-  onColorSelect: (color: string) => void
+  onColorSelect: (color?: string) => void
 }
 
 function wordCount(content: string) {
@@ -64,8 +64,9 @@ export function RightPanel({
                       : 'border-border hover:border-focus'
                   }`}
                   style={{ backgroundColor: swatch }}
-                  onClick={() => onColorSelect(swatch)}
+                  onClick={() => onColorSelect(selected ? undefined : swatch)}
                   aria-label={`${t('note.colorLabel')}: ${swatch}`}
+                  aria-pressed={selected}
                 />
               )
             })}
@@ -120,6 +121,14 @@ export function RightPanel({
                 priority={note?.priority}
                 label={note ? t(`priority.${note.priority ?? 'media'}`) : '—'}
               />
+            </div>
+            <div className="flex items-center justify-between gap-3">
+              <span>{t('note.checklistTitle')}</span>
+              <span className="text-text-primary">
+                {note?.checklist?.length
+                  ? `${note.checklist.filter((item) => item.done).length}/${note.checklist.length}`
+                  : '0/0'}
+              </span>
             </div>
           </div>
         </section>

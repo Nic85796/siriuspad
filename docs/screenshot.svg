@@ -1,173 +1,274 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 980" fill="none">
   <rect width="1600" height="980" rx="32" fill="#080808"/>
-  <rect x="16" y="16" width="1568" height="948" rx="24" fill="#0d0d0d" stroke="#1e1e1e"/>
+  <rect x="16" y="16" width="1568" height="948" rx="24" fill="#0d0d0d" stroke="#1e1e1e" stroke-width="1"/>
 
-  <rect x="16" y="16" width="1568" height="44" rx="24" fill="#0f0f0f"/>
-  <rect x="34" y="28" width="14" height="14" rx="3" fill="#111111" stroke="#1e1e1e"/>
-  <circle cx="72" cy="38" r="6" fill="#7c3aed"/>
-  <text x="90" y="44" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="18" font-weight="700">SiriusPad</text>
-  <rect x="1180" y="24" width="190" height="28" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <text x="1204" y="42" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12">Buscar</text>
-  <rect x="1386" y="24" width="132" height="28" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <text x="1412" y="42" fill="#a4a4a4" font-family="'JetBrains Mono', monospace" font-size="12">Settings</text>
-  <text x="1540" y="41" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="16">-</text>
-  <rect x="1552" y="30" width="10" height="10" stroke="#666666"/>
-  <text x="1572" y="41" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="16">x</text>
+  <!-- TITLEBAR -->
+  <rect x="16" y="16" width="1568" height="46" rx="24" fill="#0f0f0f"/>
+  <rect x="16" y="38" width="1568" height="24" fill="#0f0f0f"/>
 
-  <rect x="16" y="60" width="280" height="880" fill="#0f0f0f"/>
-  <line x1="296" y1="60" x2="296" y2="940" stroke="#1e1e1e"/>
+  <!-- App icon -->
+  <rect x="36" y="27" width="20" height="20" rx="5" fill="#13101a" stroke="#2d2060" stroke-width="1"/>
+  <circle cx="46" cy="37" r="5" fill="#7c3aed" opacity="0.9"/>
 
-  <rect x="32" y="78" width="248" height="40" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <text x="54" y="103" fill="#555555" font-family="'JetBrains Mono', monospace" font-size="13">Buscar titulo ou conteudo</text>
+  <!-- App name -->
+  <text x="66" y="44" fill="#d0d0d0" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="700" letter-spacing="0.5">SiriusPad</text>
 
-  <text x="32" y="155" fill="#4a4a4a" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="3">ESPACOS</text>
-  <rect x="240" y="138" width="28" height="28" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <text x="250" y="156" fill="#8f8f8f" font-family="'JetBrains Mono', monospace" font-size="18">+</text>
+  <!-- Search bar in titlebar -->
+  <rect x="620" y="26" width="360" height="26" rx="8" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="646" y="43" fill="#333" font-family="'JetBrains Mono', monospace" font-size="12">⌕</text>
+  <text x="664" y="43" fill="#444" font-family="'JetBrains Mono', monospace" font-size="12">Buscar titulo ou conteudo</text>
+  <text x="960" y="43" fill="#333" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">Ctrl+K</text>
 
-  <rect x="32" y="180" width="248" height="44" rx="8" fill="#161616" stroke="#1e1e1e"/>
-  <rect x="32" y="180" width="3" height="44" fill="#7c3aed"/>
-  <circle cx="52" cy="202" r="5" fill="#7c3aed"/>
-  <text x="68" y="207" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="15" font-weight="600">Geral</text>
+  <!-- Settings button -->
+  <rect x="1390" y="26" width="90" height="26" rx="8" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="1406" y="43" fill="#888" font-family="'JetBrains Mono', monospace" font-size="12">⚙ Config</text>
 
-  <rect x="32" y="232" width="248" height="44" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <circle cx="52" cy="254" r="5" fill="#3b82f6"/>
-  <text x="68" y="259" fill="#7e7e7e" font-family="'JetBrains Mono', monospace" font-size="15">API</text>
+  <!-- Window controls -->
+  <circle cx="1510" cy="39" r="7" fill="#ff5f56"/>
+  <circle cx="1532" cy="39" r="7" fill="#ffbd2e"/>
+  <circle cx="1554" cy="39" r="7" fill="#27c93f"/>
 
-  <rect x="32" y="284" width="248" height="44" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <circle cx="52" cy="306" r="5" fill="#10b981"/>
-  <text x="68" y="311" fill="#7e7e7e" font-family="'JetBrains Mono', monospace" font-size="15">Snippets</text>
+  <!-- SIDEBAR -->
+  <rect x="16" y="62" width="280" height="878" fill="#0f0f0f"/>
+  <line x1="296" y1="62" x2="296" y2="940" stroke="#1e1e1e" stroke-width="1"/>
 
-  <text x="32" y="368" fill="#4a4a4a" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="3">NOTAS</text>
-  <rect x="240" y="350" width="28" height="28" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <text x="250" y="368" fill="#8f8f8f" font-family="'JetBrains Mono', monospace" font-size="18">+</text>
+  <!-- Sidebar search -->
+  <rect x="32" y="78" width="248" height="34" rx="8" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="50" y="99" fill="#555" font-family="'JetBrains Mono', monospace" font-size="13">🔍</text>
+  <text x="72" y="100" fill="#444" font-family="'JetBrains Mono', monospace" font-size="12">Buscar</text>
 
-  <rect x="32" y="392" width="248" height="118" rx="10" fill="#161616" stroke="#1e1e1e"/>
-  <rect x="32" y="392" width="3" height="118" fill="#7c3aed"/>
-  <text x="46" y="426" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="16" font-weight="600">Atualizar modal</text>
-  <circle cx="46" cy="454" r="4" fill="#f59e0b"/>
-  <text x="58" y="459" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12">ha 2 min</text>
-  <rect x="46" y="474" width="58" height="20" rx="6" fill="#7c3aed" fill-opacity="0.12" stroke="#2d2060"/>
-  <text x="60" y="487" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="11">ux</text>
+  <!-- SPACES section -->
+  <text x="32" y="140" fill="#3a3a3a" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="3">ESPACOS</text>
+  <rect x="244" y="126" width="26" height="26" rx="7" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="252" y="143" fill="#666" font-family="'JetBrains Mono', monospace" font-size="14">+</text>
 
-  <rect x="32" y="522" width="248" height="104" rx="10" fill="#111111" stroke="#1e1e1e"/>
-  <text x="46" y="556" fill="#cfcfcf" font-family="'JetBrains Mono', monospace" font-size="15">Checklist release</text>
-  <circle cx="46" cy="584" r="4" fill="#10b981"/>
-  <text x="58" y="589" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12">ha 18 min</text>
-  <rect x="46" y="604" width="74" height="20" rx="6" fill="#1a1a2a" stroke="#222a45"/>
-  <text x="60" y="617" fill="#60a5fa" font-family="'JetBrains Mono', monospace" font-size="11">note</text>
+  <!-- Active space -->
+  <rect x="32" y="152" width="248" height="40" rx="8" fill="#13101a" stroke="#2d2060" stroke-width="1"/>
+  <rect x="32" y="152" width="3" height="40" rx="1" fill="#7c3aed"/>
+  <circle cx="52" cy="172" r="4" fill="#7c3aed"/>
+  <text x="66" y="177" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="600">Geral</text>
 
-  <rect x="32" y="638" width="248" height="104" rx="10" fill="#111111" stroke="#1e1e1e"/>
-  <text x="46" y="672" fill="#cfcfcf" font-family="'JetBrains Mono', monospace" font-size="15">Prompt showcase</text>
-  <circle cx="46" cy="700" r="4" fill="#ef4444"/>
-  <text x="58" y="705" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12">ontem</text>
-  <rect x="46" y="720" width="72" height="20" rx="6" fill="#1a1530" stroke="#2d2060"/>
-  <text x="58" y="733" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="11">feat</text>
+  <rect x="32" y="200" width="248" height="40" rx="8" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <circle cx="52" cy="220" r="4" fill="#3b82f6" opacity="0.8"/>
+  <text x="66" y="225" fill="#666" font-family="'JetBrains Mono', monospace" font-size="13">API</text>
 
-  <rect x="296" y="60" width="1040" height="36" fill="#111111"/>
-  <rect x="314" y="67" width="194" height="22" rx="7" fill="#161616" stroke="#1e1e1e"/>
-  <text x="332" y="82" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="12">Revisar modal de update</text>
-  <text x="488" y="82" fill="#6a6a6a" font-family="'JetBrains Mono', monospace" font-size="12">x</text>
+  <rect x="32" y="248" width="248" height="40" rx="8" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <circle cx="52" cy="268" r="4" fill="#10b981" opacity="0.8"/>
+  <text x="66" y="273" fill="#666" font-family="'JetBrains Mono', monospace" font-size="13">Snippets</text>
 
-  <rect x="296" y="96" width="1040" height="144" fill="#111111"/>
-  <line x1="296" y1="240" x2="1336" y2="240" stroke="#1e1e1e"/>
-  <text x="326" y="146" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700">Revisar modal de update</text>
-  <rect x="882" y="116" width="72" height="28" rx="8" fill="#161616" stroke="#1e1e1e"/>
-  <text x="899" y="134" fill="#d5d5d5" font-family="'JetBrains Mono', monospace" font-size="12">Editor</text>
-  <rect x="960" y="116" width="88" height="28" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <text x="974" y="134" fill="#757575" font-family="'JetBrains Mono', monospace" font-size="12">Dividido</text>
-  <rect x="1054" y="116" width="74" height="28" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <text x="1072" y="134" fill="#757575" font-family="'JetBrains Mono', monospace" font-size="12">Preview</text>
+  <!-- NOTES section -->
+  <text x="32" y="324" fill="#3a3a3a" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="3">NOTAS</text>
+  <rect x="244" y="310" width="26" height="26" rx="7" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="252" y="327" fill="#666" font-family="'JetBrains Mono', monospace" font-size="14">+</text>
 
-  <rect x="326" y="168" width="64" height="20" rx="6" fill="#1a1530" stroke="#2d2060"/>
-  <text x="342" y="181" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="11">updater</text>
-  <rect x="398" y="168" width="42" height="20" rx="6" fill="#1a1a2a" stroke="#222a45"/>
-  <text x="411" y="181" fill="#60a5fa" font-family="'JetBrains Mono', monospace" font-size="11">ui</text>
-  <rect x="456" y="162" width="88" height="32" rx="8" fill="#222222" stroke="#1e1e1e"/>
-  <text x="472" y="182" fill="#d9d9d9" font-family="'JetBrains Mono', monospace" font-size="12">Prioridade</text>
-  <circle cx="524" cy="178" r="4" fill="#f97316"/>
-  <text x="326" y="216" fill="#4a4a4a" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="3">COR DA NOTA</text>
-  <rect x="426" y="202" width="24" height="24" rx="6" fill="#ef4444"/>
-  <rect x="458" y="202" width="24" height="24" rx="6" fill="#f59e0b"/>
-  <rect x="490" y="202" width="24" height="24" rx="6" fill="#10b981"/>
-  <rect x="522" y="202" width="24" height="24" rx="6" fill="#3b82f6"/>
-  <rect x="554" y="202" width="24" height="24" rx="6" fill="#7c3aed"/>
-  <rect x="586" y="202" width="24" height="24" rx="6" fill="#374151"/>
+  <!-- Note card 1 - active -->
+  <rect x="32" y="338" width="248" height="108" rx="8" fill="#13101a" stroke="#2d2060" stroke-width="1"/>
+  <rect x="32" y="338" width="3" height="108" rx="1" fill="#7c3aed"/>
+  <text x="48" y="366" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="14" font-weight="600">Atualizar modal</text>
+  <text x="48" y="388" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">O modal de update agora prec...</text>
+  <circle cx="48" cy="412" r="3" fill="#f59e0b"/>
+  <text x="58" y="416" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">ha 2 min</text>
+  <rect x="48" y="428" width="56" height="18" rx="5" fill="#1a1530" stroke="#2d2060" stroke-width="1"/>
+  <text x="57" y="440" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="10">updater</text>
 
-  <rect x="296" y="240" width="1040" height="520" fill="#0d0d0d"/>
-  <text x="338" y="292" fill="#8b8b8b" font-family="'JetBrains Mono', monospace" font-size="15">O modal de update agora precisa ficar mais claro, mais bonito e mais</text>
-  <text x="338" y="324" fill="#8b8b8b" font-family="'JetBrains Mono', monospace" font-size="15">explicativo para o usuario entender o que vai acontecer.</text>
-  <text x="338" y="380" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="16">- mostrar versao atual e versao nova</text>
-  <text x="338" y="412" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="16">- resumir as novidades da release</text>
-  <text x="338" y="444" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="16">- destacar download, instalacao e reinicio</text>
-  <text x="338" y="476" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="16">- permitir continuar usando o app durante o download</text>
+  <!-- Note card 2 -->
+  <rect x="32" y="454" width="248" height="108" rx="8" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="48" y="482" fill="#ccc" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="500">Checklist release</text>
+  <text x="48" y="500" fill="#444" font-family="'JetBrains Mono', monospace" font-size="11">[ ] build  [ ] cargo check  ...</text>
+  <circle cx="48" cy="524" r="3" fill="#10b981"/>
+  <text x="58" y="528" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">ha 18 min</text>
+  <rect x="48" y="540" width="44" height="18" rx="5" fill="#111a22" stroke="#1e3048" stroke-width="1"/>
+  <text x="58" y="552" fill="#60a5fa" font-family="'JetBrains Mono', monospace" font-size="10">note</text>
 
-  <rect x="338" y="542" width="522" height="128" rx="10" fill="#111111" stroke="#1e1e1e"/>
-  <text x="360" y="572" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="12" letter-spacing="2">RESUMO DA RELEASE</text>
-  <text x="360" y="604" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="14">Nova versao publica do SiriusPad</text>
-  <text x="360" y="632" fill="#8f8f8f" font-family="'JetBrains Mono', monospace" font-size="13">- modal de update redesenhado</text>
-  <text x="360" y="656" fill="#8f8f8f" font-family="'JetBrains Mono', monospace" font-size="13">- preparacao melhor do instalador</text>
+  <!-- Note card 3 -->
+  <rect x="32" y="570" width="248" height="108" rx="8" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="48" y="598" fill="#ccc" font-family="'JetBrains Mono', monospace" font-size="13" font-weight="500">Prompt showcase</text>
+  <text x="48" y="616" fill="#444" font-family="'JetBrains Mono', monospace" font-size="11">Exemplos de prompts para...</text>
+  <circle cx="48" cy="640" r="3" fill="#ef4444"/>
+  <text x="58" y="644" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">ontem</text>
+  <rect x="48" y="656" width="38" height="18" rx="5" fill="#1a1530" stroke="#2d2060" stroke-width="1"/>
+  <text x="58" y="668" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="10">feat</text>
 
-  <rect x="884" y="542" width="406" height="128" rx="10" fill="#111111" stroke="#1e1e1e"/>
-  <text x="906" y="572" fill="#60a5fa" font-family="'JetBrains Mono', monospace" font-size="12" letter-spacing="2">CHECKLIST</text>
-  <text x="906" y="604" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="14">[x] build</text>
-  <text x="906" y="632" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="14">[x] cargo check</text>
-  <text x="906" y="660" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="14">[ ] teste manual do fluxo de update</text>
+  <!-- EDITOR PANEL -->
+  <!-- Tab bar -->
+  <rect x="296" y="62" width="1040" height="34" fill="#0e0e0e"/>
+  <line x1="296" y1="96" x2="1336" y2="96" stroke="#1e1e1e" stroke-width="1"/>
+  <rect x="312" y="70" width="200" height="20" rx="5" fill="#161616" stroke="#222" stroke-width="1"/>
+  <circle cx="323" cy="80" r="3" fill="#7c3aed" opacity="0.7"/>
+  <text x="332" y="84" fill="#c0c0c0" font-family="'JetBrains Mono', monospace" font-size="11">Atualizar modal de update</text>
+  <text x="503" y="84" fill="#3a3a3a" font-family="'JetBrains Mono', monospace" font-size="12">×</text>
 
-  <rect x="296" y="760" width="1040" height="180" fill="#0b0b0b"/>
-  <line x1="296" y1="760" x2="1336" y2="760" stroke="#1e1e1e"/>
-  <rect x="316" y="776" width="120" height="28" rx="8" fill="#111111" stroke="#1e1e1e"/>
-  <text x="334" y="794" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="12">TERMINAL</text>
-  <rect x="442" y="776" width="56" height="28" rx="8" fill="#161616" stroke="#1e1e1e"/>
-  <text x="460" y="794" fill="#8f8f8f" font-family="'JetBrains Mono', monospace" font-size="12">bash</text>
+  <!-- Note header -->
+  <rect x="296" y="96" width="1040" height="136" fill="#0f0f0f"/>
+  <line x1="296" y1="232" x2="1336" y2="232" stroke="#1e1e1e" stroke-width="1"/>
 
-  <rect x="316" y="820" width="1000" height="92" rx="10" fill="#111111" stroke="#1e1e1e"/>
-  <text x="340" y="852" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12">/home/siriusdev/siriuspad/notes/general $ npm run build</text>
-  <text x="340" y="882" fill="#34d399" font-family="'JetBrains Mono', monospace" font-size="13">built in 7.51s</text>
+  <!-- Note title -->
+  <text x="328" y="144" fill="#e8e8e8" font-family="'JetBrains Mono', monospace" font-size="22" font-weight="700">Atualizar modal de update</text>
 
-  <rect x="1336" y="60" width="248" height="880" fill="#0f0f0f"/>
-  <line x1="1336" y1="60" x2="1336" y2="940" stroke="#1e1e1e"/>
-  <text x="1360" y="92" fill="#4a4a4a" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="3">COR DA NOTA</text>
-  <rect x="1360" y="110" width="48" height="34" rx="8" fill="#ef4444"/>
-  <rect x="1416" y="110" width="48" height="34" rx="8" fill="#f59e0b"/>
-  <rect x="1472" y="110" width="48" height="34" rx="8" fill="#10b981"/>
-  <rect x="1528" y="110" width="32" height="34" rx="8" fill="#3b82f6"/>
-  <rect x="1360" y="152" width="48" height="34" rx="8" fill="#3b82f6"/>
-  <rect x="1416" y="152" width="48" height="34" rx="8" fill="#7c3aed"/>
-  <rect x="1472" y="152" width="48" height="34" rx="8" fill="#374151"/>
-  <rect x="1528" y="152" width="32" height="34" rx="8" fill="#111827"/>
+  <!-- View mode buttons -->
+  <rect x="882" y="112" width="64" height="24" rx="7" fill="#161616" stroke="#2d2060" stroke-width="1"/>
+  <text x="900" y="128" fill="#c8c8c8" font-family="'JetBrains Mono', monospace" font-size="11">Editor</text>
+  <rect x="952" y="112" width="78" height="24" rx="7" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="965" y="128" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">Dividido</text>
+  <rect x="1036" y="112" width="68" height="24" rx="7" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="1052" y="128" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">Preview</text>
 
-  <text x="1360" y="228" fill="#4a4a4a" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="3">FILTRAR POR TAG</text>
-  <rect x="1360" y="244" width="80" height="20" rx="6" fill="#1a1530" stroke="#2d2060"/>
-  <text x="1375" y="257" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="11">updater</text>
-  <rect x="1448" y="244" width="44" height="20" rx="6" fill="#1a1a2a" stroke="#222a45"/>
-  <text x="1461" y="257" fill="#60a5fa" font-family="'JetBrains Mono', monospace" font-size="11">ui</text>
+  <!-- Tags row -->
+  <rect x="328" y="160" width="68" height="18" rx="5" fill="#1a1530" stroke="#2d2060" stroke-width="1"/>
+  <text x="339" y="172" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="10">updater</text>
+  <rect x="404" y="160" width="30" height="18" rx="5" fill="#111a22" stroke="#1e3048" stroke-width="1"/>
+  <text x="414" y="172" fill="#60a5fa" font-family="'JetBrains Mono', monospace" font-size="10">ui</text>
 
-  <text x="1360" y="306" fill="#4a4a4a" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="3">INFO</text>
-  <rect x="1360" y="322" width="200" height="118" rx="10" fill="#111111" stroke="#1e1e1e"/>
-  <text x="1380" y="352" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12">Criado em</text>
-  <text x="1498" y="352" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="12" text-anchor="end">20/03/2026</text>
-  <text x="1380" y="382" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12">Palavras</text>
-  <text x="1498" y="382" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="12" text-anchor="end">84</text>
-  <text x="1380" y="412" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12">Prioridade</text>
-  <circle cx="1492" cy="408" r="4" fill="#f97316"/>
-  <text x="1506" y="412" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="12">Alta</text>
+  <!-- Priority -->
+  <rect x="448" y="156" width="100" height="26" rx="7" fill="#181818" stroke="#222" stroke-width="1"/>
+  <circle cx="466" cy="169" r="4" fill="#f97316"/>
+  <text x="476" y="173" fill="#aaa" font-family="'JetBrains Mono', monospace" font-size="11">Alta</text>
 
-  <text x="1360" y="486" fill="#4a4a4a" font-family="'JetBrains Mono', monospace" font-size="11" letter-spacing="3">ATALHOS</text>
-  <rect x="1360" y="502" width="200" height="170" rx="10" fill="#111111" stroke="#1e1e1e"/>
-  <text x="1380" y="536" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="13">Ctrl+N</text>
-  <text x="1498" y="536" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12" text-anchor="end">Nova nota</text>
-  <text x="1380" y="566" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="13">Ctrl+S</text>
-  <text x="1498" y="566" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12" text-anchor="end">Salvar</text>
-  <text x="1380" y="596" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="13">Ctrl+K</text>
-  <text x="1498" y="596" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12" text-anchor="end">Paleta</text>
-  <text x="1380" y="626" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="13">Ctrl+`</text>
-  <text x="1498" y="626" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="12" text-anchor="end">Terminal</text>
+  <!-- Color picker label + swatches -->
+  <text x="328" y="218" fill="#3a3a3a" font-family="'JetBrains Mono', monospace" font-size="9" letter-spacing="3">COR DA NOTA</text>
+  <rect x="430" y="204" width="20" height="20" rx="5" fill="#ef4444"/>
+  <rect x="456" y="204" width="20" height="20" rx="5" fill="#f59e0b"/>
+  <rect x="482" y="204" width="20" height="20" rx="5" fill="#10b981"/>
+  <rect x="508" y="204" width="20" height="20" rx="5" fill="#3b82f6"/>
+  <rect x="534" y="204" width="20" height="20" rx="5" fill="#7c3aed"/>
+  <rect x="560" y="204" width="20" height="20" rx="5" fill="#374151"/>
 
-  <rect x="16" y="940" width="1568" height="24" fill="#0f0f0f"/>
-  <text x="36" y="956" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="11">ESPACO: GERAL</text>
-  <text x="192" y="956" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="11">MARKDOWN</text>
-  <text x="310" y="956" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="11">SALVO</text>
-  <text x="388" y="956" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="11">LN 18</text>
-  <text x="452" y="956" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="11">COL 4</text>
-  <text x="1560" y="956" fill="#666666" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">1.0.11</text>
+  <!-- EDITOR BODY -->
+  <rect x="296" y="232" width="1040" height="528" fill="#0c0c0c"/>
+
+  <!-- Line numbers -->
+  <rect x="296" y="232" width="36" height="528" fill="#0d0d0d"/>
+  <text x="324" y="280" fill="#2a2a2a" font-family="'JetBrains Mono', monospace" font-size="13" text-anchor="end">1</text>
+  <text x="324" y="314" fill="#2a2a2a" font-family="'JetBrains Mono', monospace" font-size="13" text-anchor="end">2</text>
+  <text x="324" y="348" fill="#2a2a2a" font-family="'JetBrains Mono', monospace" font-size="13" text-anchor="end">3</text>
+  <text x="324" y="382" fill="#2a2a2a" font-family="'JetBrains Mono', monospace" font-size="13" text-anchor="end">4</text>
+  <text x="324" y="416" fill="#2a2a2a" font-family="'JetBrains Mono', monospace" font-size="13" text-anchor="end">5</text>
+  <text x="324" y="450" fill="#2a2a2a" font-family="'JetBrains Mono', monospace" font-size="13" text-anchor="end">6</text>
+  <line x1="332" y1="232" x2="332" y2="760" stroke="#171717" stroke-width="1"/>
+
+  <!-- Editor content -->
+  <text x="348" y="280" fill="#777" font-family="'JetBrains Mono', monospace" font-size="14">O modal de update agora precisa ficar mais claro, mais bonito e mais</text>
+  <text x="348" y="314" fill="#777" font-family="'JetBrains Mono', monospace" font-size="14">explicativo para o usuario entender o que vai acontecer.</text>
+  <text x="348" y="364" fill="#e2e2e2" font-family="'JetBrains Mono', monospace" font-size="14">- mostrar versao atual e versao nova</text>
+  <text x="348" y="398" fill="#e2e2e2" font-family="'JetBrains Mono', monospace" font-size="14">- resumir as novidades da release</text>
+  <text x="348" y="432" fill="#e2e2e2" font-family="'JetBrains Mono', monospace" font-size="14">- destacar download, instalacao e reinicio</text>
+  <text x="348" y="466" fill="#e2e2e2" font-family="'JetBrains Mono', monospace" font-size="14">- permitir continuar usando o app durante o download</text>
+
+  <!-- Cursor blink indicator -->
+  <rect x="348" y="480" width="2" height="16" fill="#7c3aed" opacity="0.8"/>
+
+  <!-- Callout blocks -->
+  <rect x="348" y="508" width="480" height="120" rx="10" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <rect x="348" y="508" width="3" height="120" rx="1" fill="#7c3aed" opacity="0.7"/>
+  <text x="368" y="532" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="2">RESUMO DA RELEASE</text>
+  <text x="368" y="558" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="13">Nova versao publica do SiriusPad</text>
+  <text x="368" y="580" fill="#666" font-family="'JetBrains Mono', monospace" font-size="12">• modal de update redesenhado</text>
+  <text x="368" y="600" fill="#666" font-family="'JetBrains Mono', monospace" font-size="12">• preparacao melhor do instalador</text>
+  <text x="368" y="620" fill="#666" font-family="'JetBrains Mono', monospace" font-size="12">• fix z-index no modal overlay</text>
+
+  <rect x="852" y="508" width="460" height="120" rx="10" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <rect x="852" y="508" width="3" height="120" rx="1" fill="#3b82f6" opacity="0.7"/>
+  <text x="872" y="532" fill="#60a5fa" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="2">CHECKLIST</text>
+  <text x="872" y="558" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="13">[x] build</text>
+  <text x="872" y="582" fill="#d4d4d4" font-family="'JetBrains Mono', monospace" font-size="13">[x] cargo check</text>
+  <text x="872" y="606" fill="#888" font-family="'JetBrains Mono', monospace" font-size="13">[ ] teste manual do fluxo de update</text>
+
+  <!-- TERMINAL PANEL -->
+  <rect x="296" y="760" width="1040" height="180" fill="#0a0a0a"/>
+  <line x1="296" y1="760" x2="1336" y2="760" stroke="#1e1e1e" stroke-width="1"/>
+
+  <!-- Terminal tabs -->
+  <rect x="314" y="770" width="100" height="24" rx="6" fill="#161616" stroke="#222" stroke-width="1"/>
+  <text x="332" y="786" fill="#d0d0d0" font-family="'JetBrains Mono', monospace" font-size="11">TERMINAL</text>
+  <rect x="422" y="770" width="50" height="24" rx="6" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="435" y="786" fill="#666" font-family="'JetBrains Mono', monospace" font-size="11">bash</text>
+  <rect x="480" y="770" width="26" height="24" rx="6" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="489" y="786" fill="#444" font-family="'JetBrains Mono', monospace" font-size="12">+</text>
+
+  <!-- Kill/clear buttons -->
+  <rect x="1220" y="770" width="50" height="24" rx="6" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="1232" y="786" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">clear</text>
+  <rect x="1278" y="770" width="46" height="24" rx="6" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="1292" y="786" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">kill</text>
+
+  <!-- Terminal content -->
+  <rect x="314" y="804" width="1002" height="110" rx="8" fill="#0e0e0e" stroke="#171717" stroke-width="1"/>
+  <text x="334" y="830" fill="#555" font-family="'JetBrains Mono', monospace" font-size="12">~/siriuspad</text>
+  <text x="418" y="830" fill="#7c3aed" font-family="'JetBrains Mono', monospace" font-size="12"> on </text>
+  <text x="448" y="830" fill="#f59e0b" font-family="'JetBrains Mono', monospace" font-size="12"> main</text>
+  <text x="500" y="830" fill="#777" font-family="'JetBrains Mono', monospace" font-size="12"> $ npm run build</text>
+  <text x="334" y="856" fill="#34d399" font-family="'JetBrains Mono', monospace" font-size="12">✓ built in 7.51s</text>
+  <text x="334" y="878" fill="#555" font-family="'JetBrains Mono', monospace" font-size="12">~/siriuspad</text>
+  <text x="418" y="878" fill="#7c3aed" font-family="'JetBrains Mono', monospace" font-size="12"> on </text>
+  <text x="448" y="878" fill="#f59e0b" font-family="'JetBrains Mono', monospace" font-size="12"> main</text>
+  <text x="500" y="878" fill="#777" font-family="'JetBrains Mono', monospace" font-size="12"> $</text>
+  <rect x="509" y="866" width="2" height="14" fill="#aaa" opacity="0.6"/>
+
+  <!-- RIGHT PANEL -->
+  <rect x="1336" y="62" width="248" height="878" fill="#0f0f0f"/>
+  <line x1="1336" y1="62" x2="1336" y2="940" stroke="#1e1e1e" stroke-width="1"/>
+
+  <!-- Color picker -->
+  <text x="1358" y="90" fill="#3a3a3a" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="3">COR DA NOTA</text>
+  <!-- Row 1 -->
+  <rect x="1358" y="102" width="44" height="30" rx="7" fill="#ef4444"/>
+  <rect x="1408" y="102" width="44" height="30" rx="7" fill="#f59e0b"/>
+  <rect x="1458" y="102" width="44" height="30" rx="7" fill="#10b981"/>
+  <rect x="1508" y="102" width="44" height="30" rx="7" fill="#3b82f6"/>
+  <!-- Row 2 -->
+  <rect x="1358" y="138" width="44" height="30" rx="7" fill="#8b5cf6"/>
+  <rect x="1408" y="138" width="44" height="30" rx="7" fill="#ec4899"/>
+  <rect x="1458" y="138" width="44" height="30" rx="7" fill="#374151"/>
+  <rect x="1508" y="138" width="44" height="30" rx="7" fill="#111827"/>
+
+  <!-- Tags filter -->
+  <text x="1358" y="202" fill="#3a3a3a" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="3">FILTRAR POR TAG</text>
+  <rect x="1358" y="214" width="68" height="18" rx="5" fill="#1a1530" stroke="#2d2060" stroke-width="1"/>
+  <text x="1369" y="226" fill="#a78bfa" font-family="'JetBrains Mono', monospace" font-size="10">updater</text>
+  <rect x="1434" y="214" width="30" height="18" rx="5" fill="#111a22" stroke="#1e3048" stroke-width="1"/>
+  <text x="1444" y="226" fill="#60a5fa" font-family="'JetBrains Mono', monospace" font-size="10">ui</text>
+
+  <!-- Info box -->
+  <text x="1358" y="270" fill="#3a3a3a" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="3">INFO</text>
+  <rect x="1358" y="282" width="206" height="130" rx="8" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="1374" y="308" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">Criado</text>
+  <text x="1548" y="308" fill="#ccc" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">20/03/2026</text>
+  <text x="1374" y="334" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">Palavras</text>
+  <text x="1548" y="334" fill="#ccc" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">84</text>
+  <text x="1374" y="360" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">Linhas</text>
+  <text x="1548" y="360" fill="#ccc" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">18</text>
+  <text x="1374" y="390" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11">Prioridade</text>
+  <circle cx="1524" cy="386" r="4" fill="#f97316"/>
+  <text x="1534" y="390" fill="#ccc" font-family="'JetBrains Mono', monospace" font-size="11">Alta</text>
+
+  <!-- Shortcuts box -->
+  <text x="1358" y="448" fill="#3a3a3a" font-family="'JetBrains Mono', monospace" font-size="10" letter-spacing="3">ATALHOS</text>
+  <rect x="1358" y="460" width="206" height="182" rx="8" fill="#111111" stroke="#1e1e1e" stroke-width="1"/>
+  <text x="1374" y="488" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="12">Ctrl+N</text>
+  <text x="1548" y="488" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">Nova nota</text>
+  <text x="1374" y="516" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="12">Ctrl+S</text>
+  <text x="1548" y="516" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">Salvar</text>
+  <text x="1374" y="544" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="12">Ctrl+K</text>
+  <text x="1548" y="544" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">Paleta</text>
+  <text x="1374" y="572" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="12">Ctrl+`</text>
+  <text x="1548" y="572" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">Terminal</text>
+  <text x="1374" y="600" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="12">Ctrl+W</text>
+  <text x="1548" y="600" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">Fechar tab</text>
+  <text x="1374" y="628" fill="#e0e0e0" font-family="'JetBrains Mono', monospace" font-size="12">Ctrl+/</text>
+  <text x="1548" y="628" fill="#555" font-family="'JetBrains Mono', monospace" font-size="11" text-anchor="end">Comentar</text>
+
+  <!-- STATUS BAR -->
+  <rect x="16" y="940" width="1568" height="24" fill="#0c0c0c" rx="0"/>
+  <rect x="16" y="940" width="1568" height="24" fill="#0c0c0c"/>
+  <line x1="16" y1="940" x2="1584" y2="940" stroke="#1e1e1e" stroke-width="1"/>
+
+  <circle cx="32" cy="952" r="3" fill="#10b981"/>
+  <text x="42" y="956" fill="#444" font-family="'JetBrains Mono', monospace" font-size="10">GERAL</text>
+  <text x="130" y="956" fill="#333" font-family="'JetBrains Mono', monospace" font-size="10">│</text>
+  <text x="144" y="956" fill="#444" font-family="'JetBrains Mono', monospace" font-size="10">MARKDOWN</text>
+  <text x="242" y="956" fill="#333" font-family="'JetBrains Mono', monospace" font-size="10">│</text>
+  <text x="256" y="956" fill="#444" font-family="'JetBrains Mono', monospace" font-size="10">SALVO</text>
+  <text x="314" y="956" fill="#333" font-family="'JetBrains Mono', monospace" font-size="10">│</text>
+  <text x="328" y="956" fill="#444" font-family="'JetBrains Mono', monospace" font-size="10">LN 18  COL 4</text>
+  <text x="1560" y="956" fill="#333" font-family="'JetBrains Mono', monospace" font-size="10" text-anchor="end">v1.0.12</text>
 </svg>

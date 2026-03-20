@@ -47,6 +47,8 @@
     "workspaceLabel": "Workspace",
     "languageLabel": "Language",
     "tagsLabel": "Tags",
+    "colorLabel": "Note color",
+    "priorityLabel": "Priority",
     "deleteConfirm": "Move \"{{title}}\" to trash?",
     "deleteDirtyDescription": "This note has unsaved changes. They will be saved before moving it to the trash.",
     "closeDirtyTitle": "This note has unsaved changes.",
@@ -57,7 +59,32 @@
     "noActive": "No active note",
     "noActiveDescription": "Create a note from the sidebar or use Ctrl+N to start writing.",
     "createFirstAction": "Create your first note",
-    "open": "Open note: {{title}}"
+    "open": "Open note: {{title}}",
+    "checklistTitle": "Checklist",
+    "checklistHint": "A local note checklist to track next steps without leaving your flow.",
+    "checklistPlaceholder": "Add checklist item",
+    "checklistAdd": "Add item",
+    "checklistEmpty": "No items yet. Add quick tasks to track fixes, tests, or follow-ups.",
+    "checklistRemove": "Remove checklist item",
+    "checklistMarkDone": "Mark as done",
+    "checklistMarkPending": "Mark as pending",
+    "calloutsTitle": "Highlight blocks",
+    "calloutsHint": "Insert Markdown callouts without memorizing the syntax. They turn into cards in preview.",
+    "calloutNote": "Note callout",
+    "calloutNoteHint": "Use it for context, summaries, observations, or quick docs.",
+    "calloutTip": "Tip callout",
+    "calloutTipHint": "Great for shortcuts, helpful commands, and practical reminders.",
+    "calloutWarning": "Warning callout",
+    "calloutWarningHint": "Use it when something needs care before you run or change it.",
+    "calloutsFooter": "Supported syntax: `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]`, `> [!BUG]` and similar. The editor stays in Markdown; the visual card appears in preview.",
+    "calloutTemplateNoteTitle": "Context",
+    "calloutTemplateNoteBody": "Summarize an important note detail here.",
+    "calloutTemplateTipTitle": "Quick tip",
+    "calloutTemplateTipBody": "Keep a shortcut, command, or useful insight here.",
+    "calloutTemplateWarningTitle": "Warning",
+    "calloutTemplateWarningBody": "Describe something that needs extra care before you continue.",
+    "calloutTemplateDangerTitle": "Critical point",
+    "calloutTemplateDangerBody": "Record impact, suspicion, and the next step."
   },
   "workspace": {
     "default": "General",
@@ -371,7 +398,7 @@
       },
       "notes": {
         "title": "Fast notes, still organized",
-        "description": "Each note combines title, Markdown, tags, priority, color, and workspace. It works as a personal backlog, debug pad, or snippet base."
+        "description": "Each note combines title, Markdown, checklist, tags, priority, color, and workspace. Use the checklist for quick tasks and callouts to highlight context in preview."
       },
       "tags": {
         "title": "Read context at a glance",
@@ -393,6 +420,10 @@
         "title": "Shortcuts worth memorizing",
         "description": "These are the ones that speed up everyday use the most. You do not need all of them now, but they stay visible in the UI."
       },
+      "practice": {
+        "title": "Test it in practice",
+        "description": "After closing the tutorial, follow this short script to validate the app's main promises in real use."
+      },
       "ready": {
         "title": "Ready to go",
         "description": "If you forget something, you can reopen the tutorial from settings. The goal is to be quick to start and comfortable to keep using."
@@ -406,6 +437,19 @@
       "welcomePoint2": "Workspaces to separate context without clutter.",
       "welcomePoint3": "Terminal, history, and shortcuts wired into the flow.",
       "welcomePoint4": "A public project maintained by SiriusX with a practical developer-first focus.",
+      "notesChecklist1": "Write updater test flow",
+      "notesChecklist2": "Validate automatic release restart",
+      "notesCalloutTitle": "Visible context in preview",
+      "notesCalloutBody": "Use > [!TIP] and > [!WARNING] blocks to highlight important information.",
+      "practiceStep1Title": "Create a new note",
+      "practiceStep1Body": "Use Ctrl+N, give the note a title, and pick a color. That color should appear in the header, tab, and note list.",
+      "practiceStep2Title": "Add a checklist",
+      "practiceStep2Body": "Create at least 2 checklist items and mark 1 as done. The counter in the panel and in the note should reflect that.",
+      "practiceStep3Title": "Insert a callout",
+      "practiceStep3Body": "Use one of the quick callout blocks, switch to preview or split mode, and confirm it becomes a highlighted card with a side accent.",
+      "practiceStep4Title": "Test the terminal",
+      "practiceStep4Body": "Open it with Ctrl+`, run a simple command like `pwd`, `ls`, or `dir`, and confirm it starts in the active note folder.",
+      "practiceFooter": "If this script works, you have already validated note color, checklist, callouts, preview, and terminal without relying on vague promises.",
       "terminalSnippetLabel": "Language-aware block",
       "terminalCommandLabel": "Shell command",
       "projectPoint1": "Developed by SiriusX and shipped as a public GitHub project.",
@@ -413,7 +457,7 @@
       "projectPoint3": "Notes stay local; external integrations are optional.",
       "projectPoint4": "Terminal and snippets run on your machine, so review before executing.",
       "readyBadge": "Everything stays local and the app opens ready to continue.",
-      "readyHint": "Start with Ctrl+N, use Ctrl+K when you forget an action, and open the terminal with Ctrl+` to run commands in the note folder or execute language-aware blocks.",
+      "readyHint": "Start with Ctrl+N, add a checklist item, insert a callout with one click, and open the terminal with Ctrl+` to test the full flow.",
       "readyPoint1": "Settings now show version, license, project links, and the security policy.",
       "readyPoint2": "You can reopen this tutorial anytime from settings.",
       "readyPoint3": "Use issues for bugs and a private advisory for vulnerabilities."

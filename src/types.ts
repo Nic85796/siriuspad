@@ -58,6 +58,7 @@ export interface NoteTab {
   id: string
   title: string
   isDirty: boolean
+  color?: string
 }
 
 export interface Workspace {

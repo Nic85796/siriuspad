@@ -19,7 +19,7 @@ O SiriusPad é um app desktop open source para guardar:
 - ideias
 - snippets
 - comandos
-- checklists técnicos
+- checklists rápidos por nota
 - rascunhos rápidos de arquitetura
 
 Ele foi pensado para ficar perto do fluxo de desenvolvimento sem tentar virar IDE, wiki corporativa ou base de conhecimento engessada.
@@ -30,7 +30,9 @@ As notas ficam no seu computador como arquivos Markdown. O uso principal do app 
 
 - editor Markdown com CodeMirror 6
 - workspaces para separar contexto por projeto, cliente ou tema
-- tags, prioridade, cor da nota e notas fixadas
+- tags, prioridade, cor da nota visível e notas fixadas
+- checklist nativo por nota
+- callout blocks no preview com sintaxe estilo `> [!TIP]`
 - terminal embutido ligado à pasta da nota ativa
 - preview de Markdown e split view
 - histórico de versões por nota

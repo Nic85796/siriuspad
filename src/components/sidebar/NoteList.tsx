@@ -3,6 +3,7 @@ import { Pin, Plus } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
+import { withAlpha } from '@/lib/color'
 import { getDateFnsLocale } from '@/lib/date'
 import { PriorityDot } from '@/components/ui/PriorityDot'
 import { TagPill } from '@/components/ui/TagPill'
@@ -94,6 +95,13 @@ export function NoteList({
                   ? 'border-focus bg-[#161616]'
                   : 'border-border bg-[#111111] hover:border-focus hover:bg-hover'
               }`}
+              style={{
+                boxShadow: note.color ? `inset 2px 0 0 ${note.color}` : undefined,
+                backgroundImage:
+                  withAlpha(note.color, isActive ? 0.11 : 0.06)
+                    ? `linear-gradient(180deg, ${withAlpha(note.color, isActive ? 0.11 : 0.06)}, transparent 80%)`
+                    : undefined,
+              }}
               onClick={() => void onOpenNote(note.id)}
               onContextMenu={(event) => {
                 event.preventDefault()

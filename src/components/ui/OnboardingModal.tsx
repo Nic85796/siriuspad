@@ -16,6 +16,7 @@ const STEPS = [
   { id: 'command', icon: '⌘', visual: 'command' },
   { id: 'project', icon: '▣', visual: 'project' },
   { id: 'shortcuts', icon: '⌨', visual: 'shortcuts' },
+  { id: 'practice', icon: '▤', visual: 'practice' },
   { id: 'ready', icon: '✓', visual: 'ready' },
 ] as const
 
@@ -38,6 +39,43 @@ function StepVisual({
             </div>
             <div className="text-sm text-text-primary">
               {t('onboarding.visuals.notesBody')}
+            </div>
+          </div>
+          <div className="rounded-md border border-border bg-[#111111] p-3">
+            <div className="mb-2 text-[11px] uppercase tracking-[0.16em] text-text-muted">
+              {t('note.checklistTitle')}
+            </div>
+            <div className="grid gap-2 text-xs">
+              {[t('onboarding.visuals.notesChecklist1'), t('onboarding.visuals.notesChecklist2')].map(
+                (item, index) => (
+                  <div
+                    key={item}
+                    className="flex items-center gap-2 rounded-md border border-border bg-[#0f0f0f] px-3 py-2 text-text-primary"
+                  >
+                    <span
+                      className={`inline-flex h-4 w-4 items-center justify-center rounded border ${
+                        index === 0
+                          ? 'border-[#2d2060] bg-[rgba(124,58,237,0.12)] text-[#c4b5fd]'
+                          : 'border-border bg-[#111111] text-transparent'
+                      }`}
+                    >
+                      ✓
+                    </span>
+                    <span>{item}</span>
+                  </div>
+                ),
+              )}
+            </div>
+          </div>
+          <div className="rounded-md border border-[#2d2060] bg-[rgba(124,58,237,0.08)] p-3">
+            <div className="mb-1 text-[11px] uppercase tracking-[0.16em] text-[#c4b5fd]">
+              &gt; [!TIP]
+            </div>
+            <div className="text-sm text-text-primary">
+              {t('onboarding.visuals.notesCalloutTitle')}
+            </div>
+            <div className="mt-1 text-xs leading-6 text-text-secondary">
+              {t('onboarding.visuals.notesCalloutBody')}
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -163,6 +201,49 @@ function StepVisual({
               <span className="text-text-secondary">{shortcut.label}</span>
             </div>
           ))}
+        </div>
+      )
+    case 'practice':
+      return (
+        <div className="grid gap-3 rounded-lg border border-border bg-[#0f0f0f] p-4 text-xs">
+          {[
+            {
+              step: '01',
+              title: t('onboarding.visuals.practiceStep1Title'),
+              body: t('onboarding.visuals.practiceStep1Body'),
+            },
+            {
+              step: '02',
+              title: t('onboarding.visuals.practiceStep2Title'),
+              body: t('onboarding.visuals.practiceStep2Body'),
+            },
+            {
+              step: '03',
+              title: t('onboarding.visuals.practiceStep3Title'),
+              body: t('onboarding.visuals.practiceStep3Body'),
+            },
+            {
+              step: '04',
+              title: t('onboarding.visuals.practiceStep4Title'),
+              body: t('onboarding.visuals.practiceStep4Body'),
+            },
+          ].map((item) => (
+            <div
+              key={item.step}
+              className="flex items-start gap-3 rounded-md border border-border bg-[#111111] px-3 py-3"
+            >
+              <span className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-[#2d2060] bg-[rgba(124,58,237,0.12)] text-[11px] font-semibold text-[#c4b5fd]">
+                {item.step}
+              </span>
+              <div className="min-w-0">
+                <div className="text-sm text-text-primary">{item.title}</div>
+                <div className="mt-1 leading-6 text-text-secondary">{item.body}</div>
+              </div>
+            </div>
+          ))}
+          <div className="rounded-md border border-[#2d2060] bg-[rgba(124,58,237,0.08)] px-3 py-3 text-xs leading-6 text-text-secondary">
+            {t('onboarding.visuals.practiceFooter')}
+          </div>
         </div>
       )
     case 'welcome':

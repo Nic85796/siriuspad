@@ -7,6 +7,18 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+## [1.0.12] - 2026-03-20
+
+### Added
+- checklist nativo por nota com contador e persistência
+- callout blocks no preview com suporte a `> [!NOTE]`, `> [!TIP]`, `> [!WARNING]` e `> [!BUG]`
+- passo de prática guiada no onboarding para validar o app de forma real
+
+### Changed
+- cor da nota agora aparece no header, editor, preview, lista de notas e abas
+- nota de boas-vindas inicial ficou mais prática, com checklist e callout de exemplo
+- README e textos do tutorial agora prometem só o que o app realmente entrega
+
 ## [1.0.11] - 2026-03-20
 
 ### Adicionado
