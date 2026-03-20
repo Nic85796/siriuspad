@@ -73,6 +73,16 @@ Windows PowerShell:
 powershell -ExecutionPolicy Bypass -File scripts/install-windows.ps1
 ```
 
+## Dependências de instalação
+
+- Linux `.deb`: o pacote Debian gerado pelo Tauri já declara `libwebkit2gtk-4.1-0` e `libgtk-3-0` como dependências base. O script de instalação usa `apt install` no arquivo `.deb`, então essas dependências são resolvidas automaticamente no sistema.
+- Windows `.exe`: o instalador NSIS do SiriusPad agora embute o bootstrapper do WebView2. Se a máquina ainda não tiver o runtime necessário, o instalador tenta preparar isso automaticamente durante a instalação.
+
+Referências oficiais do Tauri:
+
+- Debian: https://v2.tauri.app/distribute/debian/
+- Windows Installer / WebView2: https://v2.tauri.app/distribute/windows-installer/
+
 ## Atalhos principais
 
 | Atalho | Ação |
