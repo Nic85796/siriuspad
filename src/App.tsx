@@ -185,6 +185,17 @@ export default function App() {
     await requestWindowClose(true)
   }
 
+  const installPendingUpdate = async () => {
+    try {
+      await useNotesStore.getState().saveAllDirtyTabs()
+      allowWindowCloseRef.current = true
+      await updater.installUpdate()
+    } catch (error) {
+      allowWindowCloseRef.current = false
+      throw error
+    }
+  }
+
   const requestWindowClose = async (force = false) => {
     const dirtyTabs = useNotesStore.getState().openTabs.filter((tab) => tab.isDirty)
 
@@ -204,10 +215,15 @@ export default function App() {
     allowWindowCloseRef.current = true
 
     try {
-      await getCurrentWindow().destroy()
+      const windowHandle = getCurrentWindow()
+      await windowHandle.close()
     } catch (error) {
-      allowWindowCloseRef.current = false
-      console.warn('Window close unavailable', error)
+      try {
+        await getCurrentWindow().destroy()
+      } catch (destroyError) {
+        allowWindowCloseRef.current = false
+        console.warn('Window close unavailable', error, destroyError)
+      }
     }
   }
 
@@ -987,7 +1003,7 @@ export default function App() {
     createNote: () => createNote(),
     focusSearch: () => useUiStore.getState().focusSearch(),
     saveCurrentNote,
-    runSnippet: runner.run,
+    runSnippet: async () => runner.run(),
     toggleTerminal: () => setToggleTerminalNonce((current) => current + 1),
     activeNoteId: notes.activeNoteId,
     requestCloseTab,
@@ -1405,7 +1421,7 @@ export default function App() {
         state={updater.state}
         onDismiss={updater.dismiss}
         onDownload={updater.startDownload}
-        onInstall={updater.installUpdate}
+        onInstall={installPendingUpdate}
         onRetry={updater.retry}
       />
 

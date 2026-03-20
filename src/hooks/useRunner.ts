@@ -25,6 +25,7 @@ export function useRunner(
   const [running, setRunning] = useState(false)
   const [timeoutSeconds, setTimeoutSeconds] = useState(10)
   const [lastRun, setLastRun] = useState<{
+    id: string
     label: string
     language: string
     source: RunSource
@@ -41,8 +42,10 @@ export function useRunner(
     source = 'note',
     cwd = noteDirectory,
   }: RunSnippetOptions) {
+    const runId = crypto.randomUUID()
     setRunning(true)
     setLastRun({
+      id: runId,
       label: label || language,
       language,
       source,

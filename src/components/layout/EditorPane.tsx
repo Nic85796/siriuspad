@@ -31,6 +31,7 @@ interface EditorPaneProps {
     running: boolean
     timeoutSeconds: number
     lastRun: {
+      id: string
       label: string
       language: string
       source: 'note' | 'block'
@@ -146,6 +147,20 @@ export function EditorPane({
     }
   }, [toggleTerminalNonce])
 
+  useEffect(() => {
+    if (!runner.running && !runner.result) {
+      return
+    }
+
+    const timeoutId = window.setTimeout(() => {
+      setTerminalOpen(true)
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [runner.result, runner.running])
+
   if (!note) {
     return (
       <main className="flex min-h-0 flex-1 items-center justify-center bg-base">
@@ -200,7 +215,10 @@ export function EditorPane({
               findReplaceNonce={findReplaceNonce}
               onChange={onContentChange}
               onSave={onSave}
-              onRun={runner.run}
+              onRun={async () => {
+                setTerminalOpen(true)
+                await runner.run()
+              }}
               onCursorChange={onCursorChange}
             />
           </div>
@@ -249,8 +267,6 @@ export function EditorPane({
 
       <Terminal
         platform={platform}
-        language={note.language}
-        noteTitle={note.title}
         noteDirectory={noteDirectory}
         open={terminalOpen}
         height={terminalHeight}

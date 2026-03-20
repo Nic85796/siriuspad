@@ -2,7 +2,6 @@ import { Command, type Child } from '@tauri-apps/plugin-shell'
 import {
   ChevronDown,
   ChevronUp,
-  Copy,
   LoaderCircle,
   Play,
   RotateCcw,
@@ -14,8 +13,6 @@ import { useTranslation } from 'react-i18next'
 
 import { EXECUTABLE_LANGUAGES } from '@/lib/constants'
 import type { AppPlatform, RunResult } from '@/types'
-
-type TerminalTab = 'terminal' | 'output'
 
 interface TerminalEntry {
   id: string
@@ -39,8 +36,6 @@ type TerminalSeed =
 
 interface TerminalProps {
   platform: AppPlatform
-  language: string
-  noteTitle: string
   noteDirectory: string | null
   open: boolean
   height: number
@@ -51,6 +46,7 @@ interface TerminalProps {
     running: boolean
     timeoutSeconds: number
     lastRun: {
+      id: string
       label: string
       language: string
       source: 'note' | 'block'
@@ -152,6 +148,24 @@ function shellNameForPlatform(platform: AppPlatform) {
   return platform === 'windows' ? 'cmd.exe' : 'bash'
 }
 
+function promptSymbolForPlatform(platform: AppPlatform) {
+  return platform === 'windows' ? '>' : '$'
+}
+
+function formatPath(platform: AppPlatform, path: string) {
+  if (!path) {
+    return path
+  }
+
+  if (platform === 'windows') {
+    return path.replace(/^[A-Za-z]:\\Users\\[^\\]+/i, '~')
+  }
+
+  return path
+    .replace(/^\/home\/[^/]+/, '~')
+    .replace(/^\/Users\/[^/]+/, '~')
+}
+
 function createEntry(
   kind: TerminalEntry['kind'],
   text: string,
@@ -165,16 +179,8 @@ function createEntry(
   }
 }
 
-function createInitialEntries(readyText: string, directoryText?: string) {
-  return [createEntry('system', readyText), directoryText ? createEntry('system', directoryText) : null].filter(
-    Boolean,
-  ) as TerminalEntry[]
-}
-
 export function Terminal({
   platform,
-  language,
-  noteTitle,
   noteDirectory,
   open,
   height,
@@ -186,59 +192,44 @@ export function Terminal({
 }: TerminalProps) {
   const { t } = useTranslation()
   const shellName = useMemo(() => shellNameForPlatform(platform), [platform])
+  const promptSymbol = useMemo(() => promptSymbolForPlatform(platform), [platform])
   const defaultCwd = noteDirectory || (platform === 'windows' ? '%USERPROFILE%' : '~')
-  const [tab, setTab] = useState<TerminalTab>('terminal')
   const [cwd, setCwd] = useState(defaultCwd)
   const [inputValue, setInputValue] = useState('')
-  const [entries, setEntries] = useState<TerminalEntry[]>(() =>
-    createInitialEntries(
-      t('terminal.ready', { shell: shellName }),
-      noteDirectory
-        ? t('terminal.noteDirectoryReady', { cwd: defaultCwd })
-        : t('terminal.noteDirectoryFallback', { cwd: defaultCwd }),
-    ),
-  )
+  const [entries, setEntries] = useState<TerminalEntry[]>([])
   const [history, setHistory] = useState<string[]>([])
   const [historyIndex, setHistoryIndex] = useState<number | null>(null)
   const [processRunning, setProcessRunning] = useState(false)
   const resizeStateRef = useRef<{ startY: number; startHeight: number } | null>(null)
   const childRef = useRef<Child | null>(null)
   const cancelRequestedRef = useRef(false)
-  const syncedCwdRef = useRef<string | null>(defaultCwd)
   const handledSeedRef = useRef<number | null>(null)
+  const startedRunRef = useRef<string | null>(null)
+  const finishedRunRef = useRef<string | null>(null)
   const viewportRef = useRef<HTMLDivElement | null>(null)
   const promptRef = useRef<HTMLInputElement | null>(null)
 
-  const outputLanguage = runner.lastRun?.language || language
-  const outputLabel = runner.lastRun?.label || noteTitle
-  const outputSource = runner.lastRun?.source || 'note'
-  const hasOutput = useMemo(
-    () => Boolean(runner.result?.stdout || runner.result?.stderr),
-    [runner.result],
-  )
-  const quickActions = useMemo(
-    () => [
-      platform === 'windows' ? 'dir' : 'ls -la',
-      'git status',
-      platform === 'windows' ? 'npm run dev' : 'npm run dev',
-      platform === 'windows' ? 'where node' : 'which node',
-    ],
-    [platform],
-  )
+  const displayCwd = formatPath(platform, cwd)
+  const displayNoteDirectory = noteDirectory
+    ? formatPath(platform, noteDirectory)
+    : null
+  const canResetCwd = Boolean(noteDirectory && cwd !== noteDirectory)
 
   function appendEntry(entry: TerminalEntry) {
     setEntries((current) => [...current, entry])
   }
 
+  function appendEntries(nextEntries: TerminalEntry[]) {
+    if (!nextEntries.length) {
+      return
+    }
+
+    setEntries((current) => [...current, ...nextEntries])
+  }
+
   function resetTerminal() {
-    setEntries(
-      createInitialEntries(
-        t('terminal.ready', { shell: shellName }),
-        noteDirectory
-          ? t('terminal.noteDirectoryReady', { cwd: defaultCwd })
-          : t('terminal.noteDirectoryFallback', { cwd: defaultCwd }),
-      ),
-    )
+    setEntries([])
+    runner.clear()
   }
 
   async function executeShellCommand(command: string) {
@@ -303,8 +294,7 @@ export function Terminal({
 
     setInputValue('')
     setHistoryIndex(null)
-    setTab('terminal')
-    appendEntry(createEntry('command', command, cwd))
+    appendEntry(createEntry('command', command, displayCwd))
     setHistory((current) => [command, ...current.filter((item) => item !== command)].slice(0, 50))
 
     if (command.toLowerCase() === 'clear') {
@@ -319,7 +309,6 @@ export function Terminal({
         command.replace(/^cd\s*/i, ''),
       )
       setCwd(nextCwd)
-      appendEntry(createEntry('system', t('terminal.cwdChanged', { cwd: nextCwd })))
       return
     }
 
@@ -341,21 +330,6 @@ export function Terminal({
     }
   }
 
-  function clearCurrentTab() {
-    if (tab === 'terminal') {
-      resetTerminal()
-      return
-    }
-
-    runner.clear()
-  }
-
-  async function copyOutput() {
-    await navigator.clipboard.writeText(
-      [runner.result?.stdout, runner.result?.stderr].filter(Boolean).join('\n\n'),
-    )
-  }
-
   async function stopCurrentProcess() {
     if (!childRef.current) {
       return
@@ -367,31 +341,24 @@ export function Terminal({
     setProcessRunning(false)
   }
 
+  async function runCurrentNote() {
+    if (!canRunSnippet) {
+      return
+    }
+
+    onOpenChange(true)
+    await runner.run()
+  }
+
   useEffect(() => {
-    const nextCwd = defaultCwd
-
     const timeoutId = window.setTimeout(() => {
-      setCwd(nextCwd)
-
-      if (syncedCwdRef.current === nextCwd) {
-        return
-      }
-
-      syncedCwdRef.current = nextCwd
-      appendEntry(
-        createEntry(
-          'system',
-          noteDirectory
-            ? t('terminal.noteDirectoryReady', { cwd: nextCwd })
-            : t('terminal.noteDirectoryFallback', { cwd: nextCwd }),
-        ),
-      )
+      setCwd(defaultCwd)
     }, 0)
 
     return () => {
       window.clearTimeout(timeoutId)
     }
-  }, [defaultCwd, noteDirectory, t])
+  }, [defaultCwd])
 
   useEffect(() => {
     if (!open) {
@@ -405,8 +372,8 @@ export function Terminal({
 
       const delta = resizeStateRef.current.startY - event.clientY
       const nextHeight = Math.min(
-        420,
-        Math.max(140, resizeStateRef.current.startHeight + delta),
+        340,
+        Math.max(130, resizeStateRef.current.startHeight + delta),
       )
       onHeightChange(nextHeight)
     }
@@ -429,15 +396,15 @@ export function Terminal({
       top: viewportRef.current.scrollHeight,
       behavior: 'smooth',
     })
-  }, [entries, hasOutput, runner.running, runner.result, tab])
+  }, [entries, runner.result, runner.running])
 
   useEffect(() => {
-    if (!open || tab !== 'terminal') {
+    if (!open) {
       return
     }
 
     promptRef.current?.focus()
-  }, [open, tab])
+  }, [open])
 
   useEffect(() => {
     if (!seedCommand || handledSeedRef.current === seedCommand.id) {
@@ -450,20 +417,17 @@ export function Terminal({
       onOpenChange(true)
 
       if (seedCommand.kind === 'command') {
-        setTab('terminal')
         setInputValue(seedCommand.value)
         return
       }
 
       if (!seedCommand.language) {
-        setTab('terminal')
         setInputValue(seedCommand.code)
         appendEntry(createEntry('system', t('terminal.blockMissingLanguage')))
         return
       }
 
       if (!EXECUTABLE_LANGUAGES.has(seedCommand.language.toLowerCase())) {
-        setTab('terminal')
         setInputValue(seedCommand.code)
         appendEntry(
           createEntry(
@@ -473,15 +437,6 @@ export function Terminal({
         )
         return
       }
-
-      runner.clear()
-      setTab('output')
-      appendEntry(
-        createEntry(
-          'system',
-          t('terminal.runningBlock', { language: seedCommand.language }),
-        ),
-      )
 
       await runner.runSnippet({
         code: seedCommand.code,
@@ -496,16 +451,72 @@ export function Terminal({
   }, [noteDirectory, onOpenChange, runner, seedCommand, t])
 
   useEffect(() => {
-    if (runner.running || runner.result) {
-      const timeoutId = window.setTimeout(() => {
-        setTab('output')
-      }, 0)
-
-      return () => {
-        window.clearTimeout(timeoutId)
-      }
+    if (!runner.running || !runner.lastRun) {
+      return
     }
-  }, [runner.result, runner.running])
+
+    if (startedRunRef.current === runner.lastRun.id) {
+      return
+    }
+
+    startedRunRef.current = runner.lastRun.id
+    onOpenChange(true)
+
+    const message =
+      runner.lastRun.source === 'block'
+        ? t('terminal.runningBlock', { language: runner.lastRun.language })
+        : t('terminal.runningNote', {
+            title: runner.lastRun.label,
+            language: runner.lastRun.language,
+          })
+
+    const timeoutId = window.setTimeout(() => {
+      appendEntries([createEntry('system', message)])
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [onOpenChange, runner.lastRun, runner.running, t])
+
+  useEffect(() => {
+    if (!runner.result || !runner.lastRun) {
+      return
+    }
+
+    if (finishedRunRef.current === runner.lastRun.id) {
+      return
+    }
+
+    finishedRunRef.current = runner.lastRun.id
+    const nextEntries: TerminalEntry[] = []
+
+    if (runner.result.stdout.trim()) {
+      nextEntries.push(createEntry('stdout', runner.result.stdout))
+    }
+
+    if (runner.result.stderr.trim()) {
+      nextEntries.push(createEntry('stderr', runner.result.stderr))
+    }
+
+    nextEntries.push(
+      createEntry(
+        'system',
+        t('terminal.snippetFinished', {
+          code: runner.result.exit_code,
+          ms: runner.result.duration_ms,
+        }),
+      ),
+    )
+
+    const timeoutId = window.setTimeout(() => {
+      appendEntries(nextEntries)
+    }, 0)
+
+    return () => {
+      window.clearTimeout(timeoutId)
+    }
+  }, [runner.lastRun, runner.result, t])
 
   useEffect(() => {
     return () => {
@@ -549,377 +560,203 @@ export function Terminal({
       />
 
       <div className="flex h-full flex-col pt-1">
-        <div className="border-b border-border px-3 py-3">
-          <div className="flex flex-wrap items-start justify-between gap-3">
-            <div className="min-w-0 space-y-2">
-              <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-text-secondary">
-                <span
-                  className={`h-2 w-2 rounded-full ${
-                    processRunning || runner.running ? 'bg-accent' : 'bg-text-muted'
-                  }`}
-                />
-                <span>{t('terminal.title')}</span>
-                <span className="rounded-md border border-border bg-[#111111] px-2 py-1 text-[10px] text-text-secondary">
-                  {shellName}
-                </span>
-              </div>
-              <p className="text-xs leading-6 text-text-secondary">
-                {t('terminal.subtitle')}
-              </p>
-              <div className="flex flex-wrap gap-2 text-[11px]">
-                <span className="rounded-md border border-border bg-[#111111] px-2 py-1 text-text-secondary">
-                  {t('terminal.noteFolder')}
-                </span>
-                <span className="max-w-full truncate rounded-md border border-[#2d2060] bg-[rgba(124,58,237,0.12)] px-2 py-1 text-[#c4b5fd]">
-                  {cwd}
-                </span>
-                {noteDirectory && cwd !== noteDirectory ? (
-                  <button
-                    type="button"
-                    className="rounded-md border border-border bg-[#111111] px-2 py-1 text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
-                    onClick={() => {
-                      setCwd(noteDirectory)
-                      appendEntry(
-                        createEntry(
-                          'system',
-                          t('terminal.cwdChanged', { cwd: noteDirectory }),
-                        ),
-                      )
-                    }}
-                  >
-                    {t('terminal.resetCwd')}
-                  </button>
-                ) : null}
-              </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-3 py-2.5">
+          <div className="min-w-0 space-y-1">
+            <div className="inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-text-secondary">
+              <span
+                className={`h-2 w-2 rounded-full ${
+                  processRunning || runner.running ? 'bg-accent' : 'bg-text-muted'
+                }`}
+              />
+              <span>{t('terminal.title')}</span>
+              <span className="rounded-md border border-border bg-[#111111] px-2 py-1 text-[10px] text-text-secondary">
+                {shellName}
+              </span>
             </div>
-
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 rounded-md border border-border bg-[#111111] p-1">
-                {(['terminal', 'output'] as TerminalTab[]).map((item) => (
-                  <button
-                    key={item}
-                    type="button"
-                    className={`rounded-md px-2.5 py-1 text-[11px] uppercase tracking-[0.14em] transition ${
-                      tab === item
-                        ? 'bg-[#222222] text-text-primary'
-                        : 'text-text-secondary hover:bg-hover hover:text-text-primary'
-                    }`}
-                    onClick={() => setTab(item)}
-                  >
-                    {t(`terminal.${item}`)}
-                  </button>
-                ))}
-              </div>
-
-              {tab === 'output' ? (
-                <label className="inline-flex items-center gap-2 rounded-md border border-border bg-[#111111] px-2.5 py-1 text-[11px] text-text-secondary">
-                  <span>{t('terminal.timeout')}</span>
-                  <select
-                    className="bg-transparent text-text-primary outline-none"
-                    value={runner.timeoutSeconds}
-                    onChange={(event) =>
-                      runner.setTimeoutSeconds(Number(event.target.value))
-                    }
-                  >
-                    {[5, 10, 30, 60].map((seconds) => (
-                      <option key={seconds} value={seconds}>
-                        {seconds}s
-                      </option>
-                    ))}
-                  </select>
-                </label>
-              ) : null}
-
-              {tab === 'output' ? (
+            <div className="flex flex-wrap items-center gap-2 text-[11px] text-text-secondary">
+              <span>{t('terminal.noteFolder')}</span>
+              <span className="max-w-[520px] truncate rounded-md border border-border bg-[#111111] px-2 py-1 text-text-primary">
+                {displayNoteDirectory || displayCwd}
+              </span>
+              {canResetCwd ? (
                 <button
                   type="button"
-                  className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#111111] px-2.5 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary disabled:opacity-40"
-                  onClick={() => void runner.run()}
-                  disabled={!canRunSnippet || runner.running}
+                  className="rounded-md border border-border bg-[#111111] px-2 py-1 text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+                  onClick={() => setCwd(noteDirectory ?? defaultCwd)}
                 >
-                  {runner.running ? (
-                    <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <Play className="h-3.5 w-3.5" />
-                  )}
-                  {t('terminal.run')}
+                  {t('terminal.resetCwd')}
                 </button>
               ) : null}
-
-              {tab === 'output' ? (
-                <button
-                  type="button"
-                  className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#111111] px-2.5 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary disabled:opacity-40"
-                  onClick={() => void copyOutput()}
-                  disabled={!runner.result}
-                >
-                  <Copy className="h-3.5 w-3.5" />
-                  {t('common.copy')}
-                </button>
-              ) : null}
-
-              <button
-                type="button"
-                className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#111111] px-2.5 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
-                onClick={clearCurrentTab}
-              >
-                <RotateCcw className="h-3.5 w-3.5" />
-                {t('terminal.clear')}
-              </button>
-
-              <button
-                type="button"
-                className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#111111] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
-                onClick={() => onOpenChange(false)}
-                title={t('terminal.toggle')}
-              >
-                <ChevronDown className="h-3.5 w-3.5" />
-              </button>
             </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {canRunSnippet ? (
+              <button
+                type="button"
+                className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#111111] px-3 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary disabled:opacity-40"
+                onClick={() => void runCurrentNote()}
+                disabled={runner.running}
+                title={t('terminal.runCurrentNote')}
+              >
+                {runner.running ? (
+                  <LoaderCircle className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <Play className="h-3.5 w-3.5" />
+                )}
+                {t('terminal.runCurrentNote')}
+              </button>
+            ) : null}
+
+            <button
+              type="button"
+              className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#111111] px-3 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+              onClick={resetTerminal}
+            >
+              <RotateCcw className="h-3.5 w-3.5" />
+              {t('terminal.clear')}
+            </button>
+
+            <button
+              type="button"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#111111] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+              onClick={() => onOpenChange(false)}
+              title={t('terminal.toggle')}
+            >
+              <ChevronDown className="h-3.5 w-3.5" />
+            </button>
           </div>
         </div>
 
-        {tab === 'terminal' ? (
-          <>
-            <div
-              ref={viewportRef}
-              className="min-h-0 flex-1 overflow-y-auto bg-[#0b0b0b] px-3 py-3 font-mono text-xs"
+        <div
+          ref={viewportRef}
+          className="min-h-0 flex-1 overflow-y-auto bg-[#0a0a0a] px-3 py-3 font-mono text-xs"
+        >
+          {entries.length ? (
+            <div className="space-y-1.5">
+              {entries.map((entry) => (
+                <div key={entry.id} className="whitespace-pre-wrap leading-6">
+                  {entry.kind === 'command' ? (
+                    <p className="text-text-primary">
+                      <span className="text-text-secondary">
+                        {entry.prompt} {promptSymbol}{' '}
+                      </span>
+                      {entry.text}
+                    </p>
+                  ) : entry.kind === 'stdout' ? (
+                    <p className="text-[#34d399]">{entry.text}</p>
+                  ) : entry.kind === 'stderr' ? (
+                    <p className="text-[#f87171]">{entry.text}</p>
+                  ) : (
+                    <p className="text-text-secondary">{entry.text}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
+              <p className="text-sm text-text-primary">{t('terminal.empty')}</p>
+              <p className="max-w-lg text-xs leading-6 text-text-secondary">
+                {t('terminal.emptyHint', { shell: shellName })}
+              </p>
+            </div>
+          )}
+        </div>
+
+        <div className="border-t border-border bg-[#0d0d0d] px-3 py-3">
+          <label className="flex items-center gap-2 rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-secondary">
+            <span className="max-w-[42%] shrink-0 truncate rounded-sm border border-border bg-[#161616] px-2 py-1 text-[11px] text-text-secondary">
+              {displayCwd} {promptSymbol}
+            </span>
+            <input
+              ref={promptRef}
+              className="w-full bg-transparent text-text-primary outline-none"
+              style={{ caretColor: 'var(--accent)' }}
+              value={inputValue}
+              onChange={(event) => {
+                setInputValue(event.target.value)
+                setHistoryIndex(null)
+              }}
+              onKeyDown={(event) => {
+                event.stopPropagation()
+
+                if (event.key === 'Enter') {
+                  event.preventDefault()
+                  void handleCommand()
+                }
+
+                if (
+                  event.key.toLowerCase() === 'c' &&
+                  event.ctrlKey &&
+                  childRef.current
+                ) {
+                  event.preventDefault()
+                  void stopCurrentProcess()
+                }
+
+                if (event.key === 'ArrowUp') {
+                  event.preventDefault()
+                  if (!history.length) {
+                    return
+                  }
+
+                  const nextIndex =
+                    historyIndex === null
+                      ? 0
+                      : Math.min(historyIndex + 1, history.length - 1)
+                  setHistoryIndex(nextIndex)
+                  setInputValue(history[nextIndex] ?? '')
+                }
+
+                if (event.key === 'ArrowDown') {
+                  event.preventDefault()
+                  if (!history.length) {
+                    return
+                  }
+
+                  if (historyIndex === null) {
+                    setInputValue('')
+                    return
+                  }
+
+                  const nextIndex = historyIndex - 1
+                  if (nextIndex < 0) {
+                    setHistoryIndex(null)
+                    setInputValue('')
+                    return
+                  }
+
+                  setHistoryIndex(nextIndex)
+                  setInputValue(history[nextIndex] ?? '')
+                }
+              }}
+              placeholder={t('terminal.commandPlaceholder', { shell: shellName })}
+            />
+            <button
+              type="button"
+              className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-[#161616] px-2 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary disabled:opacity-40"
+              onClick={() => void handleCommand()}
+              disabled={!inputValue.trim() || processRunning}
             >
-              <div className="mb-3 grid gap-2 md:grid-cols-3">
-                {quickActions.map((command) => (
-                  <button
-                    key={command}
-                    type="button"
-                    className="rounded-md border border-border bg-[#111111] px-3 py-2 text-left text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
-                    onClick={() => {
-                      setInputValue(command)
-                      setTab('terminal')
-                      promptRef.current?.focus()
-                    }}
-                  >
-                    {command}
-                  </button>
-                ))}
-              </div>
+              <Play className="h-3.5 w-3.5" />
+              {t('terminal.run')}
+            </button>
+            <button
+              type="button"
+              className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-[#161616] px-2 text-[11px] text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171] disabled:opacity-40"
+              onClick={() => void stopCurrentProcess()}
+              disabled={!processRunning}
+            >
+              <Square className="h-3.5 w-3.5" />
+              {t('terminal.stop')}
+            </button>
+          </label>
 
-              <div className="grid gap-2">
-                {entries.map((entry) => (
-                  <div
-                    key={entry.id}
-                    className={`whitespace-pre-wrap rounded-md border px-3 py-2 leading-6 ${
-                      entry.kind === 'command'
-                        ? 'border-border bg-[#111111]'
-                        : entry.kind === 'stdout'
-                          ? 'border-[#153126] bg-[#101b15]'
-                          : entry.kind === 'stderr'
-                            ? 'border-[#402020] bg-[#1a1010]'
-                            : 'border-border bg-[#0f0f0f]'
-                    }`}
-                  >
-                    {entry.kind === 'command' ? (
-                      <p className="text-text-primary">
-                        <span className="text-text-secondary">{entry.prompt} $ </span>
-                        {entry.text}
-                      </p>
-                    ) : entry.kind === 'stdout' ? (
-                      <p className="text-[#34d399]">{entry.text}</p>
-                    ) : entry.kind === 'stderr' ? (
-                      <p className="text-[#f87171]">{entry.text}</p>
-                    ) : (
-                      <p className="text-text-secondary">{entry.text}</p>
-                    )}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="border-t border-border bg-[#0d0d0d] px-3 py-3">
-              <div className="mb-2 grid gap-2 rounded-lg border border-border bg-[#101010] p-3">
-                <div className="flex flex-wrap items-center justify-between gap-2 text-[11px] text-text-secondary">
-                  <span>
-                    {t('terminal.shellBanner', {
-                      shell: shellName,
-                    })}
-                  </span>
-                  <span>{t('terminal.historyHint')}</span>
-                </div>
-
-                <label className="flex items-center gap-2 rounded-md border border-border bg-[#0b0b0b] px-3 py-2 text-xs text-text-secondary">
-                  <span className="max-w-[40%] shrink-0 truncate rounded-sm border border-border bg-[#161616] px-2 py-1 text-[11px] text-text-secondary">
-                    {cwd} $
-                  </span>
-                  <input
-                    ref={promptRef}
-                    className="w-full bg-transparent text-text-primary outline-none"
-                    style={{ caretColor: 'var(--accent)' }}
-                    value={inputValue}
-                    onChange={(event) => {
-                      setInputValue(event.target.value)
-                      setHistoryIndex(null)
-                    }}
-                    onKeyDown={(event) => {
-                      event.stopPropagation()
-
-                      if (event.key === 'Enter') {
-                        event.preventDefault()
-                        void handleCommand()
-                      }
-
-                      if (
-                        event.key.toLowerCase() === 'c' &&
-                        event.ctrlKey &&
-                        childRef.current
-                      ) {
-                        event.preventDefault()
-                        void stopCurrentProcess()
-                      }
-
-                      if (event.key === 'ArrowUp') {
-                        event.preventDefault()
-                        if (!history.length) {
-                          return
-                        }
-
-                        const nextIndex =
-                          historyIndex === null
-                            ? 0
-                            : Math.min(historyIndex + 1, history.length - 1)
-                        setHistoryIndex(nextIndex)
-                        setInputValue(history[nextIndex] ?? '')
-                      }
-
-                      if (event.key === 'ArrowDown') {
-                        event.preventDefault()
-                        if (!history.length) {
-                          return
-                        }
-
-                        if (historyIndex === null) {
-                          setInputValue('')
-                          return
-                        }
-
-                        const nextIndex = historyIndex - 1
-                        if (nextIndex < 0) {
-                          setHistoryIndex(null)
-                          setInputValue('')
-                          return
-                        }
-
-                        setHistoryIndex(nextIndex)
-                        setInputValue(history[nextIndex] ?? '')
-                      }
-                    }}
-                    placeholder={t('terminal.commandPlaceholder', { shell: shellName })}
-                  />
-                  <button
-                    type="button"
-                    className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-[#161616] px-2 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary disabled:opacity-40"
-                    onClick={() => void handleCommand()}
-                    disabled={!inputValue.trim() || processRunning}
-                  >
-                    <Play className="h-3.5 w-3.5" />
-                    {t('terminal.run')}
-                  </button>
-                  <button
-                    type="button"
-                    className="inline-flex h-8 items-center gap-1 rounded-md border border-border bg-[#161616] px-2 text-[11px] text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171] disabled:opacity-40"
-                    onClick={() => void stopCurrentProcess()}
-                    disabled={!processRunning}
-                  >
-                    <Square className="h-3.5 w-3.5" />
-                    {t('terminal.stop')}
-                  </button>
-                </label>
-              </div>
-
-              <div className="flex flex-wrap items-center justify-between gap-3 text-[11px] text-text-secondary">
-                <span>{t('terminal.runHint')}</span>
-                <span>{t('terminal.cwdHint')}</span>
-              </div>
-            </div>
-          </>
-        ) : (
-          <div
-            ref={viewportRef}
-            className="grid min-h-0 flex-1 gap-3 overflow-y-auto bg-[#0d0d0d] px-3 py-3"
-          >
-            <div className="rounded-lg border border-border bg-[#101010] p-4">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <div className="text-[11px] uppercase tracking-[0.16em] text-text-muted">
-                    {t('terminal.output')}
-                  </div>
-                  <div className="mt-1 text-sm text-text-primary">
-                    {outputLabel}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2 text-[11px]">
-                  <span className="rounded-md border border-border bg-[#111111] px-2 py-1 text-text-secondary">
-                    {outputLanguage}
-                  </span>
-                  <span className="rounded-md border border-border bg-[#111111] px-2 py-1 text-text-secondary">
-                    {outputSource === 'block'
-                      ? t('terminal.blockSource')
-                      : t('terminal.noteSource')}
-                  </span>
-                  {runner.result ? (
-                    <span className="rounded-md border border-border bg-[#111111] px-2 py-1 text-text-secondary">
-                      exit {runner.result.exit_code}
-                    </span>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-
-            <div className="grid gap-3 lg:grid-cols-2">
-              <div className="rounded-lg border border-border bg-[#111111] p-3">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <h3 className="text-[11px] uppercase tracking-[0.16em] text-text-muted">
-                    stdout
-                  </h3>
-                  <span className="text-[11px] text-text-secondary">
-                    {t('terminal.noteFolder')}
-                  </span>
-                </div>
-                <pre className="min-h-32 overflow-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#34d399]">
-                  {runner.result?.stdout || t('terminal.noStdout')}
-                </pre>
-              </div>
-
-              <div className="rounded-lg border border-border bg-[#111111] p-3">
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <h3 className="text-[11px] uppercase tracking-[0.16em] text-text-muted">
-                    stderr
-                  </h3>
-                  <span className="text-[11px] text-text-secondary">
-                    {cwd}
-                  </span>
-                </div>
-                <pre className="min-h-32 overflow-auto whitespace-pre-wrap font-mono text-xs leading-6 text-[#f87171]">
-                  {runner.result?.stderr || t('terminal.noStderr')}
-                </pre>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-[#101010] px-3 py-2 text-[11px] text-text-secondary">
-              {runner.result ? (
-                <>
-                  <span>{t('runner.duration', { ms: runner.result.duration_ms })}</span>
-                  {runner.result.timed_out ? (
-                    <span className="text-[#fbbf24]">{t('runner.timedOut')}</span>
-                  ) : null}
-                </>
-              ) : (
-                <span>
-                  {canRunSnippet
-                    ? t('terminal.outputHint')
-                    : t('terminal.unsupportedHint')}
-                </span>
-              )}
-            </div>
+          <div className="mt-2 flex flex-wrap items-center justify-between gap-3 text-[11px] text-text-secondary">
+            <span>{t('terminal.runHint')}</span>
+            <span>{t('terminal.historyHint')}</span>
           </div>
-        )}
+        </div>
       </div>
     </section>
   )
