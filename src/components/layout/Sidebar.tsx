@@ -97,11 +97,11 @@ export function Sidebar({
 
   return (
     <aside
-      className="relative flex h-full shrink-0 flex-col border-r border-border bg-[#0f0f0f]"
+      className="motion-slide-left relative flex h-full shrink-0 flex-col border-r border-border bg-[#0f0f0f]"
       style={{ width }}
     >
       <div className="border-b border-border px-3 py-3">
-        <label className="flex items-center gap-2 rounded-md border border-border bg-[#111111] px-3 py-2 text-sm text-text-secondary focus-within:border-focus">
+        <label className="interactive-lift flex items-center gap-2 rounded-md border border-border bg-[#111111] px-3 py-2 text-sm text-text-secondary focus-within:border-focus">
           <Search className="h-4 w-4" />
           <input
             ref={searchInputRef}

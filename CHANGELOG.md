@@ -7,6 +7,17 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+## [1.0.14] - 2026-03-20
+
+### Changed
+- aplicativo ganhou animações sutis em painéis, abas, cards, botões e modais para deixar a navegação mais fluida
+- sidebar, painel direito e header do editor receberam transições e hover states mais vivos sem perder o visual minimalista
+- modal de atualização foi reorganizado para exibir resumo e destaques da release de forma mais limpa
+
+### Fixed
+- tela de atualização não quebra mais o layout ao mostrar versões e detalhes da release
+- links de release do updater agora apontam para o repositório público atual
+
 ## [1.0.13] - 2026-03-20
 
 ### Changed

@@ -39,10 +39,10 @@ function controlButtonClassName(
   }
 
   if (tone === 'danger') {
-    return 'relative z-20 flex h-8 w-8 items-center justify-center border-l border-border text-text-secondary transition hover:bg-red/20 hover:text-red'
+    return 'interactive-lift relative z-20 flex h-8 w-8 items-center justify-center border-l border-border text-text-secondary transition hover:bg-red/20 hover:text-red'
   }
 
-  return 'relative z-20 flex h-8 w-8 items-center justify-center border-l border-border text-text-secondary transition hover:bg-hover hover:text-text-primary'
+  return 'interactive-lift relative z-20 flex h-8 w-8 items-center justify-center border-l border-border text-text-secondary transition hover:bg-hover hover:text-text-primary'
 }
 
 function controlOrder(
@@ -141,7 +141,7 @@ export function TitleBar({
   const { t } = useTranslation()
 
   return (
-    <header className="relative z-10 flex h-9 items-stretch border-b border-[#1e1e1e] bg-[#0f0f0f]">
+    <header className="motion-fade-in relative z-10 flex h-9 items-stretch border-b border-[#1e1e1e] bg-[#0f0f0f]">
       {platform === 'macos' ? (
         <WindowControls
           platform={platform}
@@ -152,7 +152,7 @@ export function TitleBar({
       <div className="relative z-10 flex items-center pl-2">
         <button
           type="button"
-          className="flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-text-secondary transition hover:border-border hover:bg-hover hover:text-text-primary"
+          className="interactive-lift flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-text-secondary transition hover:border-border hover:bg-hover hover:text-text-primary"
           onClick={onToggleSidebar}
           title={t('titlebar.toggleSidebar')}
           aria-label={t('titlebar.toggleSidebar')}
@@ -166,7 +166,7 @@ export function TitleBar({
         data-tauri-drag-region
       >
         <div className="flex min-w-0 items-center gap-2" data-tauri-drag-region>
-          <span className="h-2.5 w-2.5 rounded-full bg-accent" />
+          <span className="accent-pulse h-2.5 w-2.5 rounded-full bg-accent" />
           <span className="truncate text-sm font-semibold tracking-wide text-text-primary">
             {t('app.name')}
           </span>
@@ -177,7 +177,7 @@ export function TitleBar({
       <div className="relative z-10 flex items-center gap-2 px-2">
         <button
           type="button"
-          className="inline-flex h-7 items-center gap-2 rounded-md border border-border bg-[#161616] px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-[#161616] px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
           onClick={onFocusSearch}
           title={t('titlebar.search')}
         >
@@ -186,7 +186,7 @@ export function TitleBar({
         </button>
         <button
           type="button"
-          className="inline-flex h-7 items-center gap-2 rounded-md border border-border bg-[#161616] px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-[#161616] px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
           onClick={onToggleFullscreen}
           title={t('commands.toggleFullscreen')}
           aria-label={t('commands.toggleFullscreen')}
@@ -199,7 +199,7 @@ export function TitleBar({
         </button>
         <button
           type="button"
-          className="inline-flex h-7 items-center gap-2 rounded-md border border-border bg-[#161616] px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-[#161616] px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
           onClick={onOpenSettings}
           title={t('titlebar.settings')}
         >

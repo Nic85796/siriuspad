@@ -80,7 +80,7 @@ export function NoteEditorHeader({
 
   return (
     <div
-      className="border-b border-border bg-[#111111] px-4 py-3"
+      className="motion-fade-up border-b border-border bg-[#111111] px-4 py-3"
       style={{
         backgroundImage: headerBackground
           ? `linear-gradient(180deg, ${headerBackground}, transparent 80%)`
@@ -150,7 +150,7 @@ export function NoteEditorHeader({
               <button
                 key={mode}
                 type="button"
-                className={`rounded-md px-2.5 py-1 text-[11px] transition ${
+                className={`interactive-lift rounded-md px-2.5 py-1 text-[11px] transition ${
                   previewMode === mode
                     ? 'bg-[#222222] text-text-primary'
                     : 'text-text-secondary hover:bg-hover hover:text-text-primary'
@@ -164,7 +164,7 @@ export function NoteEditorHeader({
 
           <button
             type="button"
-            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#161616] px-2.5 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+            className="interactive-lift inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#161616] px-2.5 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
             onClick={onOpenFindReplace}
             title={t('commands.findReplace')}
           >
@@ -174,7 +174,7 @@ export function NoteEditorHeader({
 
           <button
             type="button"
-            className="inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#161616] px-2.5 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+            className="interactive-lift inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#161616] px-2.5 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
             onClick={onOpenHistory}
             title={t('history.title')}
           >
@@ -184,7 +184,7 @@ export function NoteEditorHeader({
 
           <button
             type="button"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#161616] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+            className="interactive-lift inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#161616] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
             onClick={() => void onTogglePin()}
             title={note.pinned ? t('commands.unpinNote') : t('commands.pinNote')}
           >
@@ -197,7 +197,7 @@ export function NoteEditorHeader({
 
           <button
             type="button"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#161616] text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171]"
+            className="interactive-lift inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#161616] text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171]"
             onClick={() => void onDelete()}
             title={t('commands.deleteNote')}
           >

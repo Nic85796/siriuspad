@@ -98,10 +98,10 @@ jobs:
             Nova versão pública do SiriusPad.
 
             Destaques desta versão:
-            - editor central mais limpo, com organização da nota concentrada no painel lateral
-            - painel direito redesenhado para cor, checklist e callouts ficarem mais práticos
-            - lista de notas, abas e onboarding com visual mais consistente
-            - tutorial inicial mais confortável em telas menores
+            - animações sutis em painéis, abas, cards, botões e modais
+            - transições mais fluidas no layout sem perder o visual minimalista
+            - modal de atualização reorganizado e mais legível
+            - link do updater corrigido para o repositório público atual
 
             Distribuição oficial:
             - `.deb` para Linux

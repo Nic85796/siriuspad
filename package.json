@@ -1,17 +1,17 @@
 {
   "name": "siriuspad",
   "private": true,
-  "version": "1.0.13",
+  "version": "1.0.14",
   "description": "Bloco de notas desktop local para desenvolvedores, com Markdown, terminal embutido e organização por workspaces.",
   "author": "SiriusX",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Nic85796/siriuspad.git"
+    "url": "https://github.com/SiriusXofc/siriuspad.git"
   },
-  "homepage": "https://github.com/Nic85796/siriuspad",
+  "homepage": "https://github.com/SiriusXofc/siriuspad",
   "bugs": {
-    "url": "https://github.com/Nic85796/siriuspad/issues"
+    "url": "https://github.com/SiriusXofc/siriuspad/issues"
   },
   "keywords": [
     "tauri",

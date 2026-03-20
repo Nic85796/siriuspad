@@ -132,14 +132,15 @@ export function RightPanel({
   }
 
   return (
-    <aside className="flex h-full w-[288px] shrink-0 flex-col border-l border-border bg-[#0f0f0f]">
+    <aside className="motion-slide-right flex h-full w-[288px] shrink-0 flex-col border-l border-border bg-[#0f0f0f]">
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
         <section
-          className={sectionCardClassName()}
+          className={`${sectionCardClassName()} motion-fade-up surface-hover`}
           style={{
             backgroundImage: sectionTint
               ? `linear-gradient(180deg, ${sectionTint}, transparent 85%)`
               : undefined,
+            animationDelay: '40ms',
           }}
         >
           <h2 className={sectionTitleClassName()}>{t('rightPanel.noteTools')}</h2>
@@ -258,11 +259,12 @@ export function RightPanel({
         </section>
 
         <section
-          className={sectionCardClassName()}
+          className={`${sectionCardClassName()} motion-fade-up surface-hover`}
           style={{
             backgroundImage: sectionTint
               ? `linear-gradient(180deg, ${sectionTint}, transparent 85%)`
               : undefined,
+            animationDelay: '90ms',
           }}
         >
           <div className="mb-3 flex items-center justify-between gap-3">
@@ -390,7 +392,10 @@ export function RightPanel({
           )}
         </section>
 
-        <section className={sectionCardClassName()}>
+        <section
+          className={`${sectionCardClassName()} motion-fade-up surface-hover`}
+          style={{ animationDelay: '140ms' }}
+        >
           <h2 className={sectionTitleClassName()}>{t('note.calloutsTitle')}</h2>
           <p className="mb-3 text-xs leading-6 text-text-secondary">
             {t('rightPanel.calloutsHint')}
@@ -463,7 +468,7 @@ export function RightPanel({
           )}
         </section>
 
-        <section className="mb-5">
+        <section className="motion-fade-up mb-5" style={{ animationDelay: '190ms' }}>
           <h2 className={sectionTitleClassName()}>{t('rightPanel.filterTags')}</h2>
           <div className="flex flex-wrap gap-2">
             {tagCounts.length ? (
@@ -482,7 +487,7 @@ export function RightPanel({
           </div>
         </section>
 
-        <section className="mb-5">
+        <section className="motion-fade-up mb-5" style={{ animationDelay: '240ms' }}>
           <h2 className={sectionTitleClassName()}>{t('rightPanel.info')}</h2>
           <div className="grid gap-2 rounded-md border border-border bg-[#111111] p-3 text-xs text-text-secondary">
             <div className="flex items-center justify-between gap-3">
@@ -517,7 +522,7 @@ export function RightPanel({
           </div>
         </section>
 
-        <section>
+        <section className="motion-fade-up" style={{ animationDelay: '290ms' }}>
           <h2 className={sectionTitleClassName()}>{t('rightPanel.shortcuts')}</h2>
           <div className="grid gap-2 rounded-md border border-border bg-[#111111] p-3 text-[11px] text-text-secondary">
             {[

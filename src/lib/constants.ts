@@ -2,7 +2,7 @@ import type { AppLanguage, Settings, Workspace } from '@/types'
 
 export const APP_VERSION = import.meta.env.VITE_APP_VERSION ?? '0.0.0'
 export const APP_MAINTAINER = 'SiriusX'
-export const APP_REPOSITORY_URL = 'https://github.com/Nic85796/siriuspad'
+export const APP_REPOSITORY_URL = 'https://github.com/SiriusXofc/siriuspad'
 export const APP_CHANGELOG_URL = `${APP_REPOSITORY_URL}/blob/main/CHANGELOG.md`
 export const APP_LICENSE_URL = `${APP_REPOSITORY_URL}/blob/main/LICENSE`
 export const APP_SECURITY_URL = `${APP_REPOSITORY_URL}/blob/main/SECURITY.md`

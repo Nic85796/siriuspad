@@ -74,7 +74,7 @@ export function NoteList({
         </h2>
         <button
           type="button"
-          className="rounded-md border border-border bg-[#161616] p-1.5 text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+          className="interactive-lift rounded-md border border-border bg-[#161616] p-1.5 text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
           onClick={() => void onCreateNote()}
           title={t('sidebar.newNote')}
           aria-label={t('sidebar.newNote')}
@@ -84,13 +84,13 @@ export function NoteList({
       </div>
 
       <div className="grid gap-2">
-        {notes.map((note) => {
+        {notes.map((note, index) => {
           const isActive = note.id === activeNoteId
           return (
             <button
               key={note.id}
               type="button"
-              className={`relative overflow-hidden rounded-md border px-3 py-3 text-left transition ${
+              className={`motion-fade-up surface-hover relative overflow-hidden rounded-md border px-3 py-3 text-left transition ${
                 isActive
                   ? 'border-focus bg-[#161616]'
                   : 'border-border bg-[#111111] hover:border-focus hover:bg-hover'
@@ -101,6 +101,7 @@ export function NoteList({
                   withAlpha(note.color, isActive ? 0.11 : 0.06)
                     ? `linear-gradient(180deg, ${withAlpha(note.color, isActive ? 0.11 : 0.06)}, transparent 80%)`
                     : undefined,
+                animationDelay: `${Math.min(index * 28, 180)}ms`,
               }}
               onClick={() => void onOpenNote(note.id)}
               onContextMenu={(event) => {

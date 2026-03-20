@@ -1290,7 +1290,7 @@ export default function App() {
   }, [notes.createNote])
 
   return (
-    <div className="relative flex h-screen flex-col bg-base text-text-primary">
+    <div className="motion-fade-in relative flex h-screen flex-col bg-base text-text-primary">
       <ResizeBorders
         platform={uiState.platform}
         enabled={!uiState.isFullscreen}

@@ -295,9 +295,9 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
   )
 
   return (
-    <div className="absolute inset-0 z-[90] overflow-y-auto bg-black/85 px-4 py-4 sm:py-8">
+    <div className="modal-backdrop absolute inset-0 z-[90] overflow-y-auto bg-black/85 px-4 py-4 sm:py-8">
       <div className="flex min-h-full items-start justify-center sm:items-center">
-        <div className="flex w-full max-w-[560px] flex-col overflow-hidden rounded-[12px] border border-[#2d2060] bg-[#111111] sm:max-h-[calc(100vh-4rem)]">
+        <div className="modal-panel flex w-full max-w-[560px] flex-col overflow-hidden rounded-[12px] border border-[#2d2060] bg-[#111111] sm:max-h-[calc(100vh-4rem)]">
           <div className="flex items-center justify-between border-b border-border px-5 py-4">
             <div className="inline-flex items-center gap-3">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#161616] text-sm text-text-primary">
@@ -326,7 +326,9 @@ export function OnboardingModal({ onComplete }: OnboardingModalProps) {
               {t(`onboarding.steps.${step.id}.description`)}
             </p>
 
-            <StepVisual step={step} shortcuts={shortcuts} />
+            <div className="motion-fade-up">
+              <StepVisual step={step} shortcuts={shortcuts} />
+            </div>
 
             <div className="mt-5 flex items-center justify-center gap-2">
               {STEPS.map((item, dotIndex) => (

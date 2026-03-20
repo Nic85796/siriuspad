@@ -54,6 +54,11 @@
   --yellow: #fbbf24;
   --blue: #60a5fa;
 
+  --motion-fast: 140ms;
+  --motion-base: 220ms;
+  --motion-slow: 360ms;
+  --motion-spring: cubic-bezier(0.22, 1, 0.36, 1);
+
   --font-ui: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 
@@ -89,6 +94,12 @@ input,
 select,
 textarea {
   font: inherit;
+  transition:
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    box-shadow var(--motion-base) ease,
+    opacity var(--motion-fast) ease;
 }
 
 input[type='range'] {
@@ -181,4 +192,168 @@ button:disabled {
 .workspace-menu-item:hover {
   background: var(--bg-hover);
   color: var(--text-primary);
+}
+
+.motion-fade-in {
+  animation: fade-in var(--motion-base) var(--motion-spring) both;
+}
+
+.motion-fade-up {
+  animation: fade-up var(--motion-slow) var(--motion-spring) both;
+}
+
+.motion-slide-left {
+  animation: slide-left var(--motion-slow) var(--motion-spring) both;
+}
+
+.motion-slide-right {
+  animation: slide-right var(--motion-slow) var(--motion-spring) both;
+}
+
+.motion-pop {
+  animation: pop-in 260ms var(--motion-spring) both;
+}
+
+.interactive-lift {
+  transition:
+    transform var(--motion-fast) var(--motion-spring),
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    color var(--motion-fast) ease,
+    box-shadow var(--motion-base) ease;
+  will-change: transform;
+}
+
+.interactive-lift:hover {
+  transform: translateY(-1px);
+}
+
+.interactive-lift:active {
+  transform: translateY(0) scale(0.99);
+}
+
+.surface-hover {
+  transition:
+    transform var(--motion-fast) var(--motion-spring),
+    border-color var(--motion-fast) ease,
+    background-color var(--motion-fast) ease,
+    box-shadow var(--motion-base) ease;
+  will-change: transform;
+}
+
+.surface-hover:hover {
+  transform: translateY(-2px);
+}
+
+.accent-pulse {
+  animation: accent-pulse 2.8s ease-in-out infinite;
+}
+
+.progress-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.18) 45%,
+    transparent 100%
+  );
+  transform: translateX(-100%);
+  animation: shimmer 1.8s linear infinite;
+}
+
+.modal-backdrop {
+  animation: fade-in 180ms ease both;
+}
+
+.modal-panel {
+  animation: pop-in 220ms var(--motion-spring) both;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-right {
+  from {
+    opacity: 0;
+    transform: translateX(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes accent-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(124, 58, 237, 0.06);
+  }
+}
+
+@keyframes shimmer {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }

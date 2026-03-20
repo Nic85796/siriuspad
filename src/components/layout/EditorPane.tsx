@@ -163,8 +163,8 @@ export function EditorPane({
 
   if (!note) {
     return (
-      <main className="flex min-h-0 flex-1 items-center justify-center bg-base">
-        <div className="max-w-md rounded-lg border border-dashed border-border bg-[#111111] px-6 py-10 text-center">
+      <main className="motion-fade-in flex min-h-0 flex-1 items-center justify-center bg-base">
+        <div className="motion-pop max-w-md rounded-lg border border-dashed border-border bg-[#111111] px-6 py-10 text-center">
           <p className="text-sm font-semibold text-text-primary">
             {t('note.noActive')}
           </p>
@@ -186,7 +186,7 @@ export function EditorPane({
   const canRunSnippet = EXECUTABLE_LANGUAGES.has(note.language.toLowerCase())
 
   return (
-    <main className="flex min-h-0 flex-1 flex-col bg-base">
+    <main className="motion-fade-in flex min-h-0 flex-1 flex-col bg-base">
       <NoteEditorHeader
         note={note}
         workspaces={workspaces}
