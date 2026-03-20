@@ -146,6 +146,15 @@ jobs:
           distribution: temurin
           java-version: 17
 
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install Python deps for Android branding
+        shell: bash
+        run: python -m pip install --upgrade pip pillow
+
       - name: Install Rust with Android target
         uses: dtolnay/rust-toolchain@stable
         with:

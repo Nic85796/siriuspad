@@ -1,6 +1,6 @@
 [package]
 name = "siriuspad"
-version = "1.0.20"
+version = "1.0.21"
 description = "A local-first technical scratchpad for developers."
 authors = ["SiriusX"]
 license = "MIT"

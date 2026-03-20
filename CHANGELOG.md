@@ -7,6 +7,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+## [1.0.21] - 2026-03-20
+
+### Fixed
+
+- workflow Android agora prepara Python e instala `Pillow` antes de gerar os ícones do SiriusPad
+- release mobile volta a conseguir passar da etapa de branding no GitHub Actions
+
 ## [1.0.20] - 2026-03-20
 
 ### Fixed
