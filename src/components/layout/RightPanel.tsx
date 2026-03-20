@@ -1,12 +1,4 @@
 import { format } from 'date-fns'
-import {
-  Check,
-  Lightbulb,
-  NotebookText,
-  Plus,
-  ShieldAlert,
-  Trash2,
-} from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -15,9 +7,7 @@ import { getDateFnsLocale } from '@/lib/date'
 import { NOTE_COLOR_SWATCHES } from '@/lib/constants'
 import { PriorityDot } from '@/components/ui/PriorityDot'
 import { TagPill } from '@/components/ui/TagPill'
-import type { ChecklistItem, Note, NoteMetadata } from '@/types'
-
-type CalloutTone = 'note' | 'tip' | 'warning'
+import type { Note, NoteMetadata } from '@/types'
 
 interface RightPanelProps {
   note: Note | null
@@ -25,20 +15,10 @@ interface RightPanelProps {
   activeTag: string | null
   onTagClick: (tag: string | null) => void
   onColorSelect: (color?: string) => void
-  onNoteChange: (patch: Partial<Note>) => void
-  onInsertCallout: (input: { tone: CalloutTone; title?: string }) => void
 }
 
 function wordCount(content: string) {
   return content.trim() ? content.trim().split(/\s+/).length : 0
-}
-
-function createChecklistItem(text: string): ChecklistItem {
-  return {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    text,
-    done: false,
-  }
 }
 
 function normalizeHexColor(value: string) {
@@ -86,13 +66,9 @@ export function RightPanel({
   activeTag,
   onTagClick,
   onColorSelect,
-  onNoteChange,
-  onInsertCallout,
 }: RightPanelProps) {
   const { t, i18n } = useTranslation()
-  const [newChecklistItem, setNewChecklistItem] = useState('')
   const [customColor, setCustomColor] = useState(note?.color ?? NOTE_COLOR_SWATCHES[4])
-  const [calloutTitle, setCalloutTitle] = useState('')
 
   const tagCounts = useMemo(() => {
     const map = new Map<string, number>()
@@ -112,24 +88,6 @@ export function RightPanel({
   const checklistDoneCount = checklist.filter((item) => item.done).length
   const normalizedCustomColor = normalizeHexColor(customColor)
   const sectionTint = note?.color ? withAlpha(note.color, 0.08) : undefined
-
-  const updateChecklist = (nextChecklist: ChecklistItem[]) => {
-    if (!note) {
-      return
-    }
-
-    onNoteChange({ checklist: nextChecklist })
-  }
-
-  const addChecklistItem = () => {
-    const text = newChecklistItem.trim()
-    if (!note || !text) {
-      return
-    }
-
-    updateChecklist([...checklist, createChecklistItem(text)])
-    setNewChecklistItem('')
-  }
 
   return (
     <aside className="motion-slide-right flex h-full w-[288px] shrink-0 flex-col border-l border-border bg-[#0f0f0f]">
@@ -258,217 +216,7 @@ export function RightPanel({
           )}
         </section>
 
-        <section
-          className={`${sectionCardClassName()} motion-fade-up surface-hover`}
-          style={{
-            backgroundImage: sectionTint
-              ? `linear-gradient(180deg, ${sectionTint}, transparent 85%)`
-              : undefined,
-            animationDelay: '90ms',
-          }}
-        >
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div>
-              <h2 className={sectionTitleClassName()}>{t('note.checklistTitle')}</h2>
-              <p className="-mt-1 text-xs leading-6 text-text-secondary">
-                {t('rightPanel.checklistHint')}
-              </p>
-            </div>
-            <span
-              className="rounded-md border px-2 py-1 text-[11px] text-text-primary"
-              style={{
-                borderColor: note?.color ?? 'var(--border)',
-                backgroundColor: withAlpha(note?.color, 0.14) ?? '#161616',
-              }}
-            >
-              {checklistDoneCount}/{checklist.length}
-            </span>
-          </div>
-
-          {note ? (
-            <>
-              <div className="grid gap-2">
-                {checklist.length ? (
-                  checklist.map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center gap-2 rounded-md border border-border bg-[#0f0f0f] px-2 py-2 transition hover:border-focus"
-                    >
-                      <button
-                        type="button"
-                        className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border transition ${
-                          item.done
-                            ? 'border-transparent text-black'
-                            : 'border-border bg-[#111111] text-transparent hover:border-focus'
-                        }`}
-                        style={{
-                          backgroundColor: item.done
-                            ? note.color ?? 'var(--accent)'
-                            : undefined,
-                        }}
-                        onClick={() =>
-                          updateChecklist(
-                            checklist.map((entry) =>
-                              entry.id === item.id
-                                ? { ...entry, done: !entry.done }
-                                : entry,
-                            ),
-                          )
-                        }
-                        aria-label={
-                          item.done
-                            ? t('note.checklistMarkPending')
-                            : t('note.checklistMarkDone')
-                        }
-                      >
-                        <Check className="h-3.5 w-3.5" />
-                      </button>
-
-                      <input
-                        className={`min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-text-muted ${
-                          item.done ? 'text-text-secondary line-through' : 'text-text-primary'
-                        }`}
-                        value={item.text}
-                        onChange={(event) =>
-                          updateChecklist(
-                            checklist.map((entry) =>
-                              entry.id === item.id
-                                ? { ...entry, text: event.target.value }
-                                : entry,
-                            ),
-                          )
-                        }
-                        placeholder={t('note.checklistPlaceholder')}
-                      />
-
-                      <button
-                        type="button"
-                        className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-[#111111] text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171]"
-                        onClick={() =>
-                          updateChecklist(
-                            checklist.filter((entry) => entry.id !== item.id),
-                          )
-                        }
-                        aria-label={t('note.checklistRemove')}
-                      >
-                        <Trash2 className="h-3.5 w-3.5" />
-                      </button>
-                    </div>
-                  ))
-                ) : (
-                  <div className="rounded-md border border-dashed border-border bg-[#0f0f0f] px-3 py-4 text-sm text-text-secondary">
-                    {t('note.checklistEmpty')}
-                  </div>
-                )}
-              </div>
-
-              <div className="mt-3 flex gap-2">
-                <input
-                  className={panelInputClassName()}
-                  placeholder={t('note.checklistPlaceholder')}
-                  value={newChecklistItem}
-                  onChange={(event) => setNewChecklistItem(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter') {
-                      event.preventDefault()
-                      addChecklistItem()
-                    }
-                  }}
-                />
-                <button
-                  type="button"
-                  className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md border border-border bg-[#161616] px-3 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
-                  onClick={addChecklistItem}
-                >
-                  <Plus className="h-4 w-4" />
-                  {t('note.checklistAdd')}
-                </button>
-              </div>
-            </>
-          ) : (
-            <p className="text-xs leading-6 text-text-secondary">
-              {t('rightPanel.noteToolsEmpty')}
-            </p>
-          )}
-        </section>
-
-        <section
-          className={`${sectionCardClassName()} motion-fade-up surface-hover`}
-          style={{ animationDelay: '140ms' }}
-        >
-          <h2 className={sectionTitleClassName()}>{t('note.calloutsTitle')}</h2>
-          <p className="mb-3 text-xs leading-6 text-text-secondary">
-            {t('rightPanel.calloutsHint')}
-          </p>
-
-          {note ? (
-            <>
-              <input
-                className={`${panelInputClassName()} mb-3`}
-                placeholder={t('rightPanel.calloutTitlePlaceholder')}
-                value={calloutTitle}
-                onChange={(event) => setCalloutTitle(event.target.value)}
-              />
-
-              <div className="grid gap-2">
-                {[
-                  {
-                    key: 'note' as const,
-                    label: t('note.calloutNote'),
-                    icon: NotebookText,
-                  },
-                  {
-                    key: 'tip' as const,
-                    label: t('note.calloutTip'),
-                    icon: Lightbulb,
-                  },
-                  {
-                    key: 'warning' as const,
-                    label: t('note.calloutWarning'),
-                    icon: ShieldAlert,
-                  },
-                ].map((item) => {
-                  const Icon = item.icon
-
-                  return (
-                    <button
-                      key={item.key}
-                      type="button"
-                      className="flex items-center gap-3 rounded-md border border-border bg-[#0f0f0f] px-3 py-2.5 text-left text-sm text-text-primary transition hover:border-focus hover:bg-hover"
-                      onClick={() => {
-                        onInsertCallout({
-                          tone: item.key,
-                          title: calloutTitle.trim() || undefined,
-                        })
-                        setCalloutTitle('')
-                      }}
-                      >
-                        <span className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border border-border bg-[#161616] text-text-primary">
-                          <Icon className="h-4 w-4" />
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="block">{item.label}</span>
-                          <span className="mt-1 block text-[10px] uppercase tracking-[0.14em] text-text-muted">
-                            {`> [!${item.key.toUpperCase()}]`}
-                          </span>
-                        </span>
-                    </button>
-                  )
-                })}
-              </div>
-
-              <p className="mt-3 text-xs leading-6 text-text-secondary">
-                {t('note.calloutsFooter')}
-              </p>
-            </>
-          ) : (
-            <p className="text-xs leading-6 text-text-secondary">
-              {t('rightPanel.noteToolsEmpty')}
-            </p>
-          )}
-        </section>
-
-        <section className="motion-fade-up mb-5" style={{ animationDelay: '190ms' }}>
+        <section className="motion-fade-up mb-5" style={{ animationDelay: '140ms' }}>
           <h2 className={sectionTitleClassName()}>{t('rightPanel.filterTags')}</h2>
           <div className="flex flex-wrap gap-2">
             {tagCounts.length ? (
@@ -487,7 +235,7 @@ export function RightPanel({
           </div>
         </section>
 
-        <section className="motion-fade-up mb-5" style={{ animationDelay: '240ms' }}>
+        <section className="motion-fade-up mb-5" style={{ animationDelay: '190ms' }}>
           <h2 className={sectionTitleClassName()}>{t('rightPanel.info')}</h2>
           <div className="grid gap-2 rounded-md border border-border bg-[#111111] p-3 text-xs text-text-secondary">
             <div className="flex items-center justify-between gap-3">
@@ -522,7 +270,7 @@ export function RightPanel({
           </div>
         </section>
 
-        <section className="motion-fade-up" style={{ animationDelay: '290ms' }}>
+        <section className="motion-fade-up" style={{ animationDelay: '240ms' }}>
           <h2 className={sectionTitleClassName()}>{t('rightPanel.shortcuts')}</h2>
           <div className="grid gap-2 rounded-md border border-border bg-[#111111] p-3 text-[11px] text-text-secondary">
             {[

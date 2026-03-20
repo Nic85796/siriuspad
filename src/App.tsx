@@ -1366,6 +1366,7 @@ export default function App() {
             toggleTerminalNonce={toggleTerminalNonce}
             runner={runner}
             onNoteChange={(patch) => notes.updateActiveNote(patch)}
+            onInsertCallout={insertCalloutIntoActiveNote}
             onContentChange={notes.updateActiveContent}
             onSave={saveCurrentNote}
             onDelete={deleteActiveNote}
@@ -1393,7 +1394,6 @@ export default function App() {
             notes={workspaceScopedNotes}
             activeTag={notes.activeTag}
             onTagClick={(tag) => notes.setActiveTag(tag)}
-            onNoteChange={(patch) => notes.updateActiveNote(patch)}
             onColorSelect={(color) => {
               if (!notes.activeNote) {
                 return
@@ -1401,7 +1401,6 @@ export default function App() {
 
               notes.updateActiveNote({ color })
             }}
-            onInsertCallout={insertCalloutIntoActiveNote}
           />
         ) : null}
       </div>

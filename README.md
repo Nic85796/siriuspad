@@ -1,7 +1,7 @@
 [![Licença: MIT](https://img.shields.io/badge/Licen%C3%A7a-MIT-yellow.svg)](./LICENSE)
-[![Versão](https://img.shields.io/github/v/release/Nic85796/siriuspad)](https://github.com/Nic85796/siriuspad/releases/latest)
-[![Issues](https://img.shields.io/github/issues/Nic85796/siriuspad)](https://github.com/Nic85796/siriuspad/issues)
-[![Stars](https://img.shields.io/github/stars/Nic85796/siriuspad)](https://github.com/Nic85796/siriuspad/stargazers)
+[![Versão](https://img.shields.io/github/v/release/SiriusXofc/siriuspad)](https://github.com/SiriusXofc/siriuspad/releases/latest)
+[![Issues](https://img.shields.io/github/issues/SiriusXofc/siriuspad)](https://github.com/SiriusXofc/siriuspad/issues)
+[![Stars](https://img.shields.io/github/stars/SiriusXofc/siriuspad)](https://github.com/SiriusXofc/siriuspad/stargazers)
 
 # SiriusPad
 
@@ -13,16 +13,11 @@ Projeto público mantido por **SiriusX**.
 
 ## Visão geral
 
-O SiriusPad é um app desktop open source para guardar:
+O **SiriusPad** é um app desktop open source que nasceu mais por diversão, curiosidade e vontade de construir algo útil, mesmo sendo algo simples.
 
-- bugs
-- ideias
-- snippets
-- comandos
-- checklists rápidos por nota
-- rascunhos rápidos de arquitetura
+Ele não tenta substituir tudo, não quer reinventar a forma de fazer anotações e nem competir com editores grandes, Notion ou coisas do tipo. A proposta é bem mais humilde: ser um cantinho prático para guardar comandos, snippets, bugs, ideias, checklists e qualquer anotação técnica que aparece no meio do uso.
 
-Ele foi pensado para ficar perto do fluxo de desenvolvimento sem tentar virar IDE, wiki corporativa ou base de conhecimento engessada.
+Sim, dá para usar bloco de notas, VS Code, Discord salvo, arquivo solto ou qualquer outra coisa. A ideia aqui não é "você precisa disso", e sim "talvez isso deixe o processo um pouco mais confortável para alguém". Se ajudar alguém, ótimo. Se não ajudar, tudo bem também.
 
 As notas ficam no seu computador como arquivos Markdown. O uso principal do app é local, sem conta e sem obrigar sincronização externa.
 
@@ -59,14 +54,14 @@ Formatos suportados atualmente:
 
 Os assets técnicos de updater, como `latest.json`, continuam existindo apenas para o fluxo de atualização automática.
 
-Releases: https://github.com/Nic85796/siriuspad/releases/latest
+Releases: https://github.com/SiriusXofc/siriuspad/releases/latest
 
 ## Instalação rápida
 
 Linux:
 
 ```bash
-bash <(curl -fsSL https://github.com/Nic85796/siriuspad/raw/main/scripts/install-linux.sh) --deb
+bash <(curl -fsSL https://github.com/SiriusXofc/siriuspad/raw/main/scripts/install-linux.sh) --deb
 ```
 
 Windows PowerShell:
@@ -119,7 +114,7 @@ Requisitos:
 - Linux: `libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf`
 
 ```bash
-git clone https://github.com/Nic85796/siriuspad
+git clone https://github.com/SiriusXofc/siriuspad
 cd siriuspad
 npm install
 npm run tauri:dev
@@ -127,9 +122,9 @@ npm run tauri:dev
 
 ## Suporte e reporte
 
-- bugs: https://github.com/Nic85796/siriuspad/issues
+- bugs: https://github.com/SiriusXofc/siriuspad/issues
 - sugestões: use as issues do repositório
-- vulnerabilidades: https://github.com/Nic85796/siriuspad/security/advisories/new
+- vulnerabilidades: https://github.com/SiriusXofc/siriuspad/security/advisories/new
 
 ## Licença
 

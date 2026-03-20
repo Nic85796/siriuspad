@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { EXECUTABLE_LANGUAGES } from '@/lib/constants'
+import { NoteBlocks } from '@/components/editor/NoteBlocks'
 import { MarkdownPreview } from '@/components/editor/MarkdownPreview'
 import { NoteEditor, NoteEditorHeader } from '@/components/editor/NoteEditor'
 import { Terminal } from '@/components/editor/Terminal'
@@ -48,6 +49,10 @@ interface EditorPaneProps {
     setTimeoutSeconds: (value: number) => void
   }
   onNoteChange: (patch: Partial<Note>) => void
+  onInsertCallout: (input: {
+    tone: 'note' | 'tip' | 'warning'
+    title?: string
+  }) => void
   onContentChange: (value: string) => void
   onSave: () => Promise<void>
   onDelete: () => Promise<void>
@@ -73,6 +78,7 @@ export function EditorPane({
   toggleTerminalNonce,
   runner,
   onNoteChange,
+  onInsertCallout,
   onContentChange,
   onSave,
   onDelete,
@@ -266,6 +272,12 @@ export function EditorPane({
           </div>
         ) : null}
       </div>
+
+      <NoteBlocks
+        note={note}
+        onNoteChange={onNoteChange}
+        onInsertCallout={onInsertCallout}
+      />
 
       <Terminal
         platform={platform}
