@@ -100,6 +100,13 @@ export function RightPanel({
           ? "motion-fade-up flex h-[72vh] w-full flex-col rounded-t-[12px] border border-b-0 border-border bg-[#0f0f0f]"
           : "motion-slide-right flex h-full w-[288px] shrink-0 flex-col border-l border-border bg-[#0f0f0f]"
       }`}
+      style={
+        mobile
+          ? {
+              paddingBottom: "env(safe-area-inset-bottom, 0px)",
+            }
+          : undefined
+      }
     >
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
         <section

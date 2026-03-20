@@ -1363,7 +1363,10 @@ export default function App() {
   }, [notes.createNote]);
 
   return (
-    <div className="motion-fade-in relative flex h-screen flex-col bg-base text-text-primary">
+    <div
+      className="motion-fade-in relative flex h-screen flex-col bg-base text-text-primary"
+      style={{ height: "100dvh", minHeight: "100dvh" }}
+    >
       <ResizeBorders
         platform={uiState.platform}
         enabled={!uiState.isFullscreen}

@@ -92,6 +92,8 @@ export function EditorPane({
 }: EditorPaneProps) {
   const { t } = useTranslation();
   const isMobile = platform === "android" || platform === "ios";
+  const effectivePreviewMode =
+    isMobile && previewMode === "split" ? "editor" : previewMode;
   const resizeStateRef = useRef<{
     width: number;
     startX: number;
@@ -200,7 +202,8 @@ export function EditorPane({
         note={note}
         workspaces={workspaces}
         allTags={allTags}
-        previewMode={previewMode}
+        previewMode={effectivePreviewMode}
+        compact={isMobile}
         onChange={onNoteChange}
         onDelete={onDelete}
         onTogglePin={onTogglePin}
@@ -210,12 +213,12 @@ export function EditorPane({
       />
 
       <div className="relative flex min-h-0 flex-1">
-        {previewMode !== "preview" ? (
+        {effectivePreviewMode !== "preview" ? (
           <div
             className="min-w-0"
             style={{
               width:
-                previewMode === "split"
+                effectivePreviewMode === "split"
                   ? `${previewSplitRatio * 100}%`
                   : "100%",
             }}
@@ -224,6 +227,7 @@ export function EditorPane({
               noteId={note.id}
               value={note.content}
               accentColor={note.color}
+              compact={isMobile}
               settings={settings}
               findReplaceNonce={findReplaceNonce}
               onChange={onContentChange}
@@ -240,7 +244,7 @@ export function EditorPane({
           </div>
         ) : null}
 
-        {previewMode === "split" ? (
+        {effectivePreviewMode === "split" ? (
           <div
             className="w-1 cursor-col-resize bg-border hover:bg-[var(--accent-subtle)]"
             onMouseDown={(event) => {
@@ -258,12 +262,12 @@ export function EditorPane({
           />
         ) : null}
 
-        {previewMode !== "editor" ? (
+        {effectivePreviewMode !== "editor" ? (
           <div
             className="min-w-0 border-l border-border"
             style={{
               width:
-                previewMode === "split"
+                effectivePreviewMode === "split"
                   ? `${(1 - previewSplitRatio) * 100}%`
                   : "100%",
             }}
@@ -289,11 +293,14 @@ export function EditorPane({
         ) : null}
       </div>
 
-      <NoteBlocks
-        note={note}
-        onNoteChange={onNoteChange}
-        onInsertCallout={onInsertCallout}
-      />
+      {!isMobile ? (
+        <NoteBlocks
+          key={note.id}
+          note={note}
+          onNoteChange={onNoteChange}
+          onInsertCallout={onInsertCallout}
+        />
+      ) : null}
 
       {!isMobile ? (
         <Terminal

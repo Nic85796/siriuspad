@@ -7,6 +7,20 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+## [1.0.22] - 2026-03-20
+
+### Changed
+
+- header mobile agora respeita melhor a área segura do Android e organiza melhor as ações principais
+- interface mobile deixou de forçar `split view` e ganhou hierarquia visual mais limpa na abertura
+- editor no mobile fica mais leve, sem numeração de linhas e com header compacto
+- blocos da nota no desktop ficaram recolhidos por padrão para não competir com o conteúdo principal
+
+### Fixed
+
+- layout do mobile deixou de ficar espremido e sobreposto perto da barra do sistema
+- composição central da nota no desktop ficou menos carregada e mais usável
+
 ## [1.0.21] - 2026-03-20
 
 ### Fixed

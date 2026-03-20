@@ -38,6 +38,7 @@ interface NoteEditorHeaderProps {
   workspaces: Workspace[]
   allTags: string[]
   previewMode: PreviewMode
+  compact?: boolean
   onChange: (patch: Partial<Note>) => void
   onDelete: () => Promise<void>
   onTogglePin: () => Promise<void>
@@ -50,6 +51,7 @@ interface NoteEditorProps {
   noteId: string
   value: string
   accentColor?: string
+  compact?: boolean
   settings: Settings
   findReplaceNonce?: number
   onChange: (value: string) => void
@@ -67,6 +69,7 @@ export function NoteEditorHeader({
   workspaces,
   allTags,
   previewMode,
+  compact = false,
   onChange,
   onDelete,
   onTogglePin,
@@ -77,10 +80,15 @@ export function NoteEditorHeader({
   const { t } = useTranslation()
   const [tagValue, setTagValue] = useState('')
   const headerBackground = withAlpha(note.color, 0.06)
+  const previewModes = compact
+    ? (['editor', 'preview'] as PreviewMode[])
+    : (['editor', 'split', 'preview'] as PreviewMode[])
 
   return (
     <div
-      className="motion-fade-up border-b border-border bg-[#111111] px-4 py-3"
+      className={`motion-fade-up border-b border-border bg-[#111111] ${
+        compact ? 'px-3 py-3' : 'px-4 py-3'
+      }`}
       style={{
         backgroundImage: headerBackground
           ? `linear-gradient(180deg, ${headerBackground}, transparent 80%)`
@@ -88,17 +96,23 @@ export function NoteEditorHeader({
         boxShadow: note.color ? `inset 3px 0 0 ${note.color}` : undefined,
       }}
     >
-      <div className="flex flex-wrap items-start gap-3">
+      <div className={`flex ${compact ? 'flex-col gap-3' : 'flex-wrap items-start gap-3'}`}>
         <div className="min-w-0 flex-1">
           <input
-            className="w-full bg-transparent text-[20px] font-semibold tracking-tight text-text-primary outline-none placeholder:text-text-muted"
+            className={`w-full bg-transparent font-semibold tracking-tight text-text-primary outline-none placeholder:text-text-muted ${
+              compact ? 'text-[18px]' : 'text-[20px]'
+            }`}
             placeholder={t('note.titlePlaceholder')}
             title={t('note.titlePlaceholder')}
             value={note.title}
             onChange={(event) => onChange({ title: event.target.value })}
           />
 
-          <div className="mt-3 flex flex-wrap items-center gap-2">
+          <div
+            className={`mt-3 flex items-center gap-2 ${
+              compact ? 'overflow-x-auto pb-1' : 'flex-wrap'
+            }`}
+          >
             {note.tags.map((tag) => (
               <TagPill
                 key={tag}
@@ -112,7 +126,9 @@ export function NoteEditorHeader({
             ))}
 
             <input
-              className="h-8 min-w-[96px] rounded-md border border-dashed border-border bg-transparent px-2 text-[11px] text-text-primary outline-none placeholder:text-text-muted focus:border-focus"
+              className={`h-8 rounded-md border border-dashed border-border bg-transparent px-2 text-[11px] text-text-primary outline-none placeholder:text-text-muted focus:border-focus ${
+                compact ? 'min-w-[132px] shrink-0' : 'min-w-[96px]'
+              }`}
               list="note-tag-suggestions"
               placeholder={t('note.addTag')}
               value={tagValue}
@@ -144,9 +160,13 @@ export function NoteEditorHeader({
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center justify-end gap-2">
+        <div
+          className={`flex items-center gap-2 ${
+            compact ? 'w-full flex-wrap' : 'flex-wrap justify-end'
+          }`}
+        >
           <div className="flex items-center rounded-md border border-border bg-[#161616] p-1">
-            {(['editor', 'split', 'preview'] as PreviewMode[]).map((mode) => (
+            {previewModes.map((mode) => (
               <button
                 key={mode}
                 type="button"
@@ -164,22 +184,28 @@ export function NoteEditorHeader({
 
           <button
             type="button"
-            className="interactive-lift inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#161616] px-2.5 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+            className={`interactive-lift inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#161616] text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary ${
+              compact ? 'w-8 justify-center px-0' : 'px-2.5'
+            }`}
             onClick={onOpenFindReplace}
             title={t('commands.findReplace')}
+            aria-label={t('commands.findReplace')}
           >
             <Search className="h-3.5 w-3.5" />
-            {t('commands.findReplace')}
+            {!compact ? t('commands.findReplace') : null}
           </button>
 
           <button
             type="button"
-            className="interactive-lift inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#161616] px-2.5 text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+            className={`interactive-lift inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#161616] text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary ${
+              compact ? 'w-8 justify-center px-0' : 'px-2.5'
+            }`}
             onClick={onOpenHistory}
             title={t('history.title')}
+            aria-label={t('history.title')}
           >
             <Clock3 className="h-3.5 w-3.5" />
-            {t('history.title')}
+            {!compact ? t('history.title') : null}
           </button>
 
           <button
@@ -206,7 +232,13 @@ export function NoteEditorHeader({
         </div>
       </div>
 
-      <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+      <div
+        className={`mt-3 ${
+          compact
+            ? 'grid grid-cols-1 gap-2'
+            : 'flex flex-wrap items-center justify-between gap-3'
+        }`}
+      >
         <div className="flex flex-wrap items-center gap-2">
           <label className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-text-muted">
             <span>{t('note.priorityLabel')}</span>
@@ -267,6 +299,7 @@ export function NoteEditor({
   noteId,
   value,
   accentColor,
+  compact = false,
   settings,
   findReplaceNonce = 0,
   onChange,
@@ -327,10 +360,10 @@ export function NoteEditor({
     view.dispatch({
       effects: reconfigureLineNumbers(
         compartmentsRef.current,
-        settings.showLineNumbers,
+        compact ? false : settings.showLineNumbers,
       ),
     })
-  }, [settings.showLineNumbers])
+  }, [compact, settings.showLineNumbers])
 
   useEffect(() => {
     const view = viewRef.current
