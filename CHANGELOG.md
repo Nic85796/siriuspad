@@ -7,6 +7,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+## [1.0.19] - 2026-03-20
+
+### Fixed
+
+- `Cargo.lock` foi regenerado corretamente, removendo o checksum inválido que quebrou Linux, Windows e Android no CI
+- release Android continua usando o caminho resolvido do `.apk`, já validado em build local completo
+
 ## [1.0.18] - 2026-03-20
 
 ### Fixed
