@@ -7,6 +7,13 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+## [1.0.16] - 2026-03-20
+
+### Fixed
+
+- workflow de Android agora aceita licenças do SDK sem quebrar no `pipefail`
+- instalação dos pacotes Android usa `sdkmanager --sdk_root` para ficar mais estável no GitHub Actions
+
 ## [1.0.15] - 2026-03-20
 
 ### Added
