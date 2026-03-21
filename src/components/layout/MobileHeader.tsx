@@ -31,14 +31,14 @@ export function MobileHeader({
   const { t } = useTranslation();
 
   const buttonClassName =
-    "inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-[#161616] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary";
+    "inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-elevated text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary";
 
   const activeButtonClassName =
     "inline-flex h-11 w-11 items-center justify-center rounded-md border border-[#2d2060] bg-[rgba(124,58,237,0.12)] text-text-primary transition hover:border-[#4a3590] hover:bg-[rgba(124,58,237,0.18)]";
 
   return (
     <header
-      className="relative z-10 shrink-0 border-b border-border bg-[#0f0f0f] px-3 pb-3"
+      className="relative z-10 shrink-0 border-b border-border bg-surface px-3 pb-3"
       style={{
         paddingTop: "calc(env(safe-area-inset-top, 0px) + 0.85rem)",
         paddingLeft: "calc(env(safe-area-inset-left, 0px) + 0.75rem)",
@@ -100,7 +100,7 @@ export function MobileHeader({
 
       <button
         type="button"
-        className="mt-3 flex h-11 w-full items-center gap-2 rounded-md border border-border bg-[#111111] px-3 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+        className="mt-3 flex h-11 w-full items-center gap-2 rounded-md border border-border bg-base px-3 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
         onClick={onFocusSearch}
         title={t("titlebar.search")}
         aria-label={t("titlebar.search")}

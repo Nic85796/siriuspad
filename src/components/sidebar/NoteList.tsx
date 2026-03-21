@@ -97,7 +97,7 @@ export function NoteList({
           </h2>
           <button
             type="button"
-            className="interactive-lift rounded-md border border-border bg-[#161616] p-1.5 text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+            className="interactive-lift rounded-md border border-border bg-elevated p-1.5 text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
             onClick={() => void onCreateNote()}
             title={t("sidebar.newNote")}
             aria-label={t("sidebar.newNote")}
@@ -115,8 +115,8 @@ export function NoteList({
                 type="button"
                 className={`motion-fade-up surface-hover relative overflow-hidden rounded-md border px-3 py-3 text-left transition ${
                   isActive
-                    ? "border-focus bg-[#161616]"
-                    : "border-border bg-[#111111] hover:border-focus hover:bg-hover"
+                    ? "border-focus bg-elevated"
+                    : "border-border bg-surface hover:border-focus hover:bg-hover"
                 }`}
                 style={{
                   boxShadow: note.color
@@ -198,7 +198,7 @@ export function NoteList({
               <p>{t("sidebar.noNotes")}</p>
               <button
                 type="button"
-                className="mt-3 rounded-md border border-border bg-[#161616] px-3 py-2 text-sm font-medium text-text-primary transition hover:border-focus hover:bg-hover"
+                className="mt-3 rounded-md border border-border bg-elevated px-3 py-2 text-sm font-medium text-text-primary transition hover:border-focus hover:bg-hover"
                 onClick={() => void onCreateNote()}
               >
                 {t("sidebar.newNote")}
@@ -211,7 +211,7 @@ export function NoteList({
       {menu && menuPosition
         ? createPortal(
             <div
-              className="fixed z-[120] w-52 rounded-md border border-border bg-[#161616] p-1 shadow-[0_12px_32px_rgba(0,0,0,0.42)]"
+              className="fixed z-[120] w-52 rounded-md border border-border bg-elevated p-1 shadow-[0_12px_32px_var(--shadow-soft)]"
               style={menuPosition}
             >
               <button

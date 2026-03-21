@@ -98,9 +98,9 @@ export const FONT_OPTIONS = [
   'Cascadia Code',
 ] as const
 
-export const UI_ZOOM_MIN = 0.8
+export const UI_ZOOM_MIN = 0.65
 export const UI_ZOOM_MAX = 1.6
-export const UI_ZOOM_STEP = 0.1
+export const UI_ZOOM_STEP = 0.05
 
 export const LANGUAGE_OPTIONS: Array<{ value: AppLanguage; label: string }> = [
   { value: 'en', label: 'English' },

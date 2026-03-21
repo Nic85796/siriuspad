@@ -73,6 +73,8 @@
     "checklistRemove": "Remove checklist item",
     "checklistMarkDone": "Mark as done",
     "checklistMarkPending": "Mark as pending",
+    "showMetaAction": "Show details",
+    "hideMetaAction": "Hide details",
     "calloutsTitle": "Highlight blocks",
     "calloutsHint": "Insert Markdown callouts without memorizing the syntax. They drop straight into the note content and stay easy to edit.",
     "calloutAddAction": "Add callout",
@@ -177,7 +179,7 @@
       },
       "appearance": {
         "title": "Appearance",
-        "description": "Interface zoom, dark-only theme, and the font used across the UI."
+        "description": "Interface zoom, light/dark theme, and the font used across the UI."
       },
       "shortcuts": {
         "title": "Shortcuts",
@@ -210,8 +212,10 @@
       "autosave": "Autosave",
       "autosaveDelay": "Autosave delay (ms)",
       "theme": "Theme",
-      "themeLocked": "SiriusPad is dark-only. Use this section to adjust interface scale and typography.",
+      "themeLocked": "Fixed theme.",
+      "themeHint": "Switch between light and dark looks while keeping the technical SiriusPad feel.",
       "darkOnly": "Dark only",
+      "selectedTheme": "Active",
       "uiZoom": "Interface zoom",
       "uiZoomHint": "Scales the whole app, similar to browser zoom.",
       "uiZoomValue": "{{value}}% scale",
@@ -301,6 +305,7 @@
     "close": "Close"
   },
   "themes": {
+    "light": "Light",
     "dark": "Dark",
     "dark-dimmed": "Dark Dimmed",
     "midnight": "Midnight"

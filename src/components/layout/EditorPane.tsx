@@ -13,6 +13,8 @@ import type {
   Workspace,
 } from "@/types";
 
+const MOBILE_META_VISIBILITY_KEY = "siriuspad:mobile-note-meta-visible:v1";
+
 interface EditorPaneProps {
   platform: AppPlatform;
   note: Note | null;
@@ -78,6 +80,14 @@ export function EditorPane({
   const isMobile = platform === "android" || platform === "ios";
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [terminalHeight, setTerminalHeight] = useState(280);
+  const [mobileMetaVisible, setMobileMetaVisible] = useState(() => {
+    if (typeof window === "undefined") {
+      return false;
+    }
+
+    const stored = window.localStorage.getItem(MOBILE_META_VISIBILITY_KEY);
+    return stored === null ? false : stored === "true";
+  });
 
   useEffect(() => {
     if (!toggleTerminalNonce) {
@@ -106,6 +116,17 @@ export function EditorPane({
       window.clearTimeout(timeoutId);
     };
   }, [runner.result, runner.running]);
+
+  useEffect(() => {
+    if (!isMobile || typeof window === "undefined") {
+      return;
+    }
+
+    window.localStorage.setItem(
+      MOBILE_META_VISIBILITY_KEY,
+      mobileMetaVisible ? "true" : "false",
+    );
+  }, [isMobile, mobileMetaVisible]);
 
   if (!note) {
     return (
@@ -139,11 +160,13 @@ export function EditorPane({
         workspaces={workspaces}
         allTags={allTags}
         compact={isMobile}
+        showCompactMeta={mobileMetaVisible}
         onChange={onNoteChange}
         onDelete={onDelete}
         onTogglePin={onTogglePin}
         onOpenFindReplace={onOpenFindReplace}
         onOpenHistory={onOpenHistory}
+        onToggleCompactMeta={() => setMobileMetaVisible((current) => !current)}
       />
 
       <div className="relative flex min-h-0 flex-1 overflow-hidden">

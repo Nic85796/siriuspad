@@ -18,7 +18,7 @@ jobs:
       matrix:
         include:
           - platform: ubuntu-22.04
-            args: "--bundles deb"
+            args: "--bundles deb,appimage"
           - platform: windows-latest
             args: "--bundles nsis"
 
@@ -81,6 +81,7 @@ jobs:
           name: SiriusPad-${{ matrix.platform }}
           path: |
             src-tauri/target/release/bundle/**/*.deb
+            src-tauri/target/release/bundle/**/*.AppImage
             src-tauri/target/release/bundle/**/*setup.exe
           if-no-files-found: ignore
 
@@ -101,7 +102,10 @@ jobs:
             - editor com Markdown ao vivo: títulos, listas, checklist, callouts e código aparecem formatados enquanto você escreve
             - checklist e blocos da nota ficaram concentrados no painel direito, com fluxo mais limpo no editor
             - refinamentos de layout e usabilidade no desktop e na beta mobile
-            - pacote Linux agora inclui descrição pública mais clara para distribuição
+            - mobile agora pode ocultar detalhes da nota para liberar espaço de escrita
+            - interface ganhou tema claro além das variantes escuras
+            - pacote Linux agora inclui `.deb` e `.AppImage`, com descrição pública mais clara para distribuição
+            - APK beta Android agora usa assinatura estável para facilitar reinstalação por cima da versão anterior
 
             Distribuição oficial:
             - `.deb` para Linux
@@ -124,7 +128,7 @@ jobs:
         run: |
           gh release view "${{ github.ref_name }}" --json assets --jq '.assets[].name' | while IFS= read -r asset; do
             case "$asset" in
-              *.deb|*.exe|*.apk|latest.json) ;;
+              *.deb|*.AppImage|*.exe|*.apk|latest.json) ;;
               *) gh release delete-asset "${{ github.ref_name }}" "$asset" --yes || true ;;
             esac
           done

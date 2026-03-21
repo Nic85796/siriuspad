@@ -73,6 +73,8 @@
     "checklistRemove": "Remover item da checklist",
     "checklistMarkDone": "Marcar como concluído",
     "checklistMarkPending": "Marcar como pendente",
+    "showMetaAction": "Mostrar detalhes",
+    "hideMetaAction": "Ocultar detalhes",
     "calloutsTitle": "Blocos de destaque",
     "calloutsHint": "Insira callouts no Markdown sem decorar sintaxe. Eles entram direto no conteúdo da nota e ficam fáceis de editar.",
     "calloutAddAction": "Adicionar callout",
@@ -177,7 +179,7 @@
       },
       "appearance": {
         "title": "Aparência",
-        "description": "Zoom da interface, tema fixo escuro e fonte usada em toda a UI."
+        "description": "Zoom da interface, tema claro/escuro e fonte usada em toda a UI."
       },
       "shortcuts": {
         "title": "Atalhos",
@@ -210,8 +212,10 @@
       "autosave": "Salvamento automático",
       "autosaveDelay": "Delay do autosave (ms)",
       "theme": "Tema",
-      "themeLocked": "O SiriusPad usa visual dark-only. Aqui você ajusta a escala e a tipografia da interface.",
+      "themeLocked": "Tema fixo.",
+      "themeHint": "Escolha entre visual claro e escuro sem perder o estilo técnico do app.",
       "darkOnly": "Somente escuro",
+      "selectedTheme": "Ativo",
       "uiZoom": "Zoom da interface",
       "uiZoomHint": "Aumenta ou reduz tudo no app, no estilo do zoom do navegador.",
       "uiZoomValue": "{{value}}% de escala",
@@ -301,6 +305,7 @@
     "close": "Fechar"
   },
   "themes": {
+    "light": "Claro",
     "dark": "Escuro",
     "dark-dimmed": "Escuro Suave",
     "midnight": "Meia-noite"

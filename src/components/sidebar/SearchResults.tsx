@@ -63,8 +63,8 @@ export function SearchResults({
               type="button"
               className={`rounded-md border px-3 py-3 text-left transition ${
                 activeNoteId === result.note_id
-                  ? 'border-focus bg-[#161616]'
-                  : 'border-border bg-[#111111] hover:border-focus hover:bg-hover'
+                  ? 'border-focus bg-elevated'
+                  : 'border-border bg-surface hover:border-focus hover:bg-hover'
               }`}
               onClick={() => void onOpenNote(result.note_id)}
             >

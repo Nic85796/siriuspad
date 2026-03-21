@@ -24,7 +24,7 @@ export function StatusBar({ note, saveStatus, cursorInfo }: StatusBarProps) {
   const { t } = useTranslation()
 
   return (
-    <footer className="relative z-20 flex min-h-[22px] shrink-0 flex-wrap items-center gap-x-2 gap-y-1 border-t border-border bg-[#0f0f0f] px-3 py-1 text-[10px] uppercase tracking-wide text-text-secondary sm:text-[11px]">
+    <footer className="relative z-20 flex min-h-[22px] shrink-0 flex-wrap items-center gap-x-2 gap-y-1 border-t border-border bg-surface px-3 py-1 text-[10px] uppercase tracking-wide text-text-secondary sm:text-[11px]">
       <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2 overflow-hidden">
         <span className="truncate">
           {t('statusBar.workspace')}: {note?.workspace ?? t('common.none')}

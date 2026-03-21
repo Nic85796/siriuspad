@@ -17,6 +17,7 @@ import {
   UI_ZOOM_STEP,
 } from '@/lib/constants'
 import { getWorkspaceDisplayName } from '@/lib/workspaceLabel'
+import { THEMES } from '@/lib/themes'
 import { Modal } from '@/components/ui/Modal'
 import type { AppLanguage, Settings, Workspace } from '@/types'
 
@@ -94,7 +95,7 @@ function Field({
 }
 
 function controlClassName() {
-  return 'w-full rounded-lg border border-border bg-[#111111] px-3 py-2 text-sm text-text-primary outline-none transition placeholder:text-text-muted focus:border-focus'
+  return 'w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-primary outline-none transition placeholder:text-text-muted focus:border-focus'
 }
 
 function InfoTile({
@@ -107,7 +108,7 @@ function InfoTile({
   description?: string
 }) {
   return (
-    <div className="rounded-lg border border-border bg-[#111111] px-3 py-3">
+    <div className="rounded-lg border border-border bg-surface px-3 py-3">
       <div className="text-[11px] uppercase tracking-[0.16em] text-text-muted">
         {label}
       </div>
@@ -259,15 +260,34 @@ export function SettingsModal({
         <div className="grid gap-4 md:grid-cols-2">
           <Field
             label={t('settings.fields.theme')}
-            description={t('settings.fields.themeLocked')}
+            description={t('settings.fields.themeHint')}
           >
-            <div className="rounded-lg border border-[#2d2060] bg-[#151224] px-3 py-3 text-sm text-text-primary">
-              <div className="flex items-center justify-between gap-3">
-                <span className="font-medium">{t('themes.dark')}</span>
-                <span className="rounded-md border border-[#3a2c70] bg-[rgba(124,58,237,0.12)] px-2 py-1 text-[11px] uppercase tracking-[0.16em] text-[#c4b5fd]">
-                  {t('settings.fields.darkOnly')}
-                </span>
-              </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {THEMES.map((theme) => {
+                const active = settings.theme === theme.id
+
+                return (
+                  <button
+                    key={theme.id}
+                    type="button"
+                    className={`rounded-lg border px-3 py-3 text-left transition ${
+                      active
+                        ? 'border-accent bg-accent/10 text-text-primary'
+                        : 'border-border bg-surface text-text-secondary hover:border-focus hover:bg-hover hover:text-text-primary'
+                    }`}
+                    onClick={() => void onUpdate({ theme: theme.id })}
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <span className="font-medium">{t(`themes.${theme.id}`)}</span>
+                      {active ? (
+                        <span className="rounded-md border border-accent/40 bg-accent/10 px-2 py-1 text-[11px] uppercase tracking-[0.16em] text-text-primary">
+                          {t('settings.fields.selectedTheme')}
+                        </span>
+                      ) : null}
+                    </div>
+                  </button>
+                )
+              })}
             </div>
           </Field>
           <Field label={t('settings.fields.fontFamily')}>
@@ -289,11 +309,11 @@ export function SettingsModal({
             label={t('settings.fields.uiZoom')}
             description={t('settings.fields.uiZoomHint')}
           >
-            <div className="grid gap-3 rounded-lg border border-border bg-[#101010] p-3">
+            <div className="grid gap-3 rounded-lg border border-border bg-base p-3">
               <div className="flex items-center justify-between gap-3">
                 <button
                   type="button"
-                  className="rounded-md border border-border bg-[#161616] px-3 py-2 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+                  className="rounded-md border border-border bg-elevated px-3 py-2 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
                   onClick={() =>
                     void onUpdate({
                       uiZoom: Math.max(UI_ZOOM_MIN, settings.uiZoom - UI_ZOOM_STEP),
@@ -312,7 +332,7 @@ export function SettingsModal({
                 </div>
                 <button
                   type="button"
-                  className="rounded-md border border-border bg-[#161616] px-3 py-2 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+                  className="rounded-md border border-border bg-elevated px-3 py-2 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
                   onClick={() =>
                     void onUpdate({
                       uiZoom: Math.min(UI_ZOOM_MAX, settings.uiZoom + UI_ZOOM_STEP),
@@ -336,7 +356,7 @@ export function SettingsModal({
 
               <button
                 type="button"
-                className="rounded-md border border-border bg-[#161616] px-3 py-2 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+                className="rounded-md border border-border bg-elevated px-3 py-2 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
                 onClick={() => void onUpdate({ uiZoom: 1 })}
               >
                 {t('commands.resetZoom')}
@@ -379,7 +399,7 @@ export function SettingsModal({
           {shortcuts.map((item) => (
             <div
               key={item.key}
-              className="rounded-lg border border-border bg-[#111111] px-3 py-2 text-sm text-text-secondary"
+              className="rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text-secondary"
             >
               <span className="font-medium text-text-primary">{item.key}</span>
               <span className="mx-2 text-text-muted">-</span>
@@ -424,7 +444,7 @@ export function SettingsModal({
             Object.entries(settings.variables).map(([key, value]) => (
               <div
                 key={key}
-                className="flex items-center justify-between gap-3 rounded-lg border border-border bg-[#111111] px-3 py-2"
+                className="flex items-center justify-between gap-3 rounded-lg border border-border bg-surface px-3 py-2"
               >
                 <div className="min-w-0">
                   <p className="truncate font-mono text-sm text-text-primary">{key}</p>
@@ -461,7 +481,7 @@ export function SettingsModal({
           />
           <button
             type="button"
-            className="rounded-lg border border-border bg-[#111111] px-4 py-2 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
+            className="rounded-lg border border-border bg-surface px-4 py-2 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
             onClick={() => {
               if (!variableKey.trim()) {
                 return
@@ -549,7 +569,7 @@ export function SettingsModal({
           ].map((item) => (
             <div
               key={item.title}
-              className="rounded-lg border border-border bg-[#0f0f0f] px-4 py-4"
+              className="rounded-lg border border-border bg-base px-4 py-4"
             >
               <div className="text-sm font-medium text-text-primary">{item.title}</div>
               <div className="mt-2 text-xs leading-6 text-text-secondary">{item.body}</div>
@@ -562,7 +582,7 @@ export function SettingsModal({
             <button
               key={link.href}
               type="button"
-              className="rounded-md border border-border bg-[#111111] px-3 py-2 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
+              className="rounded-md border border-border bg-surface px-3 py-2 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
               onClick={() => void openExternal(link.href)}
             >
               {link.label}

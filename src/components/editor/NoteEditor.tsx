@@ -1,6 +1,7 @@
 import { EditorState } from '@codemirror/state'
 import { EditorView } from '@codemirror/view'
 import {
+  SlidersHorizontal,
   Clock3,
   Pin,
   PinOff,
@@ -37,11 +38,13 @@ interface NoteEditorHeaderProps {
   workspaces: Workspace[]
   allTags: string[]
   compact?: boolean
+  showCompactMeta?: boolean
   onChange: (patch: Partial<Note>) => void
   onDelete: () => Promise<void>
   onTogglePin: () => Promise<void>
   onOpenFindReplace: () => void
   onOpenHistory: () => void
+  onToggleCompactMeta?: () => void
 }
 
 interface NoteEditorProps {
@@ -58,11 +61,11 @@ interface NoteEditorProps {
 }
 
 function controlClassName() {
-  return 'h-8 rounded-md border border-border bg-[#161616] px-2.5 text-[11px] text-text-secondary outline-none transition hover:border-focus hover:bg-hover hover:text-text-primary focus:border-focus'
+  return 'h-8 rounded-md border border-border bg-elevated px-2.5 text-[11px] text-text-secondary outline-none transition hover:border-focus hover:bg-hover hover:text-text-primary focus:border-focus'
 }
 
 function compactMetaFieldClassName() {
-  return 'grid gap-1.5 rounded-md border border-border bg-[#141414] p-2.5'
+  return 'grid gap-1.5 rounded-md border border-border bg-elevated p-2.5'
 }
 
 export function NoteEditorHeader({
@@ -70,11 +73,13 @@ export function NoteEditorHeader({
   workspaces,
   allTags,
   compact = false,
+  showCompactMeta = true,
   onChange,
   onDelete,
   onTogglePin,
   onOpenFindReplace,
   onOpenHistory,
+  onToggleCompactMeta,
 }: NoteEditorHeaderProps) {
   const { t } = useTranslation()
   const [tagValue, setTagValue] = useState('')
@@ -82,7 +87,7 @@ export function NoteEditorHeader({
 
   return (
     <div
-      className={`motion-fade-up border-b border-border bg-[#111111] ${
+      className={`motion-fade-up border-b border-border bg-surface ${
         compact ? 'px-3 py-3' : 'px-4 py-3'
       }`}
       style={{
@@ -207,6 +212,20 @@ export function NoteEditorHeader({
         </div>
       </div>
 
+      {compact ? (
+        <div className="mt-3 flex justify-end">
+          <button
+            type="button"
+            className="inline-flex h-8 items-center gap-2 rounded-md border border-border bg-elevated px-3 text-[11px] uppercase tracking-[0.12em] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+            onClick={onToggleCompactMeta}
+          >
+            <SlidersHorizontal className="h-3.5 w-3.5" />
+            {showCompactMeta ? t('note.hideMetaAction') : t('note.showMetaAction')}
+          </button>
+        </div>
+      ) : null}
+
+      {(!compact || showCompactMeta) ? (
       <div
         className={`mt-3 ${
           compact
@@ -270,6 +289,7 @@ export function NoteEditorHeader({
           </div>
         </div>
       </div>
+      ) : null}
     </div>
   )
 }
@@ -397,11 +417,16 @@ export function NoteEditor({
 
   return (
     <div
-      className="relative h-full min-h-0 overflow-hidden bg-[#111111]"
+      className="relative h-full min-h-0 overflow-hidden bg-surface"
       style={
         {
           '--editor-font-family': `"${settings.fontFamily}", monospace`,
           '--editor-font-size': `${settings.fontSize}px`,
+          '--editor-padding-top': compact ? '1rem' : '1.2rem',
+          '--editor-padding-side': compact ? '1rem' : '1.7rem',
+          '--editor-padding-bottom': compact
+            ? 'calc(env(safe-area-inset-bottom, 0px) + 8rem)'
+            : '5.6rem',
           boxShadow: accentColor ? `inset 3px 0 0 ${accentColor}` : undefined,
           backgroundImage: withAlpha(accentColor, 0.05)
             ? `linear-gradient(180deg, ${withAlpha(accentColor, 0.05)}, transparent 55%)`
@@ -409,7 +434,7 @@ export function NoteEditor({
         } as CSSProperties
       }
     >
-      <div ref={hostRef} className="h-full min-h-0" />
+      <div ref={hostRef} className="h-full min-h-0 overflow-hidden" />
     </div>
   )
 }

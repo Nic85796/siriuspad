@@ -85,7 +85,7 @@ export function WorkspaceTree({
           </h2>
           <button
             type="button"
-            className="rounded-md border border-border bg-[#161616] p-1.5 text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+            className="rounded-md border border-border bg-elevated p-1.5 text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
             onClick={() => void onCreateWorkspace()}
             title={t("sidebar.newWorkspace")}
             aria-label={t("sidebar.newWorkspace")}
@@ -104,7 +104,7 @@ export function WorkspaceTree({
           type="button"
           className={`mb-1 flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-[12px] transition ${
             activeWorkspaceId === null
-              ? "bg-[#161616] text-text-primary"
+              ? "bg-elevated text-text-primary"
               : "text-text-secondary hover:bg-hover hover:text-text-primary"
           }`}
           onClick={() => onSelectWorkspace(null)}
@@ -126,7 +126,7 @@ export function WorkspaceTree({
                 type="button"
                 className={`flex items-center gap-2 rounded-md px-2 py-2 text-left text-[12px] transition ${
                   isActive
-                    ? "bg-[#161616] text-text-primary"
+                    ? "bg-elevated text-text-primary"
                     : "text-text-secondary hover:bg-hover hover:text-text-primary"
                 }`}
                 onClick={() => onSelectWorkspace(workspace.id)}
@@ -155,7 +155,7 @@ export function WorkspaceTree({
       {menu && menuPosition
         ? createPortal(
             <div
-              className="fixed z-[120] w-44 rounded-lg border border-border bg-[#161616] p-1 shadow-[0_12px_32px_rgba(0,0,0,0.42)]"
+              className="fixed z-[120] w-44 rounded-lg border border-border bg-elevated p-1 shadow-[0_12px_32px_var(--shadow-soft)]"
               style={menuPosition}
             >
               <button

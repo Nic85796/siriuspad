@@ -70,7 +70,7 @@ export interface Workspace {
 }
 
 export type AppLanguage = 'en' | 'pt-BR' | 'es'
-export type AppTheme = 'dark' | 'dark-dimmed' | 'midnight'
+export type AppTheme = 'dark' | 'light' | 'dark-dimmed' | 'midnight'
 export type AppPlatform = 'linux' | 'windows' | 'macos' | 'android' | 'ios'
 
 export interface ThemeDefinition {

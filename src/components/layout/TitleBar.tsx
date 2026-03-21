@@ -141,7 +141,7 @@ export function TitleBar({
   const { t } = useTranslation()
 
   return (
-    <header className="motion-fade-in relative z-10 flex h-9 items-stretch border-b border-[#1e1e1e] bg-[#0f0f0f]">
+    <header className="motion-fade-in relative z-10 flex h-9 items-stretch border-b border-border bg-surface">
       {platform === 'macos' ? (
         <WindowControls
           platform={platform}
@@ -177,7 +177,7 @@ export function TitleBar({
       <div className="relative z-10 flex items-center gap-2 px-2">
         <button
           type="button"
-          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-[#161616] px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-elevated px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
           onClick={onFocusSearch}
           title={t('titlebar.search')}
         >
@@ -186,7 +186,7 @@ export function TitleBar({
         </button>
         <button
           type="button"
-          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-[#161616] px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-elevated px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
           onClick={onToggleFullscreen}
           title={t('commands.toggleFullscreen')}
           aria-label={t('commands.toggleFullscreen')}
@@ -199,7 +199,7 @@ export function TitleBar({
         </button>
         <button
           type="button"
-          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-[#161616] px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-elevated px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
           onClick={onOpenSettings}
           title={t('titlebar.settings')}
         >

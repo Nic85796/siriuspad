@@ -58,6 +58,10 @@
   --motion-base: 220ms;
   --motion-slow: 360ms;
   --motion-spring: cubic-bezier(0.22, 1, 0.36, 1);
+  --scrollbar-thumb: #2b2b2b;
+  --scrollbar-track: #111111;
+  --selection: rgba(124, 58, 237, 0.28);
+  --shadow-soft: rgba(0, 0, 0, 0.28);
 
   --font-ui: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
@@ -116,7 +120,7 @@ button:disabled {
 }
 
 ::selection {
-  background: rgba(124, 58, 237, 0.28);
+  background: var(--selection);
 }
 
 ::-webkit-scrollbar {
@@ -127,12 +131,12 @@ button:disabled {
 ::-webkit-scrollbar-thumb {
   border: 2px solid transparent;
   border-radius: 999px;
-  background: #2b2b2b;
+  background: var(--scrollbar-thumb);
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-track {
-  background: #111111;
+  background: var(--scrollbar-track);
 }
 
 .titlebar-control {

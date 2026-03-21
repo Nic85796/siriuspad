@@ -552,8 +552,10 @@ export const siriusPadEditorTheme = EditorView.theme({
     fontFamily: 'var(--editor-font-family)',
     fontSize: 'var(--editor-font-size)',
     height: '100%',
+    minHeight: '0',
   },
   '.cm-scroller': {
+    flex: '1 1 auto',
     fontFamily: 'var(--editor-font-family)',
     lineHeight: '1.65',
     height: '100%',
@@ -568,7 +570,8 @@ export const siriusPadEditorTheme = EditorView.theme({
     minHeight: '100%',
     caretColor: 'var(--accent)',
     boxSizing: 'border-box',
-    padding: '1.4em 1.7em 5.2em',
+    padding:
+      'var(--editor-padding-top, 1.4em) var(--editor-padding-side, 1.7em) var(--editor-padding-bottom, 5.2em)',
   },
   '.cm-cursor, .cm-dropCursor': {
     borderLeftColor: 'var(--accent)',

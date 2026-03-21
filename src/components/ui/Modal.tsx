@@ -45,7 +45,7 @@ export function Modal({
       onMouseDown={onClose}
     >
       <div
-        className={`w-full ${widthClassName} overflow-hidden rounded-xl border border-border bg-[#111111]`}
+        className={`w-full ${widthClassName} overflow-hidden rounded-xl border border-border bg-surface`}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <div className="flex items-center justify-between border-b border-border px-5 py-4">

@@ -31,7 +31,7 @@ function createChecklistItem(text: string): ChecklistItem {
 }
 
 function panelInputClassName() {
-  return "h-9 w-full rounded-md border border-border bg-[#101010] px-3 text-sm text-text-primary outline-none placeholder:text-text-muted transition focus:border-focus";
+  return "h-9 w-full rounded-md border border-border bg-base px-3 text-sm text-text-primary outline-none placeholder:text-text-muted transition focus:border-focus";
 }
 
 function normalizeHexColor(value: string) {
@@ -158,7 +158,7 @@ export function NoteBlocks({
                         className={`rounded-md border px-3 py-2 text-sm transition ${
                           calloutTone === tone
                             ? "border-[#2d2060] bg-[rgba(124,58,237,0.12)] text-text-primary"
-                            : "border-border bg-[#101010] text-text-secondary hover:border-focus hover:bg-hover hover:text-text-primary"
+                            : "border-border bg-base text-text-secondary hover:border-focus hover:bg-hover hover:text-text-primary"
                         }`}
                         onClick={() => setCalloutTone(tone)}
                       >
@@ -205,7 +205,7 @@ export function NoteBlocks({
                     })}
                   </div>
 
-                  <div className="mt-2 flex items-center gap-2 rounded-md border border-border bg-[#0f0f0f] px-2 py-2">
+                  <div className="mt-2 flex items-center gap-2 rounded-md border border-border bg-base px-2 py-2">
                     <input
                       type="color"
                       className="h-8 w-10 cursor-pointer rounded border border-border bg-transparent p-0"
@@ -226,7 +226,7 @@ export function NoteBlocks({
               <div className="flex items-center justify-end gap-2 border-t border-border px-5 py-4">
                 <button
                   type="button"
-                  className="rounded-md border border-border bg-[#101010] px-3 py-2 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+                  className="rounded-md border border-border bg-base px-3 py-2 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
                   onClick={closeCalloutModal}
                 >
                   {t("common.cancel")}
@@ -248,7 +248,7 @@ export function NoteBlocks({
   return (
     <>
       <section
-        className={embedded ? "min-w-0 overflow-hidden" : "min-w-0 overflow-hidden bg-[#111111] px-4 pb-4 pt-3"}
+        className={embedded ? "min-w-0 overflow-hidden" : "min-w-0 overflow-hidden bg-surface px-4 pb-4 pt-3"}
         style={{
           backgroundImage:
             !embedded && sectionTint
@@ -259,7 +259,7 @@ export function NoteBlocks({
         {!expanded ? (
           <button
             type="button"
-            className={`interactive-lift flex w-full min-w-0 gap-3 rounded-lg border border-border bg-[#111111] px-3 py-3 text-left transition hover:border-focus hover:bg-hover ${
+            className={`interactive-lift flex w-full min-w-0 gap-3 rounded-lg border border-border bg-surface px-3 py-3 text-left transition hover:border-focus hover:bg-hover ${
               embedded
                 ? "flex-col items-stretch"
                 : "items-center justify-between"
@@ -273,16 +273,16 @@ export function NoteBlocks({
                 {t("note.blocksTitle")}
               </h2>
               <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-text-secondary">
-                <span className="rounded-md border border-border bg-[#0f0f0f] px-2 py-1">
+                <span className="rounded-md border border-border bg-base px-2 py-1">
                   {t("note.checklistTitle")} {checklistDoneCount}/{checklist.length}
                 </span>
-                <span className="rounded-md border border-border bg-[#0f0f0f] px-2 py-1">
+                <span className="rounded-md border border-border bg-base px-2 py-1">
                   {t("note.calloutsTitle")}
                 </span>
               </div>
             </div>
             <span
-              className={`inline-flex h-8 shrink-0 items-center justify-center gap-2 rounded-md border border-border bg-[#161616] px-3 text-[11px] text-text-primary ${
+              className={`inline-flex h-8 shrink-0 items-center justify-center gap-2 rounded-md border border-border bg-elevated px-3 text-[11px] text-text-primary ${
                 embedded ? "self-end" : ""
               }`}
             >
@@ -304,17 +304,17 @@ export function NoteBlocks({
                   {t("note.blocksTitle")}
                 </h2>
                 <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-text-secondary">
-                  <span className="rounded-md border border-border bg-[#111111] px-2 py-1">
+                  <span className="rounded-md border border-border bg-surface px-2 py-1">
                     {t("note.checklistTitle")} {checklistDoneCount}/{checklist.length}
                   </span>
-                  <span className="rounded-md border border-border bg-[#111111] px-2 py-1">
+                  <span className="rounded-md border border-border bg-surface px-2 py-1">
                     {t("note.calloutsTitle")}
                   </span>
                 </div>
               </div>
               <button
                 type="button"
-                className={`interactive-lift inline-flex h-8 items-center justify-center gap-2 rounded-md border border-border bg-[#161616] px-3 text-[11px] text-text-primary transition hover:border-focus hover:bg-hover ${
+                className={`interactive-lift inline-flex h-8 items-center justify-center gap-2 rounded-md border border-border bg-elevated px-3 text-[11px] text-text-primary transition hover:border-focus hover:bg-hover ${
                   embedded ? "self-end" : ""
                 }`}
                 onClick={() => setExpanded((current) => !current)}
@@ -338,7 +338,7 @@ export function NoteBlocks({
               }
             >
               <div className={embedded ? "grid min-w-0 gap-3" : "grid min-w-0 gap-3 xl:grid-cols-2"}>
-                <div className="motion-fade-up surface-hover min-w-0 overflow-hidden rounded-lg border border-border bg-[#111111] p-3">
+                <div className="motion-fade-up surface-hover min-w-0 overflow-hidden rounded-lg border border-border bg-surface p-3">
                   <div className="mb-3 flex items-start justify-between gap-3">
                     <div>
                       <h3 className="text-sm font-semibold text-text-primary">
@@ -363,7 +363,7 @@ export function NoteBlocks({
                     <div className="mb-3 flex justify-end">
                       <button
                         type="button"
-                        className="rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171]"
+                        className="rounded-md border border-border bg-base px-3 py-2 text-xs text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171]"
                         onClick={() => updateChecklist([])}
                       >
                         {t("note.checklistClear")}
@@ -376,14 +376,14 @@ export function NoteBlocks({
                       checklist.map((item) => (
                         <div
                           key={item.id}
-                          className="flex items-center gap-2 rounded-md border border-border bg-[#0f0f0f] px-2 py-2 transition hover:border-focus"
+                          className="flex items-center gap-2 rounded-md border border-border bg-base px-2 py-2 transition hover:border-focus"
                         >
                           <button
                             type="button"
                             className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border transition ${
                               item.done
                                 ? "border-transparent text-black"
-                                : "border-border bg-[#111111] text-transparent hover:border-focus"
+                                : "border-border bg-surface text-transparent hover:border-focus"
                             }`}
                             style={{
                               backgroundColor: item.done
@@ -429,7 +429,7 @@ export function NoteBlocks({
 
                           <button
                             type="button"
-                            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-[#111111] text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171]"
+                            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-surface text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171]"
                             onClick={() =>
                               updateChecklist(
                                 checklist.filter((entry) => entry.id !== item.id),
@@ -442,7 +442,7 @@ export function NoteBlocks({
                         </div>
                       ))
                     ) : (
-                      <div className="rounded-md border border-dashed border-border bg-[#0f0f0f] px-3 py-4 text-sm text-text-secondary">
+                      <div className="rounded-md border border-dashed border-border bg-base px-3 py-4 text-sm text-text-secondary">
                         {t("note.checklistEmpty")}
                       </div>
                     )}
@@ -463,7 +463,7 @@ export function NoteBlocks({
                     />
                     <button
                       type="button"
-                      className="interactive-lift inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-[#161616] px-3 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
+                      className="interactive-lift inline-flex h-9 items-center justify-center gap-2 rounded-md border border-border bg-elevated px-3 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
                       onClick={addChecklistItem}
                     >
                       <Plus className="h-4 w-4" />
@@ -473,7 +473,7 @@ export function NoteBlocks({
                 </div>
 
                 <div
-                  className="motion-fade-up surface-hover min-w-0 overflow-hidden rounded-lg border border-border bg-[#111111] p-3"
+                  className="motion-fade-up surface-hover min-w-0 overflow-hidden rounded-lg border border-border bg-surface p-3"
                   style={{ animationDelay: "70ms" }}
                 >
                   <div className="mb-3">
@@ -485,13 +485,13 @@ export function NoteBlocks({
                     </p>
                   </div>
 
-                  <div className="mb-3 rounded-md border border-border bg-[#0f0f0f] px-3 py-3 text-xs leading-6 text-text-secondary [overflow-wrap:anywhere]">
+                  <div className="mb-3 rounded-md border border-border bg-base px-3 py-3 text-xs leading-6 text-text-secondary [overflow-wrap:anywhere]">
                     {t("note.calloutsFooter")}
                   </div>
 
                   <button
                     type="button"
-                    className="interactive-lift inline-flex h-10 w-full min-w-0 items-center justify-center gap-2 rounded-md border border-border bg-[#161616] px-3 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
+                    className="interactive-lift inline-flex h-10 w-full min-w-0 items-center justify-center gap-2 rounded-md border border-border bg-elevated px-3 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
                     onClick={openCalloutModal}
                   >
                     <Plus className="h-4 w-4" />

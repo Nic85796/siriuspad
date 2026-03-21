@@ -1364,14 +1364,15 @@ export default function App() {
     };
   }, [notes.createNote]);
 
-  const rootViewportHeight = "100dvh";
+  const rootViewportHeight = isMobile ? "100svh" : "100dvh";
 
   return (
     <div
-      className="motion-fade-in relative flex h-screen flex-col bg-base text-text-primary"
+      className="motion-fade-in relative flex h-screen flex-col overflow-hidden bg-base text-text-primary"
       style={{
         height: rootViewportHeight,
         minHeight: rootViewportHeight,
+        maxHeight: rootViewportHeight,
         paddingBottom: isMobile ? "env(safe-area-inset-bottom, 0px)" : undefined,
         paddingLeft: isMobile ? "env(safe-area-inset-left, 0px)" : undefined,
         paddingRight: isMobile ? "env(safe-area-inset-right, 0px)" : undefined,

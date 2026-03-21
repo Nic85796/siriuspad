@@ -71,11 +71,11 @@ function sectionTitleClassName() {
 }
 
 function sectionCardClassName() {
-  return "mb-4 rounded-lg border border-border bg-[#111111] p-3";
+  return "mb-4 rounded-lg border border-border bg-surface p-3";
 }
 
 function panelInputClassName() {
-  return "h-9 w-full rounded-md border border-border bg-[#101010] px-3 text-sm text-text-primary outline-none placeholder:text-text-muted transition focus:border-focus";
+  return "h-9 w-full rounded-md border border-border bg-base px-3 text-sm text-text-primary outline-none placeholder:text-text-muted transition focus:border-focus";
 }
 
 export function RightPanel({
@@ -188,8 +188,8 @@ export function RightPanel({
     <aside
       className={`${
         mobile
-          ? "motion-fade-up flex h-[min(74svh,720px)] w-full flex-col overflow-hidden rounded-t-[12px] border border-b-0 border-border bg-[#0f0f0f]"
-          : "motion-slide-right relative flex h-full shrink-0 flex-col overflow-hidden border-l border-border bg-[#0f0f0f]"
+          ? "motion-fade-up flex h-[min(78svh,760px)] w-full flex-col overflow-hidden rounded-t-[12px] border border-b-0 border-border bg-surface"
+          : "motion-slide-right relative flex h-full shrink-0 flex-col overflow-hidden border-l border-border bg-surface"
       }`}
       style={
         mobile
@@ -225,7 +225,7 @@ export function RightPanel({
 
       {mobile ? (
         <div className="border-b border-border px-3 pb-3 pt-2">
-          <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-[#2a2a2a]" />
+          <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-border" />
           <div className="mb-3 flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[10px] uppercase tracking-[0.18em] text-text-muted">
@@ -235,7 +235,7 @@ export function RightPanel({
                 {note?.title || t("common.untitled")}
               </p>
             </div>
-            <div className="flex items-center gap-2 rounded-md border border-border bg-[#111111] px-2 py-1 text-[11px] text-text-secondary">
+          <div className="flex items-center gap-2 rounded-md border border-border bg-base px-2 py-1 text-[11px] text-text-secondary">
               <span
                 className="h-2.5 w-2.5 rounded-full border border-white/10"
                 style={{ backgroundColor: note?.color ?? "#2a2a2a" }}
@@ -260,7 +260,7 @@ export function RightPanel({
                   className={`inline-flex h-10 items-center justify-center gap-2 rounded-md border px-3 text-[11px] transition ${
                     active
                       ? "border-[#2d2060] bg-[rgba(124,58,237,0.12)] text-text-primary"
-                      : "border-border bg-[#111111] text-text-secondary hover:border-focus hover:bg-hover hover:text-text-primary"
+                      : "border-border bg-base text-text-secondary hover:border-focus hover:bg-hover hover:text-text-primary"
                   }`}
                   onClick={() => setMobileSection(item.key)}
                 >
@@ -298,16 +298,16 @@ export function RightPanel({
           {note ? (
             <>
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <span className="rounded-md border border-border bg-[#0f0f0f] px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-text-secondary">
+                <span className="rounded-md border border-border bg-base px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-text-secondary">
                   {t("note.priorityLabel")}:{" "}
                   {t(`priority.${note.priority ?? "media"}`)}
                 </span>
-                <span className="rounded-md border border-border bg-[#0f0f0f] px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-text-secondary">
+                <span className="rounded-md border border-border bg-base px-2 py-1 text-[10px] uppercase tracking-[0.14em] text-text-secondary">
                   {t("note.languageLabel")}: {note.language}
                 </span>
               </div>
 
-              <div className="mb-3 rounded-md border border-border bg-[#0f0f0f] px-3 py-2">
+              <div className="mb-3 rounded-md border border-border bg-base px-3 py-2">
                 <div className="flex items-center gap-2">
                   <span
                     className="h-2.5 w-2.5 shrink-0 rounded-full border border-white/10"
@@ -327,7 +327,7 @@ export function RightPanel({
               <div className="mb-3 grid min-w-0 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
-                  className="inline-flex min-w-0 items-center justify-center gap-2 rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-primary transition hover:border-focus hover:bg-hover"
+                  className="inline-flex min-w-0 items-center justify-center gap-2 rounded-md border border-border bg-base px-3 py-2 text-xs text-text-primary transition hover:border-focus hover:bg-hover"
                   onClick={onRenameNote}
                 >
                   <PencilLine className="h-3.5 w-3.5" />
@@ -335,7 +335,7 @@ export function RightPanel({
                 </button>
                 <button
                   type="button"
-                  className="inline-flex min-w-0 items-center justify-center gap-2 rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex min-w-0 items-center justify-center gap-2 rounded-md border border-border bg-base px-3 py-2 text-xs text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171] disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={() => updateChecklist([])}
                   disabled={!checklist.length}
                 >
@@ -349,7 +349,7 @@ export function RightPanel({
                   <p className="text-[10px] uppercase tracking-[0.16em] text-text-muted">
                     {t("note.colorLabel")}
                   </p>
-                  <span className="rounded-md border border-border bg-[#0f0f0f] px-2 py-1 text-[10px] text-text-secondary">
+                  <span className="rounded-md border border-border bg-base px-2 py-1 text-[10px] text-text-secondary">
                     {note.color ?? t("common.none")}
                   </span>
                 </div>
@@ -379,7 +379,7 @@ export function RightPanel({
               </div>
 
               <div className="grid gap-2">
-                <div className="flex min-w-0 items-center gap-2 rounded-md border border-border bg-[#0f0f0f] px-2 py-2">
+                <div className="flex min-w-0 items-center gap-2 rounded-md border border-border bg-base px-2 py-2">
                   <input
                     type="color"
                     className="h-8 w-10 cursor-pointer rounded border border-border bg-transparent p-0"
@@ -401,7 +401,7 @@ export function RightPanel({
                 <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
-                    className="min-w-[120px] flex-1 rounded-md border border-border bg-[#161616] px-3 py-2 text-xs text-text-primary transition hover:border-focus hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+                    className="min-w-[120px] flex-1 rounded-md border border-border bg-elevated px-3 py-2 text-xs text-text-primary transition hover:border-focus hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={() => {
                       if (normalizedCustomColor) {
                         onColorSelect(normalizedCustomColor);
@@ -413,7 +413,7 @@ export function RightPanel({
                   </button>
                   <button
                     type="button"
-                    className="min-w-[92px] rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+                    className="min-w-[92px] rounded-md border border-border bg-base px-3 py-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
                     onClick={() => onColorSelect(undefined)}
                   >
                     {t("rightPanel.clearColor")}
@@ -431,7 +431,7 @@ export function RightPanel({
               </div>
             </>
           ) : (
-            <div className="rounded-md border border-dashed border-border bg-[#0f0f0f] px-3 py-4 text-sm text-text-secondary">
+            <div className="rounded-md border border-dashed border-border bg-base px-3 py-4 text-sm text-text-secondary">
               {t("rightPanel.noteToolsEmpty")}
             </div>
           )}
@@ -472,7 +472,7 @@ export function RightPanel({
           style={{ animationDelay: "190ms" }}
         >
           <h2 className={sectionTitleClassName()}>{t("rightPanel.info")}</h2>
-          <div className="grid gap-2 rounded-md border border-border bg-[#111111] p-3 text-xs text-text-secondary">
+          <div className="grid gap-2 rounded-md border border-border bg-surface p-3 text-xs text-text-secondary">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <span>{t("rightPanel.createdAt")}</span>
               <span className="text-right text-text-primary">
@@ -511,13 +511,13 @@ export function RightPanel({
           <h2 className={sectionTitleClassName()}>
             {t("rightPanel.shortcuts")}
           </h2>
-          <div className="grid gap-2 rounded-md border border-border bg-[#111111] p-3 text-[11px] text-text-secondary">
+          <div className="grid gap-2 rounded-md border border-border bg-surface p-3 text-[11px] text-text-secondary">
             {shortcuts.map((item) => (
               <div
                 key={item.key}
-                className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-md border border-transparent bg-[#0f0f0f] px-2.5 py-2"
+                className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-md border border-transparent bg-base px-2.5 py-2"
               >
-                <span className="rounded-md border border-border bg-[#161616] px-2 py-1 text-text-primary">
+                <span className="rounded-md border border-border bg-elevated px-2 py-1 text-text-primary">
                   {item.key}
                 </span>
                 <span className="text-right">{item.label}</span>
