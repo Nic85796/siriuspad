@@ -64,13 +64,41 @@ export function NoteBlocks({
 
   return (
     <section
-      className="border-t border-border bg-[#0d0d0d] px-4 py-2"
+      className="border-t border-border bg-[#0d0d0d] px-4 py-2.5"
       style={{
         backgroundImage: sectionTint
           ? `linear-gradient(180deg, ${sectionTint}, transparent 70%)`
           : undefined,
       }}
     >
+      {!expanded ? (
+        <button
+          type="button"
+          className="interactive-lift flex w-full items-center justify-between gap-3 rounded-lg border border-border bg-[#111111] px-3 py-3 text-left transition hover:border-focus hover:bg-hover"
+          onClick={() => setExpanded(true)}
+          title={t('common.open')}
+          aria-label={t('common.open')}
+        >
+          <div className="min-w-0">
+            <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+              {t('note.blocksTitle')}
+            </h2>
+            <div className="mt-1 flex flex-wrap items-center gap-2 text-[11px] text-text-secondary">
+              <span className="rounded-md border border-border bg-[#0f0f0f] px-2 py-1">
+                {t('note.checklistTitle')} {checklistDoneCount}/{checklist.length}
+              </span>
+              <span className="rounded-md border border-border bg-[#0f0f0f] px-2 py-1">
+                {t('note.calloutsTitle')}
+              </span>
+            </div>
+          </div>
+          <span className="inline-flex h-8 shrink-0 items-center gap-2 rounded-md border border-border bg-[#161616] px-3 text-[11px] text-text-primary">
+            <ChevronDown className="h-3.5 w-3.5" />
+            {t('common.open')}
+          </span>
+        </button>
+      ) : (
+      <>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-[11px] font-semibold uppercase tracking-[0.18em] text-text-muted">
@@ -96,15 +124,8 @@ export function NoteBlocks({
           {expanded ? t('common.close') : t('common.open')}
         </button>
       </div>
-
-      {!expanded ? (
-        <p className="mt-2 text-xs leading-6 text-text-secondary">
-          {t('note.blocksHint')}
-        </p>
-      ) : null}
-
-      {expanded ? (
-      <div className="mt-3 grid gap-3 xl:grid-cols-2">
+      <div className="mt-3 max-h-[360px] overflow-y-auto pr-1">
+        <div className="grid gap-3 xl:grid-cols-2">
         <div className="motion-fade-up surface-hover rounded-lg border border-border bg-[#111111] p-3">
           <div className="mb-3 flex items-start justify-between gap-3">
             <div>
@@ -301,8 +322,10 @@ export function NoteBlocks({
             {t('note.calloutsFooter')}
           </div>
         </div>
+        </div>
       </div>
-      ) : null}
+      </>
+      )}
     </section>
   )
 }

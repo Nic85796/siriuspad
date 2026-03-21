@@ -1,3 +1,4 @@
+import { Info, Palette, Tags } from "lucide-react";
 import { format } from "date-fns";
 import { useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -70,6 +71,9 @@ export function RightPanel({
   mobile = false,
 }: RightPanelProps) {
   const { t, i18n } = useTranslation();
+  const [mobileSection, setMobileSection] = useState<"tools" | "tags" | "info">(
+    "tools",
+  );
   const [customColor, setCustomColor] = useState(
     note?.color ?? NOTE_COLOR_SWATCHES[4],
   );
@@ -92,12 +96,20 @@ export function RightPanel({
   const checklistDoneCount = checklist.filter((item) => item.done).length;
   const normalizedCustomColor = normalizeHexColor(customColor);
   const sectionTint = note?.color ? withAlpha(note.color, 0.08) : undefined;
+  const shortcuts = [
+    { key: "Ctrl+N", label: t("commands.newNote") },
+    { key: "Ctrl+S", label: t("common.save") },
+    { key: "Ctrl+K", label: t("commands.commandPalette") },
+    { key: "Ctrl+F", label: t("titlebar.search") },
+    { key: "Ctrl+`", label: t("terminal.toggle") },
+    { key: "Ctrl+Enter", label: t("terminal.run") },
+  ];
 
   return (
     <aside
       className={`${
         mobile
-          ? "motion-fade-up flex h-[72vh] w-full flex-col rounded-t-[12px] border border-b-0 border-border bg-[#0f0f0f]"
+          ? "motion-fade-up flex h-[min(78dvh,720px)] w-full flex-col rounded-t-[12px] border border-b-0 border-border bg-[#0f0f0f]"
           : "motion-slide-right flex h-full w-[288px] shrink-0 flex-col border-l border-border bg-[#0f0f0f]"
       }`}
       style={
@@ -108,7 +120,58 @@ export function RightPanel({
           : undefined
       }
     >
+      {mobile ? (
+        <div className="border-b border-border px-3 pb-3 pt-2">
+          <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-[#2a2a2a]" />
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-[10px] uppercase tracking-[0.18em] text-text-muted">
+                {t("rightPanel.noteTools")}
+              </p>
+              <p className="mt-1 truncate text-sm text-text-primary">
+                {note?.title || t("common.untitled")}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 rounded-md border border-border bg-[#111111] px-2 py-1 text-[11px] text-text-secondary">
+              <span
+                className="h-2.5 w-2.5 rounded-full border border-white/10"
+                style={{ backgroundColor: note?.color ?? "#2a2a2a" }}
+              />
+              {note?.color ?? t("common.none")}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { key: "tools" as const, icon: Palette, label: t("rightPanel.noteTools") },
+              { key: "tags" as const, icon: Tags, label: t("rightPanel.filterTags") },
+              { key: "info" as const, icon: Info, label: t("rightPanel.info") },
+            ].map((item) => {
+              const active = mobileSection === item.key;
+              const Icon = item.icon;
+
+              return (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={`inline-flex h-10 items-center justify-center gap-2 rounded-md border px-3 text-[11px] transition ${
+                    active
+                      ? "border-[#2d2060] bg-[rgba(124,58,237,0.12)] text-text-primary"
+                      : "border-border bg-[#111111] text-text-secondary hover:border-focus hover:bg-hover hover:text-text-primary"
+                  }`}
+                  onClick={() => setMobileSection(item.key)}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  <span className="truncate">{item.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+
       <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+        {!mobile || mobileSection === "tools" ? (
         <section
           className={`${sectionCardClassName()} motion-fade-up surface-hover`}
           style={{
@@ -121,11 +184,13 @@ export function RightPanel({
           <h2 className={sectionTitleClassName()}>
             {t("rightPanel.noteTools")}
           </h2>
-          <p className="mb-3 text-xs leading-6 text-text-secondary">
-            {note
-              ? t("rightPanel.noteToolsHint")
-              : t("rightPanel.noteToolsEmpty")}
-          </p>
+          {!mobile ? (
+            <p className="mb-3 text-xs leading-6 text-text-secondary">
+              {note
+                ? t("rightPanel.noteToolsHint")
+                : t("rightPanel.noteToolsEmpty")}
+            </p>
+          ) : null}
 
           {note ? (
             <>
@@ -239,7 +304,9 @@ export function RightPanel({
             </div>
           )}
         </section>
+        ) : null}
 
+        {!mobile || mobileSection === "tags" ? (
         <section
           className="motion-fade-up mb-5"
           style={{ animationDelay: "140ms" }}
@@ -265,7 +332,9 @@ export function RightPanel({
             )}
           </div>
         </section>
+        ) : null}
 
+        {!mobile || mobileSection === "info" ? (
         <section
           className="motion-fade-up mb-5"
           style={{ animationDelay: "190ms" }}
@@ -303,20 +372,15 @@ export function RightPanel({
             </div>
           </div>
         </section>
+        ) : null}
 
+        {!mobile ? (
         <section className="motion-fade-up" style={{ animationDelay: "240ms" }}>
           <h2 className={sectionTitleClassName()}>
             {t("rightPanel.shortcuts")}
           </h2>
           <div className="grid gap-2 rounded-md border border-border bg-[#111111] p-3 text-[11px] text-text-secondary">
-            {[
-              { key: "Ctrl+N", label: t("commands.newNote") },
-              { key: "Ctrl+S", label: t("common.save") },
-              { key: "Ctrl+K", label: t("commands.commandPalette") },
-              { key: "Ctrl+F", label: t("titlebar.search") },
-              { key: "Ctrl+`", label: t("terminal.toggle") },
-              { key: "Ctrl+Enter", label: t("terminal.run") },
-            ].map((item) => (
+            {shortcuts.map((item) => (
               <div
                 key={item.key}
                 className="flex items-center justify-between gap-3 rounded-md border border-transparent bg-[#0f0f0f] px-2.5 py-2"
@@ -329,6 +393,7 @@ export function RightPanel({
             ))}
           </div>
         </section>
+        ) : null}
       </div>
     </aside>
   );

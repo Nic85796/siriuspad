@@ -64,6 +64,10 @@ function controlClassName() {
   return 'h-8 rounded-md border border-border bg-[#161616] px-2.5 text-[11px] text-text-secondary outline-none transition hover:border-focus hover:bg-hover hover:text-text-primary focus:border-focus'
 }
 
+function compactMetaFieldClassName() {
+  return 'grid gap-1.5 rounded-md border border-border bg-[#141414] p-2.5'
+}
+
 export function NoteEditorHeader({
   note,
   workspaces,
@@ -96,7 +100,7 @@ export function NoteEditorHeader({
         boxShadow: note.color ? `inset 3px 0 0 ${note.color}` : undefined,
       }}
     >
-      <div className={`flex ${compact ? 'flex-col gap-3' : 'flex-wrap items-start gap-3'}`}>
+      <div className={`flex ${compact ? 'flex-col gap-3' : 'flex-wrap items-start gap-4'}`}>
         <div className="min-w-0 flex-1">
           <input
             className={`w-full bg-transparent font-semibold tracking-tight text-text-primary outline-none placeholder:text-text-muted ${
@@ -108,11 +112,7 @@ export function NoteEditorHeader({
             onChange={(event) => onChange({ title: event.target.value })}
           />
 
-          <div
-            className={`mt-3 flex items-center gap-2 ${
-              compact ? 'overflow-x-auto pb-1' : 'flex-wrap'
-            }`}
-          >
+          <div className={`mt-3 flex gap-2 ${compact ? 'flex-wrap' : 'flex-wrap items-center'}`}>
             {note.tags.map((tag) => (
               <TagPill
                 key={tag}
@@ -127,7 +127,7 @@ export function NoteEditorHeader({
 
             <input
               className={`h-8 rounded-md border border-dashed border-border bg-transparent px-2 text-[11px] text-text-primary outline-none placeholder:text-text-muted focus:border-focus ${
-                compact ? 'min-w-[132px] shrink-0' : 'min-w-[96px]'
+                compact ? 'min-w-[128px] flex-1' : 'min-w-[96px]'
               }`}
               list="note-tag-suggestions"
               placeholder={t('note.addTag')}
@@ -165,12 +165,18 @@ export function NoteEditorHeader({
             compact ? 'w-full flex-wrap' : 'flex-wrap justify-end'
           }`}
         >
-          <div className="flex items-center rounded-md border border-border bg-[#161616] p-1">
+          <div
+            className={`flex items-center rounded-md border border-border bg-[#161616] p-1 ${
+              compact ? 'min-w-0 flex-1' : ''
+            }`}
+          >
             {previewModes.map((mode) => (
               <button
                 key={mode}
                 type="button"
                 className={`interactive-lift rounded-md px-2.5 py-1 text-[11px] transition ${
+                  compact ? 'flex-1' : ''
+                } ${
                   previewMode === mode
                     ? 'bg-[#222222] text-text-primary'
                     : 'text-text-secondary hover:bg-hover hover:text-text-primary'
@@ -235,15 +241,15 @@ export function NoteEditorHeader({
       <div
         className={`mt-3 ${
           compact
-            ? 'grid grid-cols-1 gap-2'
+            ? 'grid grid-cols-1 gap-2 sm:grid-cols-3'
             : 'flex flex-wrap items-center justify-between gap-3'
         }`}
       >
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-text-muted">
+        <div className={compact ? compactMetaFieldClassName() : 'flex flex-wrap items-center gap-2'}>
+          <label className={`${compact ? 'grid gap-1.5' : 'inline-flex items-center gap-2'} text-[10px] uppercase tracking-[0.16em] text-text-muted`}>
             <span>{t('note.priorityLabel')}</span>
             <select
-              className={controlClassName()}
+              className={`${controlClassName()} ${compact ? 'w-full' : ''}`}
               value={note.priority ?? 'media'}
               onChange={(event) =>
                 onChange({
@@ -259,11 +265,12 @@ export function NoteEditorHeader({
           </label>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <label className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-text-muted">
+        <div className={compact ? 'contents' : 'flex flex-wrap items-center gap-2'}>
+          <div className={compact ? compactMetaFieldClassName() : ''}>
+            <label className={`${compact ? 'grid gap-1.5' : 'inline-flex items-center gap-2'} text-[10px] uppercase tracking-[0.16em] text-text-muted`}>
             <span>{t('note.workspaceLabel')}</span>
             <select
-              className={controlClassName()}
+              className={`${controlClassName()} ${compact ? 'w-full' : ''}`}
               value={note.workspace}
               onChange={(event) => onChange({ workspace: event.target.value })}
             >
@@ -273,12 +280,14 @@ export function NoteEditorHeader({
                 </option>
               ))}
             </select>
-          </label>
+            </label>
+          </div>
 
-          <label className="inline-flex items-center gap-2 text-[10px] uppercase tracking-[0.16em] text-text-muted">
+          <div className={compact ? compactMetaFieldClassName() : ''}>
+            <label className={`${compact ? 'grid gap-1.5' : 'inline-flex items-center gap-2'} text-[10px] uppercase tracking-[0.16em] text-text-muted`}>
             <span>{t('note.languageLabel')}</span>
             <select
-              className={controlClassName()}
+              className={`${controlClassName()} ${compact ? 'w-full' : ''}`}
               value={note.language}
               onChange={(event) => onChange({ language: event.target.value })}
             >
@@ -288,7 +297,8 @@ export function NoteEditorHeader({
                 </option>
               ))}
             </select>
-          </label>
+            </label>
+          </div>
         </div>
       </div>
     </div>
