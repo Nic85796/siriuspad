@@ -158,6 +158,21 @@ export function MarkdownPreview({
     },
   }
 
+  const resolveCalloutPalette = (tone: CalloutTone, customColor?: string | null) => {
+    const base = calloutPalette[tone]
+
+    if (!customColor) {
+      return base
+    }
+
+    return {
+      ...base,
+      border: customColor,
+      badge: customColor,
+      background: withAlpha(customColor, 0.1) ?? base.background,
+    }
+  }
+
   const renderMarkdown = (value: string, key: string) => (
     <ReactMarkdown
       key={key}
@@ -311,7 +326,7 @@ export function MarkdownPreview({
             return renderMarkdown(section.content, `markdown-${index}`)
           }
 
-          const palette = calloutPalette[section.tone]
+          const palette = resolveCalloutPalette(section.tone, section.color)
 
           return (
             <div

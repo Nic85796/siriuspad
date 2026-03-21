@@ -1,14 +1,19 @@
-import { Check, Info, Palette, PencilLine, Plus, Tags, Trash2 } from "lucide-react";
+import { Info, Palette, PencilLine, Tags, Trash2 } from "lucide-react";
 import { format } from "date-fns";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { withAlpha } from "@/lib/color";
 import { getDateFnsLocale } from "@/lib/date";
 import { NOTE_COLOR_SWATCHES } from "@/lib/constants";
+import { NoteBlocks } from "@/components/editor/NoteBlocks";
 import { PriorityDot } from "@/components/ui/PriorityDot";
 import { TagPill } from "@/components/ui/TagPill";
 import type { ChecklistItem, Note, NoteMetadata } from "@/types";
+
+const RIGHT_PANEL_WIDTH_KEY = "siriuspad:right-panel-width:v1";
+const RIGHT_PANEL_MIN_WIDTH = 220;
+const RIGHT_PANEL_MAX_WIDTH = 480;
 
 interface RightPanelProps {
   note: Note | null;
@@ -18,15 +23,16 @@ interface RightPanelProps {
   onNoteChange: (patch: Partial<Note>) => void;
   onRenameNote: () => void;
   onColorSelect: (color?: string) => void;
+  onInsertCallout: (input: {
+    tone: "note" | "tip" | "warning";
+    title?: string;
+    color?: string;
+  }) => void;
   mobile?: boolean;
 }
 
-function createChecklistItem(text: string): ChecklistItem {
-  return {
-    id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
-    text,
-    done: false,
-  };
+function clampPanelWidth(value: number) {
+  return Math.min(RIGHT_PANEL_MAX_WIDTH, Math.max(RIGHT_PANEL_MIN_WIDTH, value));
 }
 
 function wordCount(content: string) {
@@ -80,17 +86,29 @@ export function RightPanel({
   onNoteChange,
   onRenameNote,
   onColorSelect,
+  onInsertCallout,
   mobile = false,
 }: RightPanelProps) {
   const { t, i18n } = useTranslation();
   const [mobileSection, setMobileSection] = useState<"tools" | "tags" | "info">(
     "tools",
   );
+  const [panelWidth, setPanelWidth] = useState(() => {
+    if (typeof window === "undefined") {
+      return 288;
+    }
+
+    const storedValue = Number(window.localStorage.getItem(RIGHT_PANEL_WIDTH_KEY));
+    return Number.isFinite(storedValue)
+      ? clampPanelWidth(storedValue)
+      : 288;
+  });
   const [customColor, setCustomColor] = useState(
     note?.color ?? NOTE_COLOR_SWATCHES[4],
   );
-  const [mobileChecklistValue, setMobileChecklistValue] = useState("");
-
+  const resizeStateRef = useRef<{ startX: number; startWidth: number } | null>(
+    null,
+  );
   const tagCounts = useMemo(() => {
     const map = new Map<string, number>();
 
@@ -124,32 +142,87 @@ export function RightPanel({
     });
   };
 
-  const addMobileChecklistItem = () => {
-    const text = mobileChecklistValue.trim();
-
-    if (!text) {
+  useEffect(() => {
+    if (mobile || typeof window === "undefined") {
       return;
     }
 
-    updateChecklist([...checklist, createChecklistItem(text)]);
-    setMobileChecklistValue("");
-  };
+    window.localStorage.setItem(RIGHT_PANEL_WIDTH_KEY, String(panelWidth));
+  }, [mobile, panelWidth]);
+
+  useEffect(() => {
+    if (mobile) {
+      return;
+    }
+
+    const handlePointerMove = (event: MouseEvent) => {
+      const resizeState = resizeStateRef.current;
+      if (!resizeState) {
+        return;
+      }
+
+      const delta = resizeState.startX - event.clientX;
+      setPanelWidth(clampPanelWidth(resizeState.startWidth + delta));
+    };
+
+    const handlePointerUp = () => {
+      if (!resizeStateRef.current) {
+        return;
+      }
+
+      resizeStateRef.current = null;
+      document.body.style.cursor = "";
+      document.body.style.userSelect = "";
+    };
+
+    window.addEventListener("mousemove", handlePointerMove);
+    window.addEventListener("mouseup", handlePointerUp);
+
+    return () => {
+      window.removeEventListener("mousemove", handlePointerMove);
+      window.removeEventListener("mouseup", handlePointerUp);
+    };
+  }, [mobile]);
 
   return (
     <aside
       className={`${
         mobile
-          ? "motion-fade-up flex h-[min(78dvh,720px)] w-full flex-col rounded-t-[12px] border border-b-0 border-border bg-[#0f0f0f]"
-          : "motion-slide-right flex h-full w-[288px] shrink-0 flex-col border-l border-border bg-[#0f0f0f]"
+          ? "motion-fade-up flex h-[min(74svh,720px)] w-full flex-col overflow-hidden rounded-t-[12px] border border-b-0 border-border bg-[#0f0f0f]"
+          : "motion-slide-right relative flex h-full shrink-0 flex-col overflow-hidden border-l border-border bg-[#0f0f0f]"
       }`}
       style={
         mobile
           ? {
               paddingBottom: "env(safe-area-inset-bottom, 0px)",
             }
-          : undefined
+          : {
+              width: `${panelWidth}px`,
+              minWidth: `${panelWidth}px`,
+              maxWidth: `${panelWidth}px`,
+            }
       }
     >
+      {!mobile ? (
+        <button
+          type="button"
+          className="absolute inset-y-0 left-0 z-20 w-3 -translate-x-1/2 cursor-col-resize bg-transparent"
+          onMouseDown={(event) => {
+            event.preventDefault();
+            resizeStateRef.current = {
+              startX: event.clientX,
+              startWidth: panelWidth,
+            };
+            document.body.style.cursor = "col-resize";
+            document.body.style.userSelect = "none";
+          }}
+          aria-label={t("rightPanel.resize")}
+          title={t("rightPanel.resize")}
+        >
+          <span className="absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-border transition group-hover:bg-accent" />
+        </button>
+      ) : null}
+
       {mobile ? (
         <div className="border-b border-border px-3 pb-3 pt-2">
           <div className="mx-auto mb-3 h-1.5 w-14 rounded-full bg-[#2a2a2a]" />
@@ -200,7 +273,7 @@ export function RightPanel({
         </div>
       ) : null}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 py-3">
+      <div className="min-h-0 flex-1 overflow-x-hidden overflow-y-auto px-3 py-3">
         {!mobile || mobileSection === "tools" ? (
         <section
           className={`${sectionCardClassName()} motion-fade-up surface-hover`}
@@ -251,10 +324,10 @@ export function RightPanel({
                 </div>
               </div>
 
-              <div className="mb-3 grid gap-2 sm:grid-cols-2">
+              <div className="mb-3 grid min-w-0 gap-2 sm:grid-cols-2">
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-primary transition hover:border-focus hover:bg-hover"
+                  className="inline-flex min-w-0 items-center justify-center gap-2 rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-primary transition hover:border-focus hover:bg-hover"
                   onClick={onRenameNote}
                 >
                   <PencilLine className="h-3.5 w-3.5" />
@@ -262,7 +335,7 @@ export function RightPanel({
                 </button>
                 <button
                   type="button"
-                  className="inline-flex items-center justify-center gap-2 rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171] disabled:cursor-not-allowed disabled:opacity-50"
+                  className="inline-flex min-w-0 items-center justify-center gap-2 rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171] disabled:cursor-not-allowed disabled:opacity-50"
                   onClick={() => updateChecklist([])}
                   disabled={!checklist.length}
                 >
@@ -306,7 +379,7 @@ export function RightPanel({
               </div>
 
               <div className="grid gap-2">
-                <div className="flex items-center gap-2 rounded-md border border-border bg-[#0f0f0f] px-2 py-2">
+                <div className="flex min-w-0 items-center gap-2 rounded-md border border-border bg-[#0f0f0f] px-2 py-2">
                   <input
                     type="color"
                     className="h-8 w-10 cursor-pointer rounded border border-border bg-transparent p-0"
@@ -318,17 +391,17 @@ export function RightPanel({
                     aria-label={t("rightPanel.customColor")}
                   />
                   <input
-                    className={`${panelInputClassName()} h-8 px-2.5 text-[12px]`}
+                    className={`${panelInputClassName()} h-8 min-w-0 flex-1 px-2.5 text-[12px]`}
                     placeholder="#7c3aed"
                     value={customColor}
                     onChange={(event) => setCustomColor(event.target.value)}
                   />
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   <button
                     type="button"
-                    className="flex-1 rounded-md border border-border bg-[#161616] px-3 py-2 text-xs text-text-primary transition hover:border-focus hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
+                    className="min-w-[120px] flex-1 rounded-md border border-border bg-[#161616] px-3 py-2 text-xs text-text-primary transition hover:border-focus hover:bg-hover disabled:cursor-not-allowed disabled:opacity-50"
                     onClick={() => {
                       if (normalizedCustomColor) {
                         onColorSelect(normalizedCustomColor);
@@ -340,7 +413,7 @@ export function RightPanel({
                   </button>
                   <button
                     type="button"
-                    className="rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+                    className="min-w-[92px] rounded-md border border-border bg-[#101010] px-3 py-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
                     onClick={() => onColorSelect(undefined)}
                   >
                     {t("rightPanel.clearColor")}
@@ -348,129 +421,14 @@ export function RightPanel({
                 </div>
               </div>
 
-              {mobile ? (
-                <div className="mt-4 border-t border-border pt-3">
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.16em] text-text-muted">
-                        {t("note.checklistTitle")}
-                      </p>
-                      <p className="mt-1 text-xs text-text-secondary">
-                        {t("note.checklistHint")}
-                      </p>
-                    </div>
-                    <span
-                      className="rounded-md border px-2 py-1 text-[11px] text-text-primary"
-                      style={{
-                        borderColor: note.color ?? "var(--border)",
-                        backgroundColor: withAlpha(note.color, 0.14) ?? "#161616",
-                      }}
-                    >
-                      {checklistDoneCount}/{checklist.length}
-                    </span>
-                  </div>
-
-                  <div className="grid gap-2">
-                    {checklist.length ? (
-                      checklist.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center gap-2 rounded-md border border-border bg-[#0f0f0f] px-2 py-2"
-                        >
-                          <button
-                            type="button"
-                            className={`inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border transition ${
-                              item.done
-                                ? "border-transparent text-black"
-                                : "border-border bg-[#111111] text-transparent hover:border-focus"
-                            }`}
-                            style={{
-                              backgroundColor: item.done
-                                ? note.color ?? "var(--accent)"
-                                : undefined,
-                            }}
-                            onClick={() =>
-                              updateChecklist(
-                                checklist.map((entry) =>
-                                  entry.id === item.id
-                                    ? { ...entry, done: !entry.done }
-                                    : entry,
-                                ),
-                              )
-                            }
-                            aria-label={
-                              item.done
-                                ? t("note.checklistMarkPending")
-                                : t("note.checklistMarkDone")
-                            }
-                          >
-                            <Check className="h-3.5 w-3.5" />
-                          </button>
-
-                          <input
-                            className={`min-w-0 flex-1 bg-transparent text-sm outline-none placeholder:text-text-muted ${
-                              item.done
-                                ? "text-text-secondary line-through"
-                                : "text-text-primary"
-                            }`}
-                            value={item.text}
-                            onChange={(event) =>
-                              updateChecklist(
-                                checklist.map((entry) =>
-                                  entry.id === item.id
-                                    ? { ...entry, text: event.target.value }
-                                    : entry,
-                                ),
-                              )
-                            }
-                            placeholder={t("note.checklistPlaceholder")}
-                          />
-
-                          <button
-                            type="button"
-                            className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-border bg-[#111111] text-text-secondary transition hover:border-[#4a2020] hover:bg-[#2d1515] hover:text-[#f87171]"
-                            onClick={() =>
-                              updateChecklist(
-                                checklist.filter((entry) => entry.id !== item.id),
-                              )
-                            }
-                            aria-label={t("note.checklistRemove")}
-                          >
-                            <Trash2 className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="rounded-md border border-dashed border-border bg-[#0f0f0f] px-3 py-4 text-sm text-text-secondary">
-                        {t("note.checklistEmpty")}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="mt-3 flex gap-2">
-                    <input
-                      className={panelInputClassName()}
-                      placeholder={t("note.checklistPlaceholder")}
-                      value={mobileChecklistValue}
-                      onChange={(event) => setMobileChecklistValue(event.target.value)}
-                      onKeyDown={(event) => {
-                        if (event.key === "Enter") {
-                          event.preventDefault();
-                          addMobileChecklistItem();
-                        }
-                      }}
-                    />
-                    <button
-                      type="button"
-                      className="inline-flex h-9 shrink-0 items-center gap-2 rounded-md border border-border bg-[#161616] px-3 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
-                      onClick={addMobileChecklistItem}
-                    >
-                      <Plus className="h-4 w-4" />
-                      {t("note.checklistAdd")}
-                    </button>
-                  </div>
-                </div>
-              ) : null}
+              <div className="mt-4 border-t border-border pt-4">
+                <NoteBlocks
+                  note={note}
+                  onNoteChange={onNoteChange}
+                  onInsertCallout={onInsertCallout}
+                  embedded
+                />
+              </div>
             </>
           ) : (
             <div className="rounded-md border border-dashed border-border bg-[#0f0f0f] px-3 py-4 text-sm text-text-secondary">
@@ -515,7 +473,7 @@ export function RightPanel({
         >
           <h2 className={sectionTitleClassName()}>{t("rightPanel.info")}</h2>
           <div className="grid gap-2 rounded-md border border-border bg-[#111111] p-3 text-xs text-text-secondary">
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <span>{t("rightPanel.createdAt")}</span>
               <span className="text-right text-text-primary">
                 {note
@@ -525,20 +483,20 @@ export function RightPanel({
                   : "—"}
               </span>
             </div>
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <span>{t("rightPanel.words")}</span>
               <span className="text-text-primary">
                 {note ? wordCount(note.content) : 0}
               </span>
             </div>
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <span>{t("note.priorityLabel")}</span>
               <PriorityDot
                 priority={note?.priority}
                 label={note ? t(`priority.${note.priority ?? "media"}`) : "—"}
               />
             </div>
-            <div className="flex items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center justify-between gap-3">
               <span>{t("note.checklistTitle")}</span>
               <span className="text-text-primary">
                 {checklistDoneCount}/{checklist.length}
@@ -557,7 +515,7 @@ export function RightPanel({
             {shortcuts.map((item) => (
               <div
                 key={item.key}
-                className="flex items-center justify-between gap-3 rounded-md border border-transparent bg-[#0f0f0f] px-2.5 py-2"
+                className="flex min-w-0 flex-wrap items-center justify-between gap-3 rounded-md border border-transparent bg-[#0f0f0f] px-2.5 py-2"
               >
                 <span className="rounded-md border border-border bg-[#161616] px-2 py-1 text-text-primary">
                   {item.key}

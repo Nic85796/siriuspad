@@ -1,16 +1,13 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { EXECUTABLE_LANGUAGES } from "@/lib/constants";
-import { NoteBlocks } from "@/components/editor/NoteBlocks";
-import { MarkdownPreview } from "@/components/editor/MarkdownPreview";
 import { NoteEditor, NoteEditorHeader } from "@/components/editor/NoteEditor";
 import { Terminal } from "@/components/editor/Terminal";
 import type {
   AppPlatform,
   CursorInfo,
   Note,
-  PreviewMode,
   RunResult,
   Settings,
   Workspace,
@@ -23,8 +20,6 @@ interface EditorPaneProps {
   settings: Settings;
   workspaces: Workspace[];
   allTags: string[];
-  previewMode: PreviewMode;
-  previewSplitRatio: number;
   findReplaceNonce: number;
   toggleTerminalNonce: number;
   runner: {
@@ -49,18 +44,12 @@ interface EditorPaneProps {
     setTimeoutSeconds: (value: number) => void;
   };
   onNoteChange: (patch: Partial<Note>) => void;
-  onInsertCallout: (input: {
-    tone: "note" | "tip" | "warning";
-    title?: string;
-  }) => void;
   onContentChange: (value: string) => void;
   onSave: () => Promise<void>;
   onDelete: () => Promise<void>;
   onTogglePin: () => Promise<void>;
   onCreateNote: () => Promise<void>;
   onCursorChange: (cursorInfo: CursorInfo) => void;
-  onPreviewModeChange: (mode: PreviewMode) => void;
-  onPreviewSplitRatioChange: (ratio: number) => void;
   onOpenFindReplace: () => void;
   onOpenHistory: () => void;
 }
@@ -72,76 +61,23 @@ export function EditorPane({
   settings,
   workspaces,
   allTags,
-  previewMode,
-  previewSplitRatio,
   findReplaceNonce,
   toggleTerminalNonce,
   runner,
   onNoteChange,
-  onInsertCallout,
   onContentChange,
   onSave,
   onDelete,
   onTogglePin,
   onCreateNote,
   onCursorChange,
-  onPreviewModeChange,
-  onPreviewSplitRatioChange,
   onOpenFindReplace,
   onOpenHistory,
 }: EditorPaneProps) {
   const { t } = useTranslation();
   const isMobile = platform === "android" || platform === "ios";
-  const effectivePreviewMode =
-    isMobile && previewMode === "split" ? "editor" : previewMode;
-  const resizeStateRef = useRef<{
-    width: number;
-    startX: number;
-    startRatio: number;
-  } | null>(null);
   const [terminalOpen, setTerminalOpen] = useState(false);
   const [terminalHeight, setTerminalHeight] = useState(280);
-  const [terminalSeed, setTerminalSeed] = useState<
-    | {
-        id: number;
-        kind: "command";
-        value: string;
-      }
-    | {
-        id: number;
-        kind: "snippet";
-        code: string;
-        language: string | null;
-      }
-    | null
-  >(null);
-
-  useEffect(() => {
-    const onMouseMove = (event: MouseEvent) => {
-      if (!resizeStateRef.current) {
-        return;
-      }
-
-      const delta = event.clientX - resizeStateRef.current.startX;
-      const ratio =
-        (resizeStateRef.current.width * resizeStateRef.current.startRatio +
-          delta) /
-        resizeStateRef.current.width;
-      onPreviewSplitRatioChange(ratio);
-    };
-
-    const onMouseUp = () => {
-      resizeStateRef.current = null;
-    };
-
-    document.addEventListener("mousemove", onMouseMove);
-    document.addEventListener("mouseup", onMouseUp);
-
-    return () => {
-      document.removeEventListener("mousemove", onMouseMove);
-      document.removeEventListener("mouseup", onMouseUp);
-    };
-  }, [onPreviewSplitRatioChange]);
 
   useEffect(() => {
     if (!toggleTerminalNonce) {
@@ -202,106 +138,36 @@ export function EditorPane({
         note={note}
         workspaces={workspaces}
         allTags={allTags}
-        previewMode={effectivePreviewMode}
         compact={isMobile}
         onChange={onNoteChange}
         onDelete={onDelete}
         onTogglePin={onTogglePin}
-        onPreviewModeChange={onPreviewModeChange}
         onOpenFindReplace={onOpenFindReplace}
         onOpenHistory={onOpenHistory}
       />
 
-      <div className="relative flex min-h-0 flex-1">
-        {effectivePreviewMode !== "preview" ? (
-          <div
-            className="min-w-0"
-            style={{
-              width:
-                effectivePreviewMode === "split"
-                  ? `${previewSplitRatio * 100}%`
-                  : "100%",
-            }}
-          >
-            <NoteEditor
-              noteId={note.id}
-              value={note.content}
-              accentColor={note.color}
-              compact={isMobile}
-              settings={settings}
-              findReplaceNonce={findReplaceNonce}
-              onChange={onContentChange}
-              onSave={onSave}
-              onRun={async () => {
-                if (isMobile) {
-                  return;
-                }
-                setTerminalOpen(true);
-                await runner.run();
-              }}
-              onCursorChange={onCursorChange}
-            />
-          </div>
-        ) : null}
-
-        {effectivePreviewMode === "split" ? (
-          <div
-            className="w-1 cursor-col-resize bg-border hover:bg-[var(--accent-subtle)]"
-            onMouseDown={(event) => {
-              const container = event.currentTarget.parentElement;
-              if (!container) {
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden bg-[#111111]">
+          <NoteEditor
+            noteId={note.id}
+            value={note.content}
+            accentColor={note.color}
+            compact={isMobile}
+            settings={settings}
+            findReplaceNonce={findReplaceNonce}
+            onChange={onContentChange}
+            onSave={onSave}
+            onRun={async () => {
+              if (isMobile) {
                 return;
               }
-
-              resizeStateRef.current = {
-                width: container.getBoundingClientRect().width,
-                startX: event.clientX,
-                startRatio: previewSplitRatio,
-              };
+              setTerminalOpen(true);
+              await runner.run();
             }}
+            onCursorChange={onCursorChange}
           />
-        ) : null}
-
-        {effectivePreviewMode !== "editor" ? (
-          <div
-            className="min-w-0 border-l border-border"
-            style={{
-              width:
-                effectivePreviewMode === "split"
-                  ? `${(1 - previewSplitRatio) * 100}%`
-                  : "100%",
-            }}
-          >
-            <MarkdownPreview
-              content={note.content}
-              accentColor={note.color}
-              onContentChange={onContentChange}
-              onRunCodeInTerminal={
-                isMobile
-                  ? undefined
-                  : ({ code, language }) => {
-                      setTerminalOpen(true);
-                      setTerminalSeed({
-                        id: Date.now(),
-                        kind: "snippet",
-                        code,
-                        language,
-                      });
-                    }
-              }
-            />
-          </div>
-        ) : null}
+        </div>
       </div>
-
-      {!isMobile ? (
-        <NoteBlocks
-          key={note.id}
-          note={note}
-          onNoteChange={onNoteChange}
-          onInsertCallout={onInsertCallout}
-        />
-      ) : null}
 
       {!isMobile ? (
         <Terminal
@@ -310,7 +176,7 @@ export function EditorPane({
           open={terminalOpen}
           height={terminalHeight}
           canRunSnippet={canRunSnippet}
-          seedCommand={terminalSeed}
+          seedCommand={null}
           runner={runner}
           onOpenChange={setTerminalOpen}
           onHeightChange={setTerminalHeight}

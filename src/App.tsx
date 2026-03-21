@@ -55,7 +55,6 @@ import type {
   CommandItem,
   CursorInfo,
   Note,
-  PreviewMode,
 } from "@/types";
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
@@ -106,7 +105,6 @@ export default function App() {
     resetZoom: () => Promise<void>;
     toggleZenMode: () => void;
     toggleFocusMode: () => void;
-    cyclePreviewMode: () => void;
     openFindReplace: () => void;
     openCommandPalette: () => void;
     createNote: () => Promise<void>;
@@ -130,7 +128,6 @@ export default function App() {
     resetZoom: async () => {},
     toggleZenMode: () => {},
     toggleFocusMode: () => {},
-    cyclePreviewMode: () => {},
     openFindReplace: () => {},
     openCommandPalette: () => {},
     createNote: async () => {},
@@ -192,6 +189,7 @@ export default function App() {
   const insertCalloutIntoActiveNote = (input: {
     tone: "note" | "tip" | "warning";
     title?: string;
+    color?: string;
   }) => {
     if (!notes.activeNote) {
       return;
@@ -217,13 +215,13 @@ export default function App() {
 
     const template = templates[input.tone];
     const title = input.title?.trim() || template.title;
-    const block = `> [!${template.marker}] ${title}\n> ${template.body}`;
+    const colorToken = input.color?.trim() ? `{${input.color.trim()}}` : "";
+    const block = `> [!${template.marker}]${colorToken} ${title}\n> ${template.body}`;
     const nextContent = notes.activeNote.content.trim()
       ? `${notes.activeNote.content.trimEnd()}\n\n${block}\n`
       : `${block}\n`;
 
     notes.updateActiveContent(nextContent);
-    uiState.setPreviewMode("split");
   };
 
   const closeWindowAfterDecision = async (mode: "save" | "discard") => {
@@ -914,15 +912,6 @@ export default function App() {
       },
     },
     {
-      id: "app:preview",
-      label: t("commands.markdownPreview"),
-      group: t("commands.groups.app"),
-      shortcut: "Ctrl+Shift+M",
-      perform: async () => {
-        uiState.cyclePreviewMode();
-      },
-    },
-    {
       id: "app:history",
       label: t("history.title"),
       group: t("commands.groups.app"),
@@ -1125,7 +1114,6 @@ export default function App() {
     resetZoom,
     toggleZenMode: () => useUiStore.getState().toggleZenMode(),
     toggleFocusMode: () => useUiStore.getState().toggleFocusMode(),
-    cyclePreviewMode: () => useUiStore.getState().cyclePreviewMode(),
     openFindReplace: () => setFindReplaceNonce((current) => current + 1),
     openCommandPalette: () => useUiStore.getState().setCommandPaletteOpen(true),
     createNote: () => createNote(),
@@ -1230,12 +1218,6 @@ export default function App() {
       ) {
         event.preventDefault();
         void handlers.resetZoom();
-        return;
-      }
-
-      if (meta && event.shiftKey && event.key.toLowerCase() === "m") {
-        event.preventDefault();
-        handlers.cyclePreviewMode();
         return;
       }
 
@@ -1382,10 +1364,18 @@ export default function App() {
     };
   }, [notes.createNote]);
 
+  const rootViewportHeight = "100dvh";
+
   return (
     <div
       className="motion-fade-in relative flex h-screen flex-col bg-base text-text-primary"
-      style={{ height: "100dvh", minHeight: "100dvh" }}
+      style={{
+        height: rootViewportHeight,
+        minHeight: rootViewportHeight,
+        paddingBottom: isMobile ? "env(safe-area-inset-bottom, 0px)" : undefined,
+        paddingLeft: isMobile ? "env(safe-area-inset-left, 0px)" : undefined,
+        paddingRight: isMobile ? "env(safe-area-inset-right, 0px)" : undefined,
+      }}
     >
       <ResizeBorders
         platform={uiState.platform}
@@ -1431,7 +1421,7 @@ export default function App() {
         />
       ) : null}
 
-      <div className="relative flex min-h-0 flex-1">
+      <div className="relative flex min-h-0 flex-1 overflow-hidden">
         {!isMobile && showSidebar ? (
           <Sidebar
             width={uiState.sidebarWidth}
@@ -1527,23 +1517,16 @@ export default function App() {
             settings={settingsState.settings}
             workspaces={workspaceState.workspaces}
             allTags={allTags}
-            previewMode={uiState.previewMode}
-            previewSplitRatio={uiState.previewSplitRatio}
             findReplaceNonce={findReplaceNonce}
             toggleTerminalNonce={toggleTerminalNonce}
             runner={runner}
             onNoteChange={(patch) => notes.updateActiveNote(patch)}
-            onInsertCallout={insertCalloutIntoActiveNote}
             onContentChange={notes.updateActiveContent}
             onSave={saveCurrentNote}
             onDelete={deleteActiveNote}
             onTogglePin={togglePin}
             onCreateNote={() => createNote()}
             onCursorChange={setCursorInfo}
-            onPreviewModeChange={(mode: PreviewMode) =>
-              uiState.setPreviewMode(mode)
-            }
-            onPreviewSplitRatioChange={uiState.setPreviewSplitRatio}
             onOpenFindReplace={() =>
               setFindReplaceNonce((current) => current + 1)
             }
@@ -1567,6 +1550,7 @@ export default function App() {
             onTagClick={(tag) => notes.setActiveTag(tag)}
             onNoteChange={(patch) => notes.updateActiveNote(patch)}
             onRenameNote={renameActiveNote}
+            onInsertCallout={insertCalloutIntoActiveNote}
             onColorSelect={(color) => {
               if (!notes.activeNote) {
                 return;
@@ -1594,6 +1578,7 @@ export default function App() {
                 onTagClick={(tag) => notes.setActiveTag(tag)}
                 onNoteChange={(patch) => notes.updateActiveNote(patch)}
                 onRenameNote={renameActiveNote}
+                onInsertCallout={insertCalloutIntoActiveNote}
                 onColorSelect={(color) => {
                   if (!notes.activeNote) {
                     return;

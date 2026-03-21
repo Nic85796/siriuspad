@@ -9,6 +9,7 @@ export interface MarkdownSectionCallout {
   type: 'callout'
   tone: CalloutTone
   title: string | null
+  color: string | null
   content: string
 }
 
@@ -33,7 +34,8 @@ const CALLOUT_ALIASES: Record<string, CalloutDefinition> = {
   DONE: { tone: 'success' },
 }
 
-const CALLOUT_START_PATTERN = /^\s*>\s*\[!([A-Z]+)\](?:\s+(.*))?\s*$/
+const CALLOUT_START_PATTERN =
+  /^\s*>\s*\[!([A-Z]+)\](?:\{(#[0-9a-fA-F]{3,6})\})?(?:\s+(.*))?\s*$/
 const CALLOUT_LINE_PATTERN = /^\s*>\s?(.*)$/
 
 function resolveCallout(marker: string) {
@@ -83,7 +85,8 @@ export function splitMarkdownSections(content: string): MarkdownSection[] {
     markdownBuffer = []
 
     const bodyLines: string[] = []
-    const explicitTitle = startMatch[2]?.trim() || null
+    const explicitColor = startMatch[2]?.trim() || null
+    const explicitTitle = startMatch[3]?.trim() || null
     index += 1
 
     while (index < lines.length) {
@@ -108,6 +111,7 @@ export function splitMarkdownSections(content: string): MarkdownSection[] {
       type: 'callout',
       tone: callout.tone,
       title: explicitTitle,
+      color: explicitColor,
       content: bodyLines.join('\n').trim(),
     })
   }

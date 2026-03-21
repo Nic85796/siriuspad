@@ -38,12 +38,14 @@ export function MobileHeader({
 
   return (
     <header
-      className="relative z-10 border-b border-border bg-[#0f0f0f] px-3 pb-3"
+      className="relative z-10 shrink-0 border-b border-border bg-[#0f0f0f] px-3 pb-3"
       style={{
-        paddingTop: "calc(env(safe-area-inset-top, 0px) + 1.05rem)",
+        paddingTop: "calc(env(safe-area-inset-top, 0px) + 0.85rem)",
+        paddingLeft: "calc(env(safe-area-inset-left, 0px) + 0.75rem)",
+        paddingRight: "calc(env(safe-area-inset-right, 0px) + 0.75rem)",
       }}
     >
-      <div className="flex items-center gap-2.5">
+      <div className="flex items-start gap-2.5">
         <button
           type="button"
           className={sidebarOpen ? activeButtonClassName : buttonClassName}
@@ -54,53 +56,55 @@ export function MobileHeader({
           <PanelLeftOpen className="h-4 w-4" />
         </button>
 
-        <div className="min-w-0 flex-1 px-1">
+        <div className="min-w-0 flex-1 self-center px-1">
           <div className="truncate text-[15px] font-semibold tracking-wide text-text-primary">
             {title}
           </div>
-          <div className="truncate text-[11px] uppercase tracking-[0.16em] text-text-muted">
+          <div className="mt-1 truncate text-[10px] uppercase tracking-[0.16em] text-text-muted">
             {t("app.name")}
           </div>
         </div>
 
-        <button
-          type="button"
-          className={buttonClassName}
-          onClick={onCreateNote}
-          title={t("sidebar.newNote")}
-          aria-label={t("sidebar.newNote")}
-        >
-          <Plus className="h-4 w-4" />
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <button
+            type="button"
+            className={buttonClassName}
+            onClick={onCreateNote}
+            title={t("sidebar.newNote")}
+            aria-label={t("sidebar.newNote")}
+          >
+            <Plus className="h-4 w-4" />
+          </button>
 
-        <button
-          type="button"
-          className={inspectorOpen ? activeButtonClassName : buttonClassName}
-          onClick={onToggleInspector}
-          title={t("rightPanel.noteTools")}
-          aria-label={t("rightPanel.noteTools")}
-        >
-          <SlidersHorizontal className="h-4 w-4" />
-        </button>
+          <button
+            type="button"
+            className={inspectorOpen ? activeButtonClassName : buttonClassName}
+            onClick={onToggleInspector}
+            title={t("rightPanel.noteTools")}
+            aria-label={t("rightPanel.noteTools")}
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+          </button>
 
-        <button
-          type="button"
-          className={buttonClassName}
-          onClick={onOpenSettings}
-          title={t("titlebar.settings")}
-          aria-label={t("titlebar.settings")}
-        >
-          <Settings2 className="h-4 w-4" />
-        </button>
+          <button
+            type="button"
+            className={buttonClassName}
+            onClick={onOpenSettings}
+            title={t("titlebar.settings")}
+            aria-label={t("titlebar.settings")}
+          >
+            <Settings2 className="h-4 w-4" />
+          </button>
+        </div>
       </div>
 
-        <button
-          type="button"
-          className="mt-3 flex h-11 w-full items-center gap-2 rounded-md border border-border bg-[#111111] px-3 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
-          onClick={onFocusSearch}
-          title={t("titlebar.search")}
-          aria-label={t("titlebar.search")}
-        >
+      <button
+        type="button"
+        className="mt-3 flex h-11 w-full items-center gap-2 rounded-md border border-border bg-[#111111] px-3 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+        onClick={onFocusSearch}
+        title={t("titlebar.search")}
+        aria-label={t("titlebar.search")}
+      >
         <Search className="h-4 w-4" />
         <span className="truncate">{t("titlebar.search")}</span>
       </button>

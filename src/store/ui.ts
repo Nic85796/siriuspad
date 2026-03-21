@@ -5,7 +5,6 @@ import { getAppStore } from '@/lib/storage'
 import type {
   AppPlatform,
   ConfirmDialogOptions,
-  PreviewMode,
   PromptDialogOptions,
   ToastItem,
   UpdateInfo,
@@ -48,8 +47,6 @@ interface UiState {
   isFullscreen: boolean
   isZenMode: boolean
   isFocusMode: boolean
-  previewMode: PreviewMode
-  previewSplitRatio: number
   historyPanelOpen: boolean
   updateAvailable: UpdateInfo | null
   confirm: (ConfirmDialogOptions & { open: boolean }) | null
@@ -62,9 +59,6 @@ interface UiState {
   setFullscreen: (value: boolean) => void
   toggleZenMode: () => void
   toggleFocusMode: () => void
-  setPreviewMode: (mode: PreviewMode) => void
-  cyclePreviewMode: () => void
-  setPreviewSplitRatio: (ratio: number) => void
   setHistoryPanelOpen: (open: boolean) => void
   setUpdateAvailable: (info: UpdateInfo) => void
   clearUpdate: () => void
@@ -95,8 +89,6 @@ export const useUiStore = create<UiState>((set, get) => ({
   isFullscreen: false,
   isZenMode: false,
   isFocusMode: false,
-  previewMode: 'editor',
-  previewSplitRatio: 0.5,
   historyPanelOpen: false,
   updateAvailable: null,
   confirm: null,
@@ -134,24 +126,6 @@ export const useUiStore = create<UiState>((set, get) => ({
       isFocusMode: !state.isFocusMode,
       isZenMode: false,
     }))
-  },
-  setPreviewMode(mode) {
-    set({ previewMode: mode })
-  },
-  cyclePreviewMode() {
-    set((state) => ({
-      previewMode:
-        state.previewMode === 'editor'
-          ? 'split'
-          : state.previewMode === 'split'
-            ? 'preview'
-            : 'editor',
-    }))
-  },
-  setPreviewSplitRatio(ratio) {
-    set({
-      previewSplitRatio: Math.min(0.8, Math.max(0.2, ratio)),
-    })
   },
   setHistoryPanelOpen(open) {
     set({ historyPanelOpen: open })

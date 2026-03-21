@@ -153,7 +153,6 @@ export function SettingsModal({
     { key: 'Ctrl+Shift+P', action: t('commands.pinNote') },
     { key: 'Ctrl+Shift+Z', action: t('commands.zenMode') },
     { key: 'Ctrl+Shift+F', action: t('commands.focusMode') },
-    { key: 'Ctrl+Shift+M', action: t('commands.markdownPreview') },
     { key: 'Ctrl+H', action: t('commands.findReplace') },
     { key: 'F11', action: t('commands.toggleFullscreen') },
     { key: 'Alt+1..9', action: t('commands.switchWorkspace') },

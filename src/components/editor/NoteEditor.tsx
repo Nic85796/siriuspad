@@ -28,7 +28,6 @@ import { TagPill } from '@/components/ui/TagPill'
 import type {
   CursorInfo,
   Note,
-  PreviewMode,
   Settings,
   Workspace,
 } from '@/types'
@@ -37,12 +36,10 @@ interface NoteEditorHeaderProps {
   note: Note
   workspaces: Workspace[]
   allTags: string[]
-  previewMode: PreviewMode
   compact?: boolean
   onChange: (patch: Partial<Note>) => void
   onDelete: () => Promise<void>
   onTogglePin: () => Promise<void>
-  onPreviewModeChange: (mode: PreviewMode) => void
   onOpenFindReplace: () => void
   onOpenHistory: () => void
 }
@@ -72,21 +69,16 @@ export function NoteEditorHeader({
   note,
   workspaces,
   allTags,
-  previewMode,
   compact = false,
   onChange,
   onDelete,
   onTogglePin,
-  onPreviewModeChange,
   onOpenFindReplace,
   onOpenHistory,
 }: NoteEditorHeaderProps) {
   const { t } = useTranslation()
   const [tagValue, setTagValue] = useState('')
   const headerBackground = withAlpha(note.color, 0.06)
-  const previewModes = compact
-    ? (['editor', 'preview'] as PreviewMode[])
-    : (['editor', 'split', 'preview'] as PreviewMode[])
 
   return (
     <div
@@ -165,29 +157,6 @@ export function NoteEditorHeader({
             compact ? 'w-full flex-wrap' : 'flex-wrap justify-end'
           }`}
         >
-          <div
-            className={`flex items-center rounded-md border border-border bg-[#161616] p-1 ${
-              compact ? 'min-w-0 flex-1' : ''
-            }`}
-          >
-            {previewModes.map((mode) => (
-              <button
-                key={mode}
-                type="button"
-                className={`interactive-lift rounded-md px-2.5 py-1 text-[11px] transition ${
-                  compact ? 'flex-1' : ''
-                } ${
-                  previewMode === mode
-                    ? 'bg-[#222222] text-text-primary'
-                    : 'text-text-secondary hover:bg-hover hover:text-text-primary'
-                }`}
-                onClick={() => onPreviewModeChange(mode)}
-              >
-                {t(`preview.${mode}`)}
-              </button>
-            ))}
-          </div>
-
           <button
             type="button"
             className={`interactive-lift inline-flex h-8 items-center gap-1.5 rounded-md border border-border bg-[#161616] text-[11px] text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary ${
@@ -428,7 +397,7 @@ export function NoteEditor({
 
   return (
     <div
-      className="relative min-h-0 flex-1 overflow-hidden bg-[#111111]"
+      className="relative h-full min-h-0 overflow-hidden bg-[#111111]"
       style={
         {
           '--editor-font-family': `"${settings.fontFamily}", monospace`,
@@ -440,7 +409,7 @@ export function NoteEditor({
         } as CSSProperties
       }
     >
-      <div ref={hostRef} className="h-full" />
+      <div ref={hostRef} className="h-full min-h-0" />
     </div>
   )
 }

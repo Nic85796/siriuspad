@@ -1,10 +1,202 @@
 .cm-editor {
   height: 100%;
+  --md-heading-1-size: calc(var(--editor-font-size) * 1.42);
+  --md-heading-2-size: calc(var(--editor-font-size) * 1.22);
+  --md-heading-3-size: calc(var(--editor-font-size) * 1.1);
+  --md-heading-4-size: calc(var(--editor-font-size) * 1);
+  --md-callout-radius: 8px;
+  --md-callout-gap: 0.45rem;
 }
 
 .cm-editor .cm-line {
   padding-left: 0;
   padding-right: 0;
+  max-width: 100%;
+}
+
+.cm-editor .cm-md-hidden-marker,
+.cm-editor .cm-md-hidden-marker * {
+  color: transparent !important;
+  font-size: 0.01px !important;
+  letter-spacing: -0.45em;
+  opacity: 0 !important;
+}
+
+.cm-editor .cm-line.cm-md-heading {
+  color: var(--text-primary);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+}
+
+.cm-editor .cm-line.cm-md-heading-1 {
+  font-size: var(--md-heading-1-size);
+  line-height: 1.22;
+  padding-top: 0.28rem;
+  padding-bottom: 0.16rem;
+}
+
+.cm-editor .cm-line.cm-md-heading-2 {
+  font-size: var(--md-heading-2-size);
+  line-height: 1.28;
+  padding-top: 0.24rem;
+  padding-bottom: 0.1rem;
+}
+
+.cm-editor .cm-line.cm-md-heading-3 {
+  font-size: var(--md-heading-3-size);
+  line-height: 1.35;
+}
+
+.cm-editor .cm-line.cm-md-heading-4,
+.cm-editor .cm-line.cm-md-heading-5,
+.cm-editor .cm-line.cm-md-heading-6 {
+  font-size: var(--md-heading-4-size);
+  line-height: 1.45;
+}
+
+.cm-editor .cm-line.cm-md-task {
+  padding-left: 0;
+}
+
+.cm-editor .cm-line.cm-md-task-done {
+  color: rgba(224, 224, 224, 0.58);
+  text-decoration: line-through;
+  text-decoration-color: rgba(224, 224, 224, 0.18);
+}
+
+.cm-editor .cm-line.cm-md-list-item,
+.cm-editor .cm-line.cm-md-ordered-item {
+  padding-left: 0;
+}
+
+.cm-editor .cm-line.cm-md-callout {
+  background: var(--callout-bg, rgba(124, 58, 237, 0.08));
+  border-left: 2px solid var(--callout-accent, var(--accent));
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  padding-left: 0.85rem;
+  padding-right: 0.85rem;
+  overflow-wrap: anywhere;
+}
+
+.cm-editor .cm-line.cm-md-callout-start {
+  margin-top: var(--md-callout-gap);
+  padding-top: 0.55rem;
+  border-top-left-radius: var(--md-callout-radius);
+  border-top-right-radius: var(--md-callout-radius);
+  font-weight: 600;
+}
+
+.cm-editor .cm-line.cm-md-callout-start::before {
+  content: attr(data-callout-label);
+  display: inline-flex;
+  margin-right: 0.65rem;
+  margin-bottom: 0.22rem;
+  border: 1px solid color-mix(in srgb, var(--callout-accent) 32%, transparent);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.12);
+  color: var(--callout-accent);
+  padding: 0.12rem 0.48rem;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.cm-editor .cm-line.cm-md-callout-end {
+  padding-bottom: 0.55rem;
+  border-bottom-left-radius: var(--md-callout-radius);
+  border-bottom-right-radius: var(--md-callout-radius);
+  margin-bottom: var(--md-callout-gap);
+}
+
+.cm-editor .cm-line.cm-md-callout-single {
+  padding-bottom: 0.55rem;
+}
+
+.cm-editor .cm-line.cm-md-code-fence {
+  position: relative;
+  min-height: 0.4rem;
+  padding: 0;
+}
+
+.cm-editor .cm-line.cm-md-code-fence-start {
+  margin-top: 0.55rem;
+}
+
+.cm-editor .cm-line.cm-md-code-fence-start::before {
+  content: attr(data-code-language);
+  display: inline-flex;
+  margin-bottom: 0.2rem;
+  border: 1px solid rgba(96, 165, 250, 0.18);
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.85);
+  color: #8ab4ff;
+  padding: 0.14rem 0.48rem;
+  font-size: 0.72em;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cm-editor .cm-line.cm-md-code-block {
+  background: rgba(17, 17, 17, 0.96);
+  border-left: 2px solid rgba(96, 165, 250, 0.18);
+  border-right: 1px solid rgba(255, 255, 255, 0.04);
+  padding-left: 0.9rem;
+  padding-right: 0.9rem;
+}
+
+.cm-editor .cm-line.cm-md-code-block + .cm-line.cm-md-code-block {
+  border-top: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.cm-editor .cm-inline-code,
+.cm-editor .cm-inline-code *,
+.cm-editor .cm-md-inline-code,
+.cm-editor .cm-md-inline-code *,
+.cm-editor .cm-md-inline-code-full,
+.cm-editor .cm-md-inline-code-full * {
+  border: 1px solid rgba(96, 165, 250, 0.18);
+  border-radius: 0.35rem;
+  background: rgba(59, 130, 246, 0.12);
+  color: #acd1ff;
+  padding: 0.05rem 0.32rem;
+}
+
+.cm-editor .cm-md-task-widget,
+.cm-editor .cm-md-list-widget {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.55rem;
+}
+
+.cm-editor .cm-md-task-widget {
+  height: 0.96rem;
+  width: 0.96rem;
+  cursor: pointer;
+  border-radius: 0.24rem;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.03);
+  vertical-align: -0.12rem;
+}
+
+.cm-editor .cm-md-task-widget.is-done {
+  border-color: color-mix(in srgb, var(--accent) 58%, white 10%);
+  background: color-mix(in srgb, var(--accent) 78%, transparent);
+}
+
+.cm-editor .cm-md-task-widget.is-done::before {
+  content: '✓';
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #0d0d0d;
+}
+
+.cm-editor .cm-md-list-widget {
+  min-width: 1rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--accent) 50%, var(--text-secondary));
 }
 
 .cm-editor .cm-variable-token {

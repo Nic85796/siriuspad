@@ -334,9 +334,21 @@ export function OnboardingModal({
   );
 
   return (
-    <div className="modal-backdrop absolute inset-0 z-[90] overflow-y-auto bg-black/85 px-4 py-4 sm:py-8">
-      <div className="flex min-h-full items-start justify-center sm:items-center">
-        <div className="modal-panel flex w-full max-w-[560px] flex-col overflow-hidden rounded-[12px] border border-[#2d2060] bg-[#111111] sm:max-h-[calc(100vh-4rem)]">
+    <div className="modal-backdrop fixed inset-0 z-[90] overflow-y-auto bg-black/85">
+      <div
+        className="flex min-h-full items-start justify-center px-3 sm:items-center sm:px-4"
+        style={{
+          paddingTop: "calc(env(safe-area-inset-top, 0px) + 0.75rem)",
+          paddingBottom: "calc(env(safe-area-inset-bottom, 0px) + 0.75rem)",
+        }}
+      >
+        <div
+          className="modal-panel flex max-h-[90dvh] w-full max-w-[560px] flex-col overflow-y-auto rounded-[12px] border border-[#2d2060] bg-[#111111] sm:overflow-hidden"
+          style={{
+            maxHeight:
+              "calc(100svh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px) - 1.5rem)",
+          }}
+        >
           <div className="flex items-center justify-between border-b border-border px-5 py-4">
             <div className="inline-flex items-center gap-3">
               <span className="inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-[#161616] text-sm text-text-primary">

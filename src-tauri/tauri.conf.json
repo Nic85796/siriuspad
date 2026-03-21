@@ -1,7 +1,7 @@
 {
   "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
   "productName": "SiriusPad",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "identifier": "dev.siriusdev.siriuspad",
   "build": {
     "frontendDist": "../dist",
@@ -30,17 +30,29 @@
   },
   "bundle": {
     "active": true,
-    "targets": ["deb", "nsis"],
+    "publisher": "SiriusX",
+    "homepage": "https://github.com/SiriusXofc/siriuspad",
+    "license": "MIT",
+    "category": "DeveloperTool",
+    "shortDescription": "Bloco de notas local para desenvolvedores, com Markdown ao vivo, checklist, terminal e workspaces.",
+    "longDescription": "SiriusPad e um scratchpad local-first para desenvolvedores. Ele combina edicao em Markdown com renderizacao ao vivo no proprio editor, checklist interativa, callouts, terminal embutido, historico por nota, workspaces e autosave. O foco e capturar bugs, comandos, snippets e ideias tecnicas com um fluxo rapido e direto, tanto no desktop quanto na beta mobile.",
+    "targets": ["deb", "appimage", "nsis"],
     "createUpdaterArtifacts": true,
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/icon.ico"],
+    "android": {
+      "minSdkVersion": 24
+    },
     "linux": {
+      "appimage": {},
       "deb": {
-        "depends": []
+        "depends": [],
+        "section": "utils",
+        "priority": "optional"
       }
     },
     "windows": {
       "webviewInstallMode": {
-        "type": "embedBootstrapper",
+        "type": "offlineInstaller",
         "silent": true
       }
     }

@@ -98,13 +98,14 @@ jobs:
             Nova versão pública do SiriusPad.
 
             Destaques desta versão:
-            - Android abre com mais estabilidade ao usar diretório de dados próprio do app
-            - beta mobile agora publica o APK com nome limpo: `SiriusPad_<versão>_android.apk`
-            - branding Android ganhou ícones dedicados do SiriusPad
-            - updater continua desktop-only para não prometer instalação automática no mobile
+            - editor com Markdown ao vivo: títulos, listas, checklist, callouts e código aparecem formatados enquanto você escreve
+            - checklist e blocos da nota ficaram concentrados no painel direito, com fluxo mais limpo no editor
+            - refinamentos de layout e usabilidade no desktop e na beta mobile
+            - pacote Linux agora inclui descrição pública mais clara para distribuição
 
             Distribuição oficial:
             - `.deb` para Linux
+            - `.AppImage` como alternativa para Linux
             - `.exe` para Windows
             - `.apk` beta para Android
             - `latest.json` para o fluxo de auto-update
