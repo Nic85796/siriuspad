@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-REPO="${SIRIUSPAD_REPO:-Nic85796/siriuspad}"
+REPO="${SIRIUSPAD_REPO:-SiriusXofc/siriuspad}"
 FORMAT="deb"
 
 print_error() {
@@ -19,10 +19,11 @@ require_cmd() {
 usage() {
   cat <<'EOF'
 Usage:
-  bash scripts/install-linux.sh [--deb]
+  bash scripts/install-linux.sh [--deb|--appimage]
 
 Options:
   --deb       Download and install the latest .deb package
+  --appimage  Download the latest .AppImage to ~/.local/bin
 
 Environment:
   SIRIUSPAD_REPO=owner/repo  Override the GitHub repository used for releases
@@ -33,6 +34,9 @@ for arg in "$@"; do
   case "$arg" in
     --deb)
       FORMAT="deb"
+      ;;
+    --appimage)
+      FORMAT="appimage"
       ;;
     -h|--help)
       usage
@@ -65,6 +69,7 @@ payload = json.load(sys.stdin)
 wanted = sys.argv[1]
 suffix_map = {
     "deb": ".deb",
+    "appimage": ".AppImage",
 }
 suffix = suffix_map[wanted]
 for asset in payload.get("assets", []):
@@ -108,6 +113,14 @@ case "$FORMAT" in
       print_error "apt-get is required to install the .deb package"
       exit 1
     fi
+    ;;
+  appimage)
+    install_dir="${HOME}/.local/bin"
+    mkdir -p "$install_dir"
+    install_path="${install_dir}/SiriusPad.AppImage"
+    cp "$asset_path" "$install_path"
+    chmod +x "$install_path"
+    printf 'AppImage installed at %s\n' "$install_path"
     ;;
 esac
 

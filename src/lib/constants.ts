@@ -23,8 +23,11 @@ export const DEFAULT_SETTINGS: Settings = {
   defaultWorkspace: DEFAULT_WORKSPACE_ID,
   githubToken: '',
   variables: {},
+  initialSyncDone: false,
   language: 'pt-BR',
   useSystemLanguage: true,
+  supabaseUrl: '',
+  supabaseAnonKey: '',
 }
 
 export const DEFAULT_WORKSPACE: Workspace = {

@@ -36,6 +36,7 @@ interface SettingsModalProps {
       | 'appearance'
       | 'variables'
       | 'integrations'
+      | 'database'
       | 'shortcuts'
       | 'language',
   ) => Promise<void>
@@ -606,6 +607,44 @@ export function SettingsModal({
               }
           />
         </Field>
+      </Section>
+
+      <Section
+        title={t('settings.sections.database.title')}
+        description={t('settings.sections.database.description')}
+        onReset={() => onResetSection('database')}
+        resetLabel={t('settings.reset')}
+      >
+        <div className="grid gap-4">
+          <Field
+            label={t('settings.fields.supabaseUrl')}
+            description={t('settings.fields.supabaseUrlHint')}
+          >
+            <input
+              className={controlClassName()}
+              type="text"
+              placeholder="https://xyz.supabase.co"
+              value={settings.supabaseUrl || ''}
+              onChange={(event) =>
+                void onUpdate({ supabaseUrl: event.target.value })
+              }
+            />
+          </Field>
+          <Field
+            label={t('settings.fields.supabaseAnonKey')}
+            description={t('settings.fields.supabaseAnonKeyHint')}
+          >
+            <input
+              className={controlClassName()}
+              type="password"
+              placeholder="eyJ..."
+              value={settings.supabaseAnonKey || ''}
+              onChange={(event) =>
+                void onUpdate({ supabaseAnonKey: event.target.value })
+              }
+            />
+          </Field>
+        </div>
       </Section>
 
       <section className="px-6 py-5">

@@ -1,5 +1,6 @@
 import { EditorState } from '@codemirror/state'
-import { EditorView } from '@codemirror/view'
+import type { EditorView } from '@codemirror/view'
+import { EditorView as EditorViewClass } from '@codemirror/view'
 import {
   SlidersHorizontal,
   Clock3,
@@ -10,6 +11,7 @@ import {
 } from 'lucide-react'
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
+import { FormatToolbar } from '@/components/ui/FormatToolbar'
 
 import {
   NOTE_LANGUAGES,
@@ -22,6 +24,7 @@ import {
   getCursorInfo,
   openEditorSearchPanel,
   reconfigureLineNumbers,
+  reconfigureReadOnly,
   reconfigureTabSize,
   reconfigureWordWrap,
 } from '@/lib/codemirror'
@@ -84,6 +87,7 @@ export function NoteEditorHeader({
   const { t } = useTranslation()
   const [tagValue, setTagValue] = useState('')
   const headerBackground = withAlpha(note.color, 0.06)
+  const isWelcome = ["Bem-vindo ao SiriusPad", "Bienvenido a SiriusPad", "Welcome to SiriusPad"].includes(note.title.trim());
 
   return (
     <div
@@ -102,11 +106,12 @@ export function NoteEditorHeader({
           <input
             className={`w-full bg-transparent font-semibold tracking-tight text-text-primary outline-none placeholder:text-text-muted ${
               compact ? 'text-[18px]' : 'text-[20px]'
-            }`}
+            } ${isWelcome ? 'cursor-default opacity-80' : ''}`}
             placeholder={t('note.titlePlaceholder')}
             title={t('note.titlePlaceholder')}
             value={note.title}
-            onChange={(event) => onChange({ title: event.target.value })}
+            readOnly={isWelcome}
+            onChange={(event) => !isWelcome && onChange({ title: event.target.value })}
           />
 
           <div className={`mt-3 flex gap-2 ${compact ? 'flex-wrap' : 'flex-wrap items-center'}`}>
@@ -122,33 +127,35 @@ export function NoteEditorHeader({
               />
             ))}
 
-            <input
-              className={`h-8 rounded-md border border-dashed border-border bg-transparent px-2 text-[11px] text-text-primary outline-none placeholder:text-text-muted focus:border-focus ${
-                compact ? 'min-w-[128px] flex-1' : 'min-w-[96px]'
-              }`}
-              list="note-tag-suggestions"
-              placeholder={t('note.addTag')}
-              value={tagValue}
-              onChange={(event) => setTagValue(event.target.value)}
-              onKeyDown={(event) => {
-                if (event.key !== 'Enter') {
-                  return
-                }
+            {!isWelcome && (
+              <input
+                className={`h-8 rounded-md border border-dashed border-border bg-transparent px-2 text-[11px] text-text-primary outline-none placeholder:text-text-muted focus:border-focus ${
+                  compact ? 'min-w-[128px] flex-1' : 'min-w-[96px]'
+                }`}
+                list="note-tag-suggestions"
+                placeholder={t('note.addTag')}
+                value={tagValue}
+                onChange={(event) => setTagValue(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key !== 'Enter') {
+                    return
+                  }
 
-                event.preventDefault()
-                const nextTag = tagValue.trim()
+                  event.preventDefault()
+                  const nextTag = tagValue.trim()
 
-                if (!nextTag || note.tags.includes(nextTag)) {
+                  if (!nextTag || note.tags.includes(nextTag)) {
+                    setTagValue('')
+                    return
+                  }
+
+                  onChange({
+                    tags: [...note.tags, nextTag],
+                  })
                   setTagValue('')
-                  return
-                }
-
-                onChange({
-                  tags: [...note.tags, nextTag],
-                })
-                setTagValue('')
-              }}
-            />
+                }}
+              />
+            )}
             <datalist id="note-tag-suggestions">
               {allTags.map((tag) => (
                 <option key={tag} value={tag} />
@@ -201,14 +208,16 @@ export function NoteEditorHeader({
             )}
           </button>
 
-          <button
-            type="button"
-            className="interactive-lift inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-elevated text-text-secondary transition hover:border-red/30 hover:bg-red/10 hover:text-red"
-            onClick={() => void onDelete()}
-            title={t('commands.deleteNote')}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </button>
+          {!isWelcome && (
+            <button
+              type="button"
+              className="interactive-lift inline-flex h-8 w-8 items-center justify-center rounded-md border border-border bg-elevated text-text-secondary transition hover:border-red/30 hover:bg-red/10 hover:text-red"
+              onClick={() => void onDelete()}
+              title={t('commands.deleteNote')}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
       </div>
 
@@ -308,8 +317,10 @@ export function NoteEditor({
 }: NoteEditorProps) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const viewRef = useRef<EditorView | null>(null)
+  const containerRef = useRef<HTMLDivElement | null>(null)
   const compartmentsRef = useRef(createEditorCompartments())
   const handlersRef = useRef({ onChange, onSave, onRun, onCursorChange })
+  const [editorView, setEditorView] = useState<EditorView | null>(null)
 
   useEffect(() => {
     handlersRef.current = { onChange, onSave, onRun, onCursorChange }
@@ -337,16 +348,18 @@ export function NoteEditor({
       ),
     })
 
-    const view = new EditorView({
+    const view = new EditorViewClass({
       state,
       parent: hostRef.current,
     })
 
     viewRef.current = view
+    setEditorView(view)
     handlersRef.current.onCursorChange?.(getCursorInfo(view))
 
     return () => {
       view.destroy()
+      setEditorView(null)
     }
   }, [noteId])
 
@@ -392,6 +405,20 @@ export function NoteEditor({
       return
     }
 
+    const contentTitle = value.split('\n')[0].replace(/^#\s+/, '').trim()
+    const isNoteReadonly = ["Bem-vindo ao SiriusPad", "Bienvenido a SiriusPad", "Welcome to SiriusPad"].includes(contentTitle)
+
+    view.dispatch({
+      effects: reconfigureReadOnly(compartmentsRef.current, isNoteReadonly),
+    })
+  }, [value])
+
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view) {
+      return
+    }
+
     const currentValue = view.state.doc.toString()
     if (currentValue === value) {
       return
@@ -417,6 +444,7 @@ export function NoteEditor({
 
   return (
     <div
+      ref={containerRef}
       className="relative h-full min-h-0 overflow-hidden bg-surface"
       style={
         {
@@ -435,6 +463,7 @@ export function NoteEditor({
       }
     >
       <div ref={hostRef} className="h-full min-h-0 overflow-hidden" />
+      <FormatToolbar editorView={editorView} containerRef={containerRef} />
     </div>
   )
 }

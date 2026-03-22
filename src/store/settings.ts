@@ -16,6 +16,7 @@ type SettingsSection =
   | 'appearance'
   | 'variables'
   | 'integrations'
+  | 'database'
   | 'shortcuts'
   | 'language'
 
@@ -339,6 +340,13 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         next = {
           ...current,
           githubToken: DEFAULT_SETTINGS.githubToken,
+        }
+        break
+      case 'database':
+        next = {
+          ...current,
+          supabaseUrl: DEFAULT_SETTINGS.supabaseUrl,
+          supabaseAnonKey: DEFAULT_SETTINGS.supabaseAnonKey,
         }
         break
       case 'shortcuts':

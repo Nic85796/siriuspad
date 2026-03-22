@@ -1,11 +1,11 @@
 blank_issues_enabled: false
 contact_links:
   - name: Política de segurança
-    url: https://github.com/Nic85796/siriuspad/blob/main/SECURITY.md
+    url: https://github.com/SiriusXofc/siriuspad/blob/main/SECURITY.md
     about: Vulnerabilidades não devem ser abertas em público.
   - name: Reportar vulnerabilidade em privado
-    url: https://github.com/Nic85796/siriuspad/security/advisories/new
+    url: https://github.com/SiriusXofc/siriuspad/security/advisories/new
     about: Use este canal para falhas de segurança, execução indevida ou exposição de dados.
   - name: Documentação do projeto
-    url: https://github.com/Nic85796/siriuspad/blob/main/README.md
+    url: https://github.com/SiriusXofc/siriuspad/blob/main/README.md
     about: Leia visão geral, instalação, licença, contribuição e suporte.

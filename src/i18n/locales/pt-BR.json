@@ -16,6 +16,9 @@
     "delete": "Excluir",
     "create": "Criar",
     "copy": "Copiar",
+    "cut": "Recortar",
+    "paste": "Colar",
+    "selectAll": "Selecionar tudo",
     "allNotes": "Todas as notas",
     "untitled": "Sem título",
     "none": "—",
@@ -25,7 +28,8 @@
   "titlebar": {
     "search": "Buscar",
     "settings": "Configurações",
-    "toggleSidebar": "Alternar sidebar"
+    "toggleSidebar": "Alternar sidebar",
+    "toggleRightPanel": "Alternar ferramentas da nota"
   },
   "sidebar": {
     "searchPlaceholder": "Buscar título ou conteúdo",
@@ -37,7 +41,8 @@
     "workspaceHint": "Crie mais espaços usando o botão +.",
     "noNotes": "Nenhuma nota neste espaço.",
     "noResults": "Sem resultados para \"{{query}}\".",
-    "loading": "Buscando..."
+    "loading": "Buscando...",
+    "allNotesSummary": "Visualizando as {{count}} notas de todos os espaços."
   },
   "note": {
     "copySuffix": "cópia",
@@ -193,6 +198,10 @@
         "title": "Integrações",
         "description": "O export para Gist usa um token com o escopo gist."
       },
+      "database": {
+        "title": "Banco de Dados",
+        "description": "Credenciais opcionais do Supabase para manter um backup remoto das suas notas."
+      },
       "about": {
         "title": "Projeto e segurança",
         "description": "Informações públicas do SiriusPad, avisos de uso, links úteis e canais corretos para suporte e vulnerabilidades."
@@ -229,6 +238,10 @@
       "githubToken": "Token do GitHub",
       "githubTokenHint": "Armazenado localmente. Requer escopo gist.",
       "githubTokenPlaceholder": "ghp_...",
+      "supabaseUrl": "URL do Projeto Supabase",
+      "supabaseUrlHint": "Ex: https://xyz.supabase.co",
+      "supabaseAnonKey": "Chave Pública (Anon) Supabase",
+      "supabaseAnonKeyHint": "Chave JWT que começa com eyJ...",
       "language": "Idioma",
       "followSystemLanguage": "Seguir idioma do sistema",
       "followSystemLanguageHint": "Troca a interface automaticamente conforme o idioma principal do dispositivo.",
@@ -279,6 +292,7 @@
     "unsaved": "não salvo",
     "saving": "salvando...",
     "error": "erro",
+    "cloudSync": "Sync nuvem",
     "line": "Ln {{line}}",
     "column": "Col {{col}}",
     "words": "{{count}}p",

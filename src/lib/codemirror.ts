@@ -45,6 +45,7 @@ import {
   EditorView,
   MatchDecorator,
   ViewPlugin,
+  ViewUpdate,
   WidgetType,
   drawSelection,
   highlightActiveLine,
@@ -53,6 +54,7 @@ import {
   lineNumbers,
 } from '@codemirror/view'
 import { tags } from '@lezer/highlight'
+import { invoke } from '@tauri-apps/api/core'
 
 import { withAlpha } from '@/lib/color'
 import type { CursorInfo, Settings } from '@/types'
@@ -68,6 +70,33 @@ const hiddenMarkerDecoration = Decoration.replace({
 const inlineCodeDecoration = Decoration.mark({
   class: 'cm-md-inline-code',
 })
+
+const boldDecoration      = Decoration.mark({ class: 'cm-md-bold' })
+const italicDecoration    = Decoration.mark({ class: 'cm-md-italic' })
+const underlineDecoration = Decoration.mark({ class: 'cm-md-underline' })
+const strikeDecoration    = Decoration.mark({ class: 'cm-md-strike' })
+const spoilerDecoration   = Decoration.mark({ class: 'cm-md-spoiler' })
+// Mark-based hidden marker: allows multiple format markers to overlap
+// (enables nested formatting like **_bold italic_**)
+const inlineHiddenMarker  = Decoration.mark({ class: 'cm-md-hidden-marker' })
+
+const INLINE_FORMAT_PATTERNS: Array<{
+  regex: RegExp
+  pre: number
+  suf: number
+  deco: ReturnType<typeof Decoration.mark>
+}> = [
+  // Bold must come before italic so ** is matched before *
+  { regex: /\*\*([^*\n]+?)\*\*/g, pre: 2, suf: 2, deco: boldDecoration },
+  { regex: /\*([^*\n]+?)\*/g, pre: 1, suf: 1, deco: italicDecoration },
+  // Double-underscore before single
+  { regex: /__([^_\n]+?)__/g, pre: 2, suf: 2, deco: underlineDecoration },
+  { regex: /_([^_\n]+?)_/g, pre: 1, suf: 1, deco: italicDecoration },
+  // Strikethrough
+  { regex: /~~([^~\n]+?)~~/g, pre: 2, suf: 2, deco: strikeDecoration },
+  // Spoiler (Discord-style)
+  { regex: /\|\|([^|\n]+?)\|\|/g, pre: 2, suf: 2, deco: spoilerDecoration },
+]
 
 const variableMatcher = new MatchDecorator({
   regexp: /\{\{[A-Z0-9_]+\}\}/g,
@@ -206,6 +235,216 @@ class ListMarkerWidget extends WidgetType {
   }
 }
 
+// ─── Link & Media widgets ──────────────────────────────────────────────────────
+
+const IMAGE_PATTERN = /(?:!\[([^\]\n]*)\]\(([^)\n]+)\))/g
+const LINK_PATTERN  = /(?:(?<!!)\[([^\]\n]+)\]\(([^)\n]+)\))/g
+const RAW_URL_PATTERN = /(?:\b(https?:\/\/[^\s<"']+\.(?:png|jpe?g|gif|webp|mp4|webm|mov|mkv)(?:\?[^\s<"']*)?))/gi
+
+function openExternalUrl(url: string) {
+  void invoke('plugin:opener|open', { path: url }).catch(() => {
+    window.open(url, '_blank', 'noreferrer')
+  })
+}
+
+/** Renders [text](url) as a styled span. Ctrl/Cmd+Click opens the URL. */
+class LinkWidget extends WidgetType {
+  private readonly text: string
+  private readonly url: string
+
+  constructor(text: string, url: string) {
+    super()
+    this.text = text
+    this.url  = url
+  }
+
+  toDOM() {
+    const span = document.createElement('span')
+    span.className = 'cm-md-link'
+    span.textContent = this.text
+    span.title = `Ctrl+Click para abrir: ${this.url}`
+    span.setAttribute('role', 'link')
+    span.setAttribute('tabindex', '0')
+    span.addEventListener('click', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault()
+        e.stopPropagation()
+        openExternalUrl(this.url)
+      }
+      // Plain click → CodeMirror positions cursor (no stopPropagation)
+    })
+    span.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        openExternalUrl(this.url)
+      }
+    })
+    return span
+  }
+
+  eq(other: LinkWidget) {
+    return other.text === this.text && other.url === this.url
+  }
+
+  ignoreEvent(event: Event) {
+    return event.type !== 'click' && event.type !== 'keydown'
+  }
+}
+
+/** Renders media as an <img> or <video>. Falls back to text on error. */
+class ImageWidget extends WidgetType {
+  private readonly alt: string
+  private readonly src: string
+
+  constructor(alt: string, src: string) {
+    super()
+    this.alt = alt
+    this.src = src
+  }
+
+  toDOM() {
+    const wrapper = document.createElement('span')
+    wrapper.className = 'cm-md-image-wrapper'
+
+    const isVideo = this.src.match(/\.(mp4|webm|mov|mkv)(?:\?.*)?$/i)
+
+    if (isVideo) {
+      const vid = document.createElement('video')
+      vid.src       = this.src
+      vid.className = 'cm-md-image'
+      vid.controls  = true
+      vid.muted     = true
+      vid.loop      = true
+
+      vid.addEventListener('error', () => {
+        const err = document.createElement('span')
+        err.className   = 'cm-md-image-error'
+        err.textContent = `🎬 ${this.alt || this.src}`
+        wrapper.replaceChildren(err)
+      })
+
+      wrapper.appendChild(vid)
+      return wrapper
+    }
+
+    const img = document.createElement('img')
+    img.src       = this.src
+    img.alt       = this.alt
+    img.className = 'cm-md-image'
+    img.draggable = false
+
+    img.addEventListener('error', () => {
+      const err = document.createElement('span')
+      err.className   = 'cm-md-image-error'
+      err.textContent = `🖼 ${this.alt || this.src}`
+      wrapper.replaceChildren(err)
+    })
+
+    wrapper.appendChild(img)
+    return wrapper
+  }
+
+  eq(other: ImageWidget) {
+    return other.alt === this.alt && other.src === this.src
+  }
+
+  ignoreEvent() { return true }
+}
+
+
+function createMediaDecorations(view: EditorView) {
+  const builder = new RangeSetBuilder<Decoration>()
+  const { selection, doc } = view.state
+  const cursorFrom = selection.main.from
+  const cursorTo   = selection.main.to
+
+  let activeCodeFence = false
+
+  for (let lineNum = 1; lineNum <= doc.lines; lineNum++) {
+    const line = doc.line(lineNum)
+    const text = line.text
+
+    if (CODE_FENCE_PATTERN.test(text)) {
+      activeCodeFence = !activeCodeFence
+      continue
+    }
+    if (activeCodeFence) continue
+
+    type MatchData = { start: number; end: number; widget: WidgetType }
+    const matches: MatchData[] = []
+
+    // 1. Markdown Images
+    IMAGE_PATTERN.lastIndex = 0
+    for (const m of text.matchAll(IMAGE_PATTERN)) {
+      matches.push({
+        start: m.index ?? 0,
+        end: (m.index ?? 0) + m[0].length,
+        widget: new ImageWidget(m[1], m[2]),
+      })
+    }
+
+    // 2. Markdown Links
+    LINK_PATTERN.lastIndex = 0
+    for (const m of text.matchAll(LINK_PATTERN)) {
+      matches.push({
+        start: m.index ?? 0,
+        end: (m.index ?? 0) + m[0].length,
+        widget: new LinkWidget(m[1], m[2]),
+      })
+    }
+
+    // 3. Raw Media URLs
+    RAW_URL_PATTERN.lastIndex = 0
+    for (const m of text.matchAll(RAW_URL_PATTERN)) {
+      matches.push({
+        start: m.index ?? 0,
+        end: (m.index ?? 0) + m[0].length,
+        widget: new ImageWidget('', m[1]),
+      })
+    }
+
+    matches.sort((a, b) => a.start - b.start)
+
+    let lastEnd = 0
+    for (const match of matches) {
+      if (match.start < lastEnd) continue // Skip overlaps
+      lastEnd = match.end
+
+      const absStart = line.from + match.start
+      const absEnd   = line.from + match.end
+
+      // Show markdown/text when cursor is inside
+      if (cursorFrom <= absEnd && cursorTo >= absStart) continue
+
+      builder.add(
+        absStart,
+        absEnd,
+        Decoration.replace({
+          widget: match.widget,
+          inclusive: false,
+        }),
+      )
+    }
+  }
+
+  return builder.finish()
+}
+
+const mediaDecorations = ViewPlugin.fromClass(
+  class {
+    decorations
+    constructor(view: EditorView) {
+      this.decorations = createMediaDecorations(view)
+    }
+    update(update: ViewUpdate) {
+      if (update.docChanged || update.viewportChanged || update.selectionSet) {
+        this.decorations = createMediaDecorations(update.view)
+      }
+    }
+  },
+  { decorations: (instance) => instance.decorations },
+)
+
 function taskMarkerDecoration(done: boolean) {
   return Decoration.replace({
     widget: new TaskMarkerWidget(done),
@@ -270,6 +509,83 @@ function createInlineCodeDecorations(view: EditorView) {
 
   return builder.finish()
 }
+
+/**
+ * Creates decorations for inline Markdown formatting (bold, italic, etc.).
+ * All patterns run independently per line — nested/combined formats are supported.
+ * e.g. **_bold italic_** renders both bold AND italic.
+ */
+function createInlineFormattingDecorations(view: EditorView) {
+  const { selection, doc } = view.state
+  const cursorFrom = selection.main.from
+  const cursorTo   = selection.main.to
+
+  // Collect every (from, to, deco) triple across all patterns on all lines
+  const items: Array<{ from: number; to: number; deco: Decoration }> = []
+
+  let activeCodeFence = false
+
+  for (let lineNum = 1; lineNum <= doc.lines; lineNum++) {
+    const line = doc.line(lineNum)
+    const text = line.text
+
+    if (CODE_FENCE_PATTERN.test(text)) {
+      activeCodeFence = !activeCodeFence
+      continue
+    }
+    if (activeCodeFence) continue
+
+    for (const { regex, pre, suf, deco } of INLINE_FORMAT_PATTERNS) {
+      regex.lastIndex = 0
+      for (const match of text.matchAll(regex)) {
+        const start = match.index ?? 0
+        const end   = start + match[0].length
+
+        const absStart  = line.from + start
+        const absEnd    = line.from + end
+        const innerFrom = absStart + pre
+        const innerTo   = absEnd   - suf
+
+        if (innerTo <= innerFrom) continue
+
+        // Reveal raw markers when cursor touches this range
+        if (cursorFrom <= absEnd && cursorTo >= absStart) continue
+
+        // Prefix marker
+        items.push({ from: absStart,  to: innerFrom, deco: inlineHiddenMarker })
+        // Styled content (mark decorations overlap freely)
+        items.push({ from: innerFrom, to: innerTo,   deco })
+        // Suffix marker
+        items.push({ from: innerTo,   to: absEnd,    deco: inlineHiddenMarker })
+      }
+    }
+  }
+
+  // Sort by (from, to) — RangeSetBuilder requires non-decreasing `from`
+  items.sort((a, b) => a.from - b.from || a.to - b.to)
+
+  const builder = new RangeSetBuilder<Decoration>()
+  for (const { from, to, deco } of items) {
+    if (from < to) builder.add(from, to, deco)
+  }
+  return builder.finish()
+}
+
+
+const inlineFormattingDecorations = ViewPlugin.fromClass(
+  class {
+    decorations
+    constructor(view: EditorView) {
+      this.decorations = createInlineFormattingDecorations(view)
+    }
+    update(update: ViewUpdate) {
+      if (update.docChanged || update.viewportChanged || update.selectionSet) {
+        this.decorations = createInlineFormattingDecorations(update.view)
+      }
+    }
+  },
+  { decorations: (instance) => instance.decorations },
+)
 
 function createMarkdownLineDecorations(view: EditorView) {
   const builder = new RangeSetBuilder<Decoration>()
@@ -608,6 +924,69 @@ export const siriusPadEditorTheme = EditorView.theme({
     border: '1px solid var(--border)',
     color: 'var(--text-secondary)',
   },
+  // ── Markdown link styles ──────────────────────────────────
+  '.cm-md-link': {
+    color: 'var(--blue, #60a5fa)',
+    textDecoration: 'underline',
+    cursor: 'pointer',
+    fontStyle: 'normal',
+  },
+  '.cm-md-link:hover': {
+    opacity: '0.8',
+  },
+  // ── Markdown image styles ─────────────────────────────────
+  '.cm-md-image-wrapper': {
+    display: 'inline-block',
+    verticalAlign: 'middle',
+    margin: '4px 0',
+  },
+  '.cm-md-image': {
+    maxWidth: '100%',
+    maxHeight: '400px',
+    borderRadius: '6px',
+    objectFit: 'contain',
+    border: '1px solid var(--border)',
+    backgroundColor: 'var(--bg-elevated)',
+  },
+  '.cm-md-image-error': {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '4px 8px',
+    fontSize: '11px',
+    color: 'var(--red)',
+    backgroundColor: 'color-mix(in srgb, var(--red) 10%, transparent)',
+    border: '1px dashed var(--red)',
+    borderRadius: '4px',
+    opacity: '0.8',
+  },
+  // ── Markdown inline formatting styles ──────────────────────────────
+  '.cm-md-bold':      { fontWeight: '700' },
+  '.cm-md-italic':    { fontStyle: 'italic' },
+  '.cm-md-underline': { textDecoration: 'underline' },
+  '.cm-md-strike':    { textDecoration: 'line-through' },
+  '.cm-md-spoiler': {
+    backgroundColor: 'var(--text-muted)',
+    color: 'transparent',
+    borderRadius: '3px',
+    cursor: 'pointer',
+    userSelect: 'text',
+    transition: 'color 0.15s, background-color 0.15s',
+  },
+  '.cm-md-spoiler:hover': {
+    backgroundColor: 'color-mix(in srgb, var(--text-muted) 30%, transparent)',
+    color: 'var(--text-primary)',
+  },
+  // Hidden marker: font-size 0 collapses the ** _ ~~ etc. characters
+  // Using a mark (not replace) so multiple markers can overlap for nested formats
+  '.cm-md-hidden-marker': {
+    fontSize: '0',
+    lineHeight: '0',
+    display: 'inline-block',
+    width: '0',
+    overflow: 'hidden',
+    verticalAlign: 'baseline',
+  },
 })
 
 export const siriusPadHighlightStyle = HighlightStyle.define([
@@ -655,6 +1034,7 @@ export const siriusPadHighlightStyle = HighlightStyle.define([
 ])
 
 interface EditorHandlers {
+  readOnly?: boolean
   onChange: (value: string) => void
   onSave: () => void | Promise<void>
   onRun?: () => void | Promise<void>
@@ -665,6 +1045,7 @@ export interface EditorCompartments {
   lineNumbers: Compartment
   wordWrap: Compartment
   tabSize: Compartment
+  readOnly: Compartment
 }
 
 export function createEditorCompartments(): EditorCompartments {
@@ -672,6 +1053,7 @@ export function createEditorCompartments(): EditorCompartments {
     lineNumbers: new Compartment(),
     wordWrap: new Compartment(),
     tabSize: new Compartment(),
+    readOnly: new Compartment(),
   }
 }
 
@@ -741,6 +1123,7 @@ export function createEditorExtensions(
   compartments: EditorCompartments,
 ): Extension[] {
   return [
+    EditorState.readOnly.of(handlers.readOnly ?? false),
     history(),
     drawSelection(),
     highlightSpecialChars(),
@@ -757,8 +1140,11 @@ export function createEditorExtensions(
     search({ top: true }),
     syntaxHighlighting(siriusPadHighlightStyle, { fallback: true }),
     siriusPadEditorTheme,
+    compartments.readOnly.of(EditorState.readOnly.of(handlers.readOnly ?? false)),
     taskToggleExtension(),
     variableDecorations,
+    mediaDecorations,
+    inlineFormattingDecorations,
     inlineCodeDecorations,
     markdownLineDecorations,
     compartments.lineNumbers.of(lineNumberExtension(settings.showLineNumbers)),
@@ -805,6 +1191,13 @@ export function reconfigureTabSize(
   tabSize: Settings['tabSize'],
 ) {
   return compartments.tabSize.reconfigure(tabSizeExtension(tabSize))
+}
+
+export function reconfigureReadOnly(
+  compartments: EditorCompartments,
+  readOnly: boolean,
+) {
+  return compartments.readOnly.reconfigure(EditorState.readOnly.of(readOnly))
 }
 
 export function getCursorInfo(view: EditorView) {

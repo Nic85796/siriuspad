@@ -95,6 +95,9 @@ export interface Settings {
   variables: Record<string, string>
   language: AppLanguage
   useSystemLanguage: boolean
+  supabaseUrl?: string
+  supabaseAnonKey?: string
+  initialSyncDone?: boolean
 }
 
 export type SaveStatus = 'saved' | 'dirty' | 'saving' | 'error'

@@ -51,7 +51,7 @@ export async function exportNoteToGist(
     method: 'POST',
     headers: {
       Accept: 'application/vnd.github+json',
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token.trim()}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({

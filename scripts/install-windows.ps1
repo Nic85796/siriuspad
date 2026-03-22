@@ -1,5 +1,5 @@
 param(
-  [string]$Repo = "Nic85796/siriuspad"
+  [string]$Repo = "SiriusXofc/siriuspad"
 )
 
 $ErrorActionPreference = "Stop"

@@ -16,6 +16,9 @@
     "delete": "Delete",
     "create": "Create",
     "copy": "Copy",
+    "cut": "Cut",
+    "paste": "Paste",
+    "selectAll": "Select all",
     "allNotes": "All notes",
     "untitled": "Untitled",
     "none": "—",
@@ -25,7 +28,8 @@
   "titlebar": {
     "search": "Search",
     "settings": "Settings",
-    "toggleSidebar": "Toggle sidebar"
+    "toggleSidebar": "Toggle sidebar",
+    "toggleRightPanel": "Toggle note tools"
   },
   "sidebar": {
     "searchPlaceholder": "Search title or content",
@@ -37,7 +41,8 @@
     "workspaceHint": "Create more workspaces with the + button.",
     "noNotes": "No notes in this workspace.",
     "noResults": "No results for \"{{query}}\".",
-    "loading": "Searching..."
+    "loading": "Searching...",
+    "allNotesSummary": "Viewing all {{count}} notes across every workspace."
   },
   "note": {
     "copySuffix": "copy",
@@ -193,6 +198,10 @@
         "title": "Integrations",
         "description": "GitHub Gist export uses a token with the gist scope."
       },
+      "database": {
+        "title": "Cloud backup",
+        "description": "Optional Supabase credentials used to keep a remote backup of your notes."
+      },
       "about": {
         "title": "Project and security",
         "description": "Public SiriusPad project info, usage notices, useful links, and the right channels for support and vulnerabilities."
@@ -229,6 +238,10 @@
       "githubToken": "GitHub token",
       "githubTokenHint": "Stored locally. Requires gist scope.",
       "githubTokenPlaceholder": "ghp_...",
+      "supabaseUrl": "Supabase project URL",
+      "supabaseUrlHint": "Example: https://xyz.supabase.co",
+      "supabaseAnonKey": "Supabase anon key",
+      "supabaseAnonKeyHint": "Public JWT key that usually starts with eyJ...",
       "language": "Language",
       "followSystemLanguage": "Follow system language",
       "followSystemLanguageHint": "Switches the interface automatically based on the device primary language.",
@@ -279,6 +292,7 @@
     "unsaved": "unsaved",
     "saving": "saving...",
     "error": "error",
+    "cloudSync": "Cloud sync",
     "line": "Ln {{line}}",
     "column": "Col {{col}}",
     "words": "{{count}}w",

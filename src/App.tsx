@@ -9,6 +9,7 @@ import {
 import { collectTags, replaceVariables } from "@/lib/parser";
 import { exportNoteToGist } from "@/lib/gist";
 import { exportAsJson, exportAsMarkdown, exportAsTxt } from "@/lib/export";
+import { syncAllNotes } from "@/lib/sync";
 import { useNotes } from "@/hooks/useNotes";
 import { useRunner } from "@/hooks/useRunner";
 import { useSearch } from "@/hooks/useSearch";
@@ -38,6 +39,8 @@ import { PromptModal } from "@/components/ui/PromptModal";
 import { SettingsModal } from "@/components/ui/SettingsModal";
 import { ToastViewport } from "@/components/ui/Toast";
 import { UpdateModal } from "@/components/ui/UpdateModal";
+import { GridView } from "@/components/dashboard/GridView";
+import { ContextMenu } from "@/components/ui/ContextMenu";
 import {
   hasCompletedOnboarding,
   markOnboardingComplete,
@@ -57,7 +60,12 @@ import type {
   CursorInfo,
   Note,
 } from "@/types";
-import { useEffect, useRef, useState } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type MouseEvent as ReactMouseEvent,
+} from "react";
 import { useTranslation } from "react-i18next";
 
 function cycleValue(values: string[], current: string) {
@@ -92,6 +100,7 @@ export default function App() {
   const { t } = useTranslation();
   const [searchQuery, setSearchQuery] = useState("");
   const [sidebarVisible, setSidebarVisible] = useState(true);
+  const [rightPanelVisible, setRightPanelVisible] = useState(true);
   const [cursorInfo, setCursorInfo] = useState<CursorInfo | null>(null);
   const [findReplaceNonce, setFindReplaceNonce] = useState(0);
   const [toggleTerminalNonce, setToggleTerminalNonce] = useState(0);
@@ -100,6 +109,10 @@ export default function App() {
     null,
   );
   const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   const bootstrappedRef = useRef(false);
   const allowWindowCloseRef = useRef(false);
@@ -188,7 +201,7 @@ export default function App() {
   const showTabs = !isMobile && !uiState.isZenMode;
   const showRightPanel = isMobile
     ? mobileInspectorOpen
-    : !uiState.isZenMode && !uiState.isFocusMode;
+    : rightPanelVisible && !uiState.isZenMode && !uiState.isFocusMode;
   const mobileSidebarWidth = Math.min(uiState.sidebarWidth, 320);
 
   const insertCalloutIntoActiveNote = (input: {
@@ -374,6 +387,10 @@ export default function App() {
 
   const toggleNotePinById = async (noteId: string) => {
     const source = await readNoteForAction(noteId);
+    
+    const isWelcome = ["Bem-vindo ao SiriusPad", "Bienvenido a SiriusPad", "Welcome to SiriusPad"].includes(source.title.trim());
+    if (isWelcome) return;
+
     const nextNote = {
       ...source,
       pinned: !source.pinned,
@@ -393,6 +410,10 @@ export default function App() {
   };
 
   const deleteNoteById = async (noteId: string) => {
+    const source = await readNoteForAction(noteId);
+    const isWelcome = ["Bem-vindo ao SiriusPad", "Bienvenido a SiriusPad", "Welcome to SiriusPad"].includes(source.title.trim());
+    if (isWelcome) return;
+
     const state = useNotesStore.getState();
     const draft = state.noteDrafts[noteId];
     const metadata = state.notes.find((item) => item.id === noteId);
@@ -616,6 +637,49 @@ export default function App() {
             ? t("toasts.exportedTxt")
             : t("toasts.exportedJson"),
     });
+  };
+
+  const handleGlobalContextMenu = (
+    event: ReactMouseEvent<HTMLDivElement>,
+  ) => {
+    event.preventDefault();
+    setContextMenu({
+      x: event.clientX,
+      y: event.clientY,
+    });
+  };
+
+  const handleContextMenuAction = async (action: string) => {
+    setContextMenu(null);
+
+    switch (action) {
+      case "copy":
+        document.execCommand("copy");
+        break;
+      case "cut":
+        document.execCommand("cut");
+        break;
+      case "paste":
+        try {
+            const text = await navigator.clipboard.readText();
+            // This is a simple fallback, better to use app-level command if focused
+            if (isEditableTarget(document.activeElement)) {
+                (document.activeElement as HTMLInputElement | HTMLTextAreaElement).value += text;
+            }
+        } catch (err) {
+            console.warn("Failed to read clipboard:", err);
+        }
+        break;
+      case "selectAll":
+        document.execCommand("selectAll");
+        break;
+      case "exportGist":
+        await exportCurrentNoteToGist();
+        break;
+      case "delete":
+        await deleteActiveNote();
+        break;
+    }
   };
 
   const createWorkspace = async () => {
@@ -1112,6 +1176,26 @@ export default function App() {
     };
   }, [isMobile, t]);
 
+  useEffect(() => {
+    if (!settingsState.ready || !notes.ready) return;
+    
+    const dbConfigured =
+      !!settingsState.settings.supabaseUrl &&
+      !!settingsState.settings.supabaseAnonKey;
+
+    if (dbConfigured && !settingsState.settings.initialSyncDone) {
+      console.log("Initial DB setup detected. Running bulk sync of all existing notes...");
+      void syncAllNotes();
+      void settingsState.update({ initialSyncDone: true });
+    }
+  }, [
+    settingsState.ready, 
+    notes.ready, 
+    settingsState.settings.supabaseUrl, 
+    settingsState.settings.supabaseAnonKey, 
+    settingsState.settings.initialSyncDone
+  ]);
+
   shortcutHandlersRef.current = {
     toggleFullscreen,
     zoomIn,
@@ -1375,7 +1459,8 @@ export default function App() {
 
   return (
     <div
-      className="motion-fade-in relative flex h-screen flex-col overflow-hidden bg-base text-text-primary"
+      className="flex h-screen flex-col overflow-hidden bg-base text-text-primary selection:bg-accent/30"
+      onContextMenu={isMobile ? undefined : handleGlobalContextMenu}
       style={{
         height: rootViewportHeight,
         minHeight: rootViewportHeight,
@@ -1398,6 +1483,7 @@ export default function App() {
           onOpenSettings={() => uiState.setSettingsOpen(true)}
           onRequestWindowClose={() => void requestWindowClose()}
           onToggleSidebar={() => setSidebarVisible((current) => !current)}
+          onToggleRightPanel={() => setRightPanelVisible((current) => !current)}
           onToggleFullscreen={() => void toggleFullscreen()}
         />
       ) : null}
@@ -1509,7 +1595,7 @@ export default function App() {
         ) : null}
 
         <div className="relative flex min-h-0 min-w-0 flex-1 flex-col">
-          {showTabs ? (
+          {showTabs && workspaceState.activeWorkspaceId !== null ? (
             <TabBar
               tabs={notes.openTabs}
               activeTabId={notes.activeNoteId}
@@ -1518,28 +1604,36 @@ export default function App() {
             />
           ) : null}
 
-          <EditorPane
-            platform={uiState.platform}
-            note={notes.activeNote}
-            noteDirectory={activeNoteDirectory}
-            settings={settingsState.settings}
-            workspaces={workspaceState.workspaces}
-            allTags={allTags}
-            findReplaceNonce={findReplaceNonce}
-            toggleTerminalNonce={toggleTerminalNonce}
-            runner={runner}
-            onNoteChange={(patch) => notes.updateActiveNote(patch)}
-            onContentChange={notes.updateActiveContent}
-            onSave={saveCurrentNote}
-            onDelete={deleteActiveNote}
-            onTogglePin={togglePin}
-            onCreateNote={() => createNote()}
-            onCursorChange={setCursorInfo}
-            onOpenFindReplace={() =>
-              setFindReplaceNonce((current) => current + 1)
-            }
-            onOpenHistory={() => uiState.setHistoryPanelOpen(true)}
-          />
+          {workspaceState.activeWorkspaceId === null ? (
+            <GridView
+              notes={visibleNotes}
+              onOpenNote={openNoteFromNavigation}
+              onCreateNote={() => createNoteFromMobile()}
+            />
+          ) : (
+            <EditorPane
+              platform={uiState.platform}
+              note={notes.activeNote}
+              noteDirectory={activeNoteDirectory}
+              settings={settingsState.settings}
+              workspaces={workspaceState.workspaces}
+              allTags={allTags}
+              findReplaceNonce={findReplaceNonce}
+              toggleTerminalNonce={toggleTerminalNonce}
+              runner={runner}
+              onNoteChange={(patch) => notes.updateActiveNote(patch)}
+              onContentChange={notes.updateActiveContent}
+              onSave={saveCurrentNote}
+              onDelete={deleteActiveNote}
+              onTogglePin={togglePin}
+              onCreateNote={() => createNote()}
+              onCursorChange={setCursorInfo}
+              onOpenFindReplace={() =>
+                setFindReplaceNonce((current) => current + 1)
+              }
+              onOpenHistory={() => uiState.setHistoryPanelOpen(true)}
+            />
+          )}
 
           <HistoryPanel
             open={uiState.historyPanelOpen}
@@ -1680,6 +1774,15 @@ export default function App() {
         />
       ) : null}
 
+      {contextMenu ? (
+        <ContextMenu
+          x={contextMenu.x}
+          y={contextMenu.y}
+          onClose={() => setContextMenu(null)}
+          onAction={handleContextMenuAction}
+        />
+      ) : null}
+      
       <ToastViewport />
     </div>
   );

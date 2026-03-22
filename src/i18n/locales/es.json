@@ -16,6 +16,9 @@
     "delete": "Eliminar",
     "create": "Crear",
     "copy": "Copiar",
+    "cut": "Cortar",
+    "paste": "Pegar",
+    "selectAll": "Seleccionar todo",
     "allNotes": "Todas las notas",
     "untitled": "Sin título",
     "none": "—",
@@ -25,7 +28,8 @@
   "titlebar": {
     "search": "Buscar",
     "settings": "Configuración",
-    "toggleSidebar": "Alternar barra lateral"
+    "toggleSidebar": "Alternar barra lateral",
+    "toggleRightPanel": "Alternar herramientas de la nota"
   },
   "sidebar": {
     "searchPlaceholder": "Buscar título o contenido",
@@ -37,7 +41,8 @@
     "workspaceHint": "Crea más espacios con el botón +.",
     "noNotes": "No hay notas en este espacio.",
     "noResults": "No hay resultados para \"{{query}}\".",
-    "loading": "Buscando..."
+    "loading": "Buscando...",
+    "allNotesSummary": "Viendo las {{count}} notas de todos los espacios."
   },
   "note": {
     "copySuffix": "copia",
@@ -193,6 +198,10 @@
         "title": "Integraciones",
         "description": "La exportación a Gist usa un token con el alcance gist."
       },
+      "database": {
+        "title": "Respaldo en la nube",
+        "description": "Credenciales opcionales de Supabase para mantener un respaldo remoto de tus notas."
+      },
       "about": {
         "title": "Proyecto y seguridad",
         "description": "Información pública del proyecto SiriusPad, avisos de uso, enlaces útiles y los canales correctos para soporte y vulnerabilidades."
@@ -229,6 +238,10 @@
       "githubToken": "Token de GitHub",
       "githubTokenHint": "Se guarda localmente. Requiere alcance gist.",
       "githubTokenPlaceholder": "ghp_...",
+      "supabaseUrl": "URL del proyecto Supabase",
+      "supabaseUrlHint": "Ejemplo: https://xyz.supabase.co",
+      "supabaseAnonKey": "Clave anon de Supabase",
+      "supabaseAnonKeyHint": "JWT pública que normalmente empieza con eyJ...",
       "language": "Idioma",
       "followSystemLanguage": "Seguir idioma del sistema",
       "followSystemLanguageHint": "Cambia la interfaz automáticamente según el idioma principal del dispositivo.",
@@ -279,6 +292,7 @@
     "unsaved": "sin guardar",
     "saving": "guardando...",
     "error": "error",
+    "cloudSync": "Sync nube",
     "line": "Ln {{line}}",
     "column": "Col {{col}}",
     "words": "{{count}}p",

@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import i18n from '@/i18n'
 import { DEFAULT_WORKSPACE_ID } from '@/lib/constants'
 import { createEmptyNote, sortNotes, toMetadata } from '@/lib/parser'
+import { syncNote, deleteNoteSync } from '@/lib/sync'
 import { useSettingsStore } from '@/store/settings'
 import type {
   Note,
@@ -349,6 +350,10 @@ export const useNotesStore = create<NotesState>((set, get) => ({
           ...syncActiveState(state.activeNoteId, state.noteDrafts, saveStatuses),
         }
       })
+      
+      // Execute Cloud Sync in the background
+      void syncNote(current)
+      
     } catch (error) {
       console.error(error)
 
@@ -399,9 +404,15 @@ export const useNotesStore = create<NotesState>((set, get) => ({
       return
     }
 
+    const isWelcome = ["Bem-vindo ao SiriusPad", "Bienvenido a SiriusPad", "Welcome to SiriusPad"].includes(current.title.trim())
+    if (isWelcome) return
+
     await invoke('trash_note', {
       id,
     })
+
+    // Delete from Cloud Backup in the background
+    void deleteNoteSync(id)
 
     const remainingNotes = state.notes.filter((note) => note.id !== id)
     const nextTabs = state.openTabs.filter((tab) => tab.id !== id)

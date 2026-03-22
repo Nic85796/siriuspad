@@ -148,7 +148,7 @@ export function HistoryPanel({
   }
 
   return (
-    <aside className="absolute inset-y-0 right-0 z-20 flex w-[320px] flex-col border-l border-border bg-elevated">
+    <aside className="fixed inset-y-0 right-0 z-[60] flex w-[320px] flex-col border-l border-border bg-elevated shadow-2xl">
       <div className="flex items-center justify-between border-b border-border px-4 py-3">
         <h3 className="text-sm font-semibold text-text-primary">{t('history.title')}</h3>
         <button

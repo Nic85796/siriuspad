@@ -4,6 +4,7 @@ import {
   Minimize2,
   Minus,
   PanelLeftOpen,
+  PanelRightOpen,
   Search,
   Settings2,
   Square,
@@ -20,6 +21,7 @@ interface TitleBarProps {
   onOpenSettings: () => void
   onRequestWindowClose: () => void
   onToggleSidebar: () => void
+  onToggleRightPanel: () => void
   onToggleFullscreen: () => void
 }
 
@@ -136,6 +138,7 @@ export function TitleBar({
   onOpenSettings,
   onRequestWindowClose,
   onToggleSidebar,
+  onToggleRightPanel,
   onToggleFullscreen,
 }: TitleBarProps) {
   const { t } = useTranslation()
@@ -205,6 +208,15 @@ export function TitleBar({
         >
           <Settings2 className="h-3.5 w-3.5" />
           {t('titlebar.settings')}
+        </button>
+        <button
+          type="button"
+          className="interactive-lift flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-text-secondary transition hover:border-border hover:bg-hover hover:text-text-primary ml-1"
+          onClick={onToggleRightPanel}
+          title={t('titlebar.toggleRightPanel', 'Ajustes da Nota')}
+          aria-label={t('titlebar.toggleRightPanel', 'Ajustes da Nota')}
+        >
+          <PanelRightOpen className="h-4 w-4" />
         </button>
       </div>
 

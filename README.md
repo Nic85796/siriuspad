@@ -30,9 +30,9 @@ As notas ficam no seu computador como arquivos Markdown. O uso principal do app 
 - workspaces para separar contexto por projeto, cliente ou tema
 - tags, prioridade, cor da nota visível e notas fixadas
 - checklist nativo por nota
-- callout blocks no preview com sintaxe estilo `> [!TIP]`
+- callouts integrados à nota com sintaxe estilo `> [!TIP]`
 - terminal embutido ligado à pasta da nota ativa
-- preview de Markdown e split view
+- Markdown ao vivo no próprio editor, sem painel de preview separado
 - histórico de versões por nota
 - busca fuzzy em títulos e conteúdo
 - autosave automático no disco
@@ -52,7 +52,7 @@ As notas ficam no seu computador como arquivos Markdown. O uso principal do app 
 
 Formatos suportados atualmente:
 
-- Linux: `.deb`
+- Linux: `.deb` e `.AppImage`
 - Windows: `.exe`
 - Android beta: `.apk`
 
@@ -68,6 +68,12 @@ Linux:
 bash <(curl -fsSL https://github.com/SiriusXofc/siriuspad/raw/main/scripts/install-linux.sh) --deb
 ```
 
+Linux AppImage:
+
+```bash
+bash <(curl -fsSL https://github.com/SiriusXofc/siriuspad/raw/main/scripts/install-linux.sh) --appimage
+```
+
 Windows PowerShell:
 
 ```powershell
@@ -77,7 +83,7 @@ powershell -ExecutionPolicy Bypass -File scripts/install-windows.ps1
 ## Dependências de instalação
 
 - Linux `.deb`: o pacote Debian gerado pelo Tauri já declara `libwebkit2gtk-4.1-0` e `libgtk-3-0` como dependências base. O script de instalação usa `apt install` no arquivo `.deb`, então essas dependências são resolvidas automaticamente no sistema.
-- Windows `.exe`: o instalador NSIS do SiriusPad agora embute o bootstrapper do WebView2. Se a máquina ainda não tiver o runtime necessário, o instalador tenta preparar isso automaticamente durante a instalação.
+- Windows `.exe`: o instalador NSIS do SiriusPad usa o instalador offline do WebView2. Isso melhora a instalação em máquinas sem internet ou com rede restrita.
 
 Referências oficiais do Tauri:
 
