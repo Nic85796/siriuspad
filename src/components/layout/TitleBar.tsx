@@ -1,5 +1,6 @@
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import {
+  BrainCircuit,
   Maximize2,
   Minimize2,
   Minus,
@@ -19,6 +20,7 @@ interface TitleBarProps {
   isFullscreen: boolean
   onFocusSearch: () => void
   onOpenSettings: () => void
+  onOpenAssistant: () => void
   onRequestWindowClose: () => void
   onToggleSidebar: () => void
   onToggleRightPanel: () => void
@@ -136,6 +138,7 @@ export function TitleBar({
   isFullscreen,
   onFocusSearch,
   onOpenSettings,
+  onOpenAssistant,
   onRequestWindowClose,
   onToggleSidebar,
   onToggleRightPanel,
@@ -199,6 +202,15 @@ export function TitleBar({
           ) : (
             <Maximize2 className="h-3.5 w-3.5" />
           )}
+        </button>
+        <button
+          type="button"
+          className="interactive-lift inline-flex h-7 items-center gap-2 rounded-md border border-border bg-elevated px-2 text-xs text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+          onClick={onOpenAssistant}
+          title={t('titlebar.assistant')}
+        >
+          <BrainCircuit className="h-3.5 w-3.5" />
+          {t('titlebar.assistant')}
         </button>
         <button
           type="button"

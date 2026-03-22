@@ -39,8 +39,8 @@ import { PromptModal } from "@/components/ui/PromptModal";
 import { SettingsModal } from "@/components/ui/SettingsModal";
 import { ToastViewport } from "@/components/ui/Toast";
 import { UpdateModal } from "@/components/ui/UpdateModal";
+import { AiModal } from "@/components/ui/AiModal";
 import { GridView } from "@/components/dashboard/GridView";
-import { ContextMenu } from "@/components/ui/ContextMenu";
 import {
   hasCompletedOnboarding,
   markOnboardingComplete,
@@ -55,6 +55,7 @@ import { useSettingsStore } from "@/store/settings";
 import { useUiStore } from "@/store/ui";
 import { useWorkspaceStore } from "@/store/workspace";
 import type {
+  AiChatMessage,
   AppPlatform,
   CommandItem,
   CursorInfo,
@@ -64,7 +65,6 @@ import {
   useEffect,
   useRef,
   useState,
-  type MouseEvent as ReactMouseEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -79,6 +79,28 @@ function clampUiZoom(value: number) {
 
 function getEffectiveUiZoom(uiZoom: number) {
   return Number((uiZoom * UI_ZOOM_BASELINE).toFixed(3));
+}
+
+function buildAssistantSystemPrompt(language: string) {
+  return [
+    "You are Sirius AI, the built-in assistant inside SiriusPad.",
+    "Reply in the user's preferred UI language when possible.",
+    `Preferred UI language: ${language}.`,
+    "Be practical, concise, and useful for technical notes, snippets, debugging, and organization.",
+    "When the user asks for note-ready content, prefer clean Markdown without decorative wrappers.",
+  ].join(" ");
+}
+
+function buildAssistantNoteContext(note: Note) {
+  return [
+    "The user asked you to consider the active note as context.",
+    `Title: ${note.title || "Untitled"}`,
+    `Workspace: ${note.workspace}`,
+    `Language: ${note.language}`,
+    `Tags: ${note.tags.join(", ") || "none"}`,
+    "Current note content:",
+    note.content.slice(0, 12000),
+  ].join("\n");
 }
 
 function isEditableTarget(target: EventTarget | null) {
@@ -109,10 +131,10 @@ export default function App() {
     null,
   );
   const [mobileInspectorOpen, setMobileInspectorOpen] = useState(false);
-  const [contextMenu, setContextMenu] = useState<{
-    x: number;
-    y: number;
-  } | null>(null);
+  const [assistantOpen, setAssistantOpen] = useState(false);
+  const [assistantMessages, setAssistantMessages] = useState<AiChatMessage[]>([]);
+  const [assistantBusy, setAssistantBusy] = useState(false);
+  const [assistantError, setAssistantError] = useState<string | null>(null);
 
   const bootstrappedRef = useRef(false);
   const allowWindowCloseRef = useRef(false);
@@ -240,6 +262,114 @@ export default function App() {
       : `${block}\n`;
 
     notes.updateActiveContent(nextContent);
+  };
+
+  const appendAssistantReplyToNote = () => {
+    const latestReply = [...assistantMessages]
+      .reverse()
+      .find((message) => message.role === "assistant");
+
+    if (!latestReply || !notes.activeNote) {
+      return;
+    }
+
+    const currentContent = notes.activeNote.content.trimEnd();
+    const nextContent = currentContent
+      ? `${currentContent}\n\n${latestReply.content.trim()}\n`
+      : `${latestReply.content.trim()}\n`;
+
+    notes.updateActiveContent(nextContent);
+    setAssistantOpen(false);
+    uiState.pushToast({
+      kind: "success",
+      title: t("ai.insertedIntoNote"),
+    });
+  };
+
+  const copyLatestAssistantReply = async () => {
+    const latestReply = [...assistantMessages]
+      .reverse()
+      .find((message) => message.role === "assistant");
+
+    if (!latestReply) {
+      return;
+    }
+
+    await navigator.clipboard.writeText(latestReply.content);
+    uiState.pushToast({
+      kind: "success",
+      title: t("ai.copied"),
+    });
+  };
+
+  const sendAssistantPrompt = async (
+    prompt: string,
+    useNoteContext: boolean,
+  ) => {
+    const apiKey = settingsState.settings.aiApiKey.trim();
+    if (!apiKey) {
+      setAssistantError(t("ai.setupError"));
+      return;
+    }
+
+    const trimmedPrompt = prompt.trim();
+    if (!trimmedPrompt) {
+      return;
+    }
+
+    const nextUserMessage: AiChatMessage = {
+      id: crypto.randomUUID(),
+      role: "user",
+      content: trimmedPrompt,
+    };
+
+    const conversation = [...assistantMessages, nextUserMessage]
+      .slice(-10)
+      .map((message) => ({
+        role: message.role,
+        content: message.content,
+      }));
+    const requestMessages = [
+      {
+        role: "system",
+        content: buildAssistantSystemPrompt(settingsState.settings.language),
+      },
+    ];
+
+    if (useNoteContext && notes.activeNote) {
+      requestMessages.push({
+        role: "system",
+        content: buildAssistantNoteContext(notes.activeNote),
+      });
+    }
+
+    setAssistantMessages((current) => [...current, nextUserMessage]);
+    setAssistantBusy(true);
+    setAssistantError(null);
+
+    try {
+      const reply = await invoke<string>("ai_chat", {
+        apiKey,
+        baseUrl: settingsState.settings.aiBaseUrl,
+        model: settingsState.settings.aiModel,
+        messages: [...requestMessages, ...conversation],
+      });
+
+      setAssistantMessages((current) => [
+        ...current,
+        {
+          id: crypto.randomUUID(),
+          role: "assistant",
+          content: reply.trim(),
+        },
+      ]);
+    } catch (error) {
+      setAssistantError(
+        error instanceof Error ? error.message : t("common.unknownError"),
+      );
+    } finally {
+      setAssistantBusy(false);
+    }
   };
 
   const closeWindowAfterDecision = async (mode: "save" | "discard") => {
@@ -639,49 +769,6 @@ export default function App() {
     });
   };
 
-  const handleGlobalContextMenu = (
-    event: ReactMouseEvent<HTMLDivElement>,
-  ) => {
-    event.preventDefault();
-    setContextMenu({
-      x: event.clientX,
-      y: event.clientY,
-    });
-  };
-
-  const handleContextMenuAction = async (action: string) => {
-    setContextMenu(null);
-
-    switch (action) {
-      case "copy":
-        document.execCommand("copy");
-        break;
-      case "cut":
-        document.execCommand("cut");
-        break;
-      case "paste":
-        try {
-            const text = await navigator.clipboard.readText();
-            // This is a simple fallback, better to use app-level command if focused
-            if (isEditableTarget(document.activeElement)) {
-                (document.activeElement as HTMLInputElement | HTMLTextAreaElement).value += text;
-            }
-        } catch (err) {
-            console.warn("Failed to read clipboard:", err);
-        }
-        break;
-      case "selectAll":
-        document.execCommand("selectAll");
-        break;
-      case "exportGist":
-        await exportCurrentNoteToGist();
-        break;
-      case "delete":
-        await deleteActiveNote();
-        break;
-    }
-  };
-
   const createWorkspace = async () => {
     uiState.showPrompt({
       title: t("workspace.name"),
@@ -905,6 +992,14 @@ export default function App() {
       shortcut: "Ctrl+,",
       perform: async () => {
         uiState.setSettingsOpen(true);
+      },
+    },
+    {
+      id: "app:assistant",
+      label: t("commands.openAssistant"),
+      group: t("commands.groups.app"),
+      perform: async () => {
+        setAssistantOpen(true);
       },
     },
     {
@@ -1460,7 +1555,6 @@ export default function App() {
   return (
     <div
       className="flex h-screen flex-col overflow-hidden bg-base text-text-primary selection:bg-accent/30"
-      onContextMenu={isMobile ? undefined : handleGlobalContextMenu}
       style={{
         height: rootViewportHeight,
         minHeight: rootViewportHeight,
@@ -1481,6 +1575,7 @@ export default function App() {
           isFullscreen={uiState.isFullscreen}
           onFocusSearch={() => uiState.focusSearch()}
           onOpenSettings={() => uiState.setSettingsOpen(true)}
+          onOpenAssistant={() => setAssistantOpen(true)}
           onRequestWindowClose={() => void requestWindowClose()}
           onToggleSidebar={() => setSidebarVisible((current) => !current)}
           onToggleRightPanel={() => setRightPanelVisible((current) => !current)}
@@ -1511,6 +1606,11 @@ export default function App() {
             setSidebarVisible(false);
             setMobileInspectorOpen(false);
             uiState.setSettingsOpen(true);
+          }}
+          onOpenAssistant={() => {
+            setSidebarVisible(false);
+            setMobileInspectorOpen(false);
+            setAssistantOpen(true);
           }}
         />
       ) : null}
@@ -1764,6 +1864,28 @@ export default function App() {
         onCommandRun={uiState.rememberCommand}
       />
 
+      <AiModal
+        open={assistantOpen}
+        note={notes.activeNote}
+        configured={Boolean(settingsState.settings.aiApiKey.trim())}
+        model={settingsState.settings.aiModel}
+        messages={assistantMessages}
+        busy={assistantBusy}
+        error={assistantError}
+        onClose={() => setAssistantOpen(false)}
+        onOpenSettings={() => {
+          setAssistantOpen(false);
+          uiState.setSettingsOpen(true);
+        }}
+        onSend={sendAssistantPrompt}
+        onClear={() => {
+          setAssistantMessages([]);
+          setAssistantError(null);
+        }}
+        onCopyLatest={copyLatestAssistantReply}
+        onInsertLatest={appendAssistantReplyToNote}
+      />
+
       {showOnboarding ? (
         <OnboardingModal
           platform={uiState.platform}
@@ -1774,15 +1896,6 @@ export default function App() {
         />
       ) : null}
 
-      {contextMenu ? (
-        <ContextMenu
-          x={contextMenu.x}
-          y={contextMenu.y}
-          onClose={() => setContextMenu(null)}
-          onAction={handleContextMenuAction}
-        />
-      ) : null}
-      
       <ToastViewport />
     </div>
   );

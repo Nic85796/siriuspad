@@ -95,6 +95,9 @@ export interface Settings {
   variables: Record<string, string>
   language: AppLanguage
   useSystemLanguage: boolean
+  aiApiKey: string
+  aiBaseUrl: string
+  aiModel: string
   supabaseUrl?: string
   supabaseAnonKey?: string
   initialSyncDone?: boolean
@@ -148,4 +151,10 @@ export interface CommandItem {
   keywords?: string[]
   shortcut?: string
   perform: () => void | Promise<void>
+}
+
+export interface AiChatMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
 }

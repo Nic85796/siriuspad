@@ -1,4 +1,5 @@
 import {
+  BrainCircuit,
   PanelLeftOpen,
   Plus,
   Search,
@@ -16,6 +17,7 @@ interface MobileHeaderProps {
   onCreateNote: () => void;
   onFocusSearch: () => void;
   onOpenSettings: () => void;
+  onOpenAssistant: () => void;
 }
 
 export function MobileHeader({
@@ -27,6 +29,7 @@ export function MobileHeader({
   onCreateNote,
   onFocusSearch,
   onOpenSettings,
+  onOpenAssistant,
 }: MobileHeaderProps) {
   const { t } = useTranslation();
 
@@ -84,6 +87,16 @@ export function MobileHeader({
             aria-label={t("rightPanel.noteTools")}
           >
             <SlidersHorizontal className="h-4 w-4" />
+          </button>
+
+          <button
+            type="button"
+            className={buttonClassName}
+            onClick={onOpenAssistant}
+            title={t("titlebar.assistant")}
+            aria-label={t("titlebar.assistant")}
+          >
+            <BrainCircuit className="h-4 w-4" />
           </button>
 
           <button

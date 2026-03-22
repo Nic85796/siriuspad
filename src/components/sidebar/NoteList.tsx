@@ -130,6 +130,7 @@ export function NoteList({
                 onClick={() => void onOpenNote(note.id)}
                 onContextMenu={(event) => {
                   event.preventDefault();
+                  event.stopPropagation();
                   setMenu({
                     note,
                     x: event.clientX,

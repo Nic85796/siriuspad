@@ -593,10 +593,11 @@ export function SettingsModal({
         onReset={() => onResetSection('integrations')}
         resetLabel={t('settings.reset')}
       >
-        <Field
-          label={t('settings.fields.githubToken')}
-          description={t('settings.fields.githubTokenHint')}
-        >
+        <div className="grid gap-4 md:grid-cols-2">
+          <Field
+            label={t('settings.fields.githubToken')}
+            description={t('settings.fields.githubTokenHint')}
+          >
             <input
               className={controlClassName()}
               type="password"
@@ -605,8 +606,54 @@ export function SettingsModal({
               onChange={(event) =>
                 void onUpdate({ githubToken: event.target.value })
               }
-          />
-        </Field>
+            />
+          </Field>
+
+          <Field
+            label={t('settings.fields.aiApiKey')}
+            description={t('settings.fields.aiApiKeyHint')}
+          >
+            <input
+              className={controlClassName()}
+              type="password"
+              placeholder={t('settings.fields.aiApiKeyPlaceholder')}
+              value={settings.aiApiKey}
+              onChange={(event) =>
+                void onUpdate({ aiApiKey: event.target.value })
+              }
+            />
+          </Field>
+
+          <Field
+            label={t('settings.fields.aiBaseUrl')}
+            description={t('settings.fields.aiBaseUrlHint')}
+          >
+            <input
+              className={controlClassName()}
+              type="text"
+              placeholder="https://api.groq.com/openai/v1"
+              value={settings.aiBaseUrl}
+              onChange={(event) =>
+                void onUpdate({ aiBaseUrl: event.target.value })
+              }
+            />
+          </Field>
+
+          <Field
+            label={t('settings.fields.aiModel')}
+            description={t('settings.fields.aiModelHint')}
+          >
+            <input
+              className={controlClassName()}
+              type="text"
+              placeholder="llama-3.1-8b-instant"
+              value={settings.aiModel}
+              onChange={(event) =>
+                void onUpdate({ aiModel: event.target.value })
+              }
+            />
+          </Field>
+        </div>
       </Section>
 
       <Section

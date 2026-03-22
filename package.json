@@ -1,7 +1,7 @@
 {
   "name": "siriuspad",
   "private": true,
-  "version": "1.0.28",
+  "version": "1.0.29",
   "description": "Bloco de notas local para desenvolvedores, com Markdown, workspaces e beta mobile para Android.",
   "author": "SiriusX",
   "license": "MIT",

@@ -132,6 +132,7 @@ export function WorkspaceTree({
                 onClick={() => onSelectWorkspace(workspace.id)}
                 onContextMenu={(event) => {
                   event.preventDefault();
+                  event.stopPropagation();
                   setMenu({
                     workspaceId: workspace.id,
                     x: event.clientX,

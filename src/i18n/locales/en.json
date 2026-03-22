@@ -27,6 +27,7 @@
   },
   "titlebar": {
     "search": "Search",
+    "assistant": "Sirius AI",
     "settings": "Settings",
     "toggleSidebar": "Toggle sidebar",
     "toggleRightPanel": "Toggle note tools"
@@ -161,6 +162,7 @@
     "exportMarkdown": "Export active note as .md",
     "exportTxt": "Export active note as .txt",
     "exportJson": "Export active note as .json",
+    "openAssistant": "Open Sirius AI",
     "openSettings": "Open settings",
     "toggleLineNumbers": "Toggle line numbers",
     "toggleWordWrap": "Toggle word wrap",
@@ -196,7 +198,7 @@
       },
       "integrations": {
         "title": "Integrations",
-        "description": "GitHub Gist export uses a token with the gist scope."
+        "description": "Gist and Sirius AI use local, optional credentials."
       },
       "database": {
         "title": "Cloud backup",
@@ -238,6 +240,13 @@
       "githubToken": "GitHub token",
       "githubTokenHint": "Stored locally. Requires gist scope.",
       "githubTokenPlaceholder": "ghp_...",
+      "aiApiKey": "AI API key",
+      "aiApiKeyHint": "Stored locally. Requests go through the app backend instead of the frontend.",
+      "aiApiKeyPlaceholder": "gsk_... / sk-...",
+      "aiBaseUrl": "OpenAI-compatible endpoint",
+      "aiBaseUrlHint": "Base URL used for the AI request. The default works with Groq.",
+      "aiModel": "AI model",
+      "aiModelHint": "Model name sent in the request, such as llama-3.1-8b-instant.",
       "supabaseUrl": "Supabase project URL",
       "supabaseUrlHint": "Example: https://xyz.supabase.co",
       "supabaseAnonKey": "Supabase anon key",
@@ -505,6 +514,32 @@
       "readyPoint2": "You can reopen this tutorial anytime from settings.",
       "readyPoint3": "Use issues for bugs and a private advisory for vulnerabilities."
     }
+  },
+  "ai": {
+    "title": "Sirius AI",
+    "panelTitle": "Technical note assistant",
+    "panelHint": "Ask for summaries, reviews, titles, checklists, explanations, or help turning the current note into something more useful.",
+    "modelLabel": "Active model",
+    "modelHint": "Requests use an OpenAI/Groq-compatible endpoint configured in Integrations.",
+    "setupTitle": "The AI key still needs to be configured",
+    "setupBody": "Open settings, go to Integrations, and fill in a key and, if you want, the endpoint/model. The conversation stays local in the app and the HTTP call is made by the SiriusPad backend.",
+    "setupHint": "Configure the AI key in Integrations to unlock the chat.",
+    "setupError": "Configure an AI key in Integrations before using Sirius AI.",
+    "openSettings": "Open integrations",
+    "useNoteContext": "Use the active note as context: {{title}}",
+    "useNoteContextDisabled": "There is no active note to use as context",
+    "copyLatest": "Copy reply",
+    "insertLatest": "Insert into note",
+    "clear": "Clear chat",
+    "assistantLabel": "Sirius AI",
+    "youLabel": "You",
+    "empty": "The conversation starts here. Ask for a summary, a better title, a checklist, a callout, or help reviewing the current note.",
+    "inputPlaceholder": "Ask something about the note, request a summary, a checklist, a callout, or help with the next step...",
+    "inputHint": "Use Ctrl+Enter to send faster.",
+    "thinking": "Thinking...",
+    "send": "Send",
+    "copied": "AI reply copied",
+    "insertedIntoNote": "AI reply inserted into the note"
   },
   "rightPanel": {
     "noteTools": "Note tools",

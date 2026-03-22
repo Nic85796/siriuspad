@@ -7,6 +7,24 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
+## [1.0.29] - 2026-03-21
+
+### Added
+
+- Sirius AI voltou ao app com modal próprio, chave configurável nas integrações e chamada HTTP feita pelo backend do Tauri
+- botão dedicado para abrir a IA no desktop e no mobile, além de entrada na paleta de comandos
+
+### Changed
+
+- integrações agora agrupam GitHub Gist e a configuração da IA no mesmo lugar, com endpoint compatível com OpenAI/Groq e modelo configurável
+- resposta mais recente da IA pode ser copiada ou inserida direto no conteúdo da nota ativa
+
+### Fixed
+
+- conflito entre o menu global de clique direito e os menus específicos da sidebar foi removido, deixando só os menus corretos de nota e espaço
+- `pt-BR`, `en` e `es` ganharam as chaves novas da IA e seguiram alinhadas entre si
+- build desktop voltou a validar com a nova camada de rede do backend, mantendo `npm run build`, `npm run lint` e `cargo check` verdes
+
 ## [1.0.28] - 2026-03-21
 
 ### Changed

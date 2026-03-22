@@ -2,7 +2,7 @@ mod commands;
 mod models;
 mod storage;
 
-use commands::{fs, history, platform, runner, search, terminal, updater};
+use commands::{ai, fs, history, platform, runner, search, terminal, updater};
 #[cfg(mobile)]
 use tauri::Manager;
 
@@ -46,6 +46,7 @@ pub fn run() {
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![
+            ai::ai_chat,
             fs::ensure_dirs,
             fs::list_notes,
             fs::read_note,

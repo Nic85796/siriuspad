@@ -340,6 +340,9 @@ export const useSettingsStore = create<SettingsState>((set, get) => ({
         next = {
           ...current,
           githubToken: DEFAULT_SETTINGS.githubToken,
+          aiApiKey: DEFAULT_SETTINGS.aiApiKey,
+          aiBaseUrl: DEFAULT_SETTINGS.aiBaseUrl,
+          aiModel: DEFAULT_SETTINGS.aiModel,
         }
         break
       case 'database':
