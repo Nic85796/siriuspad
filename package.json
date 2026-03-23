@@ -1,7 +1,7 @@
 {
   "name": "siriuspad",
   "private": true,
-  "version": "1.0.30",
+  "version": "1.0.31",
   "description": "Bloco de notas local para desenvolvedores, com Markdown, workspaces e beta mobile para Android.",
   "author": "SiriusX",
   "license": "MIT",
@@ -54,6 +54,7 @@
     "@codemirror/state": "^6.6.0",
     "@codemirror/view": "^6.40.0",
     "@lezer/highlight": "^1.2.3",
+    "@replit/codemirror-vim": "^6.3.0",
     "@supabase/supabase-js": "^2.99.3",
     "@tauri-apps/api": "^2.10.1",
     "@tauri-apps/plugin-dialog": "^2.6.0",

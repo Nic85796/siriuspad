@@ -54,6 +54,7 @@ interface EditorPaneProps {
   onCursorChange: (cursorInfo: CursorInfo) => void;
   onOpenFindReplace: () => void;
   onOpenHistory: () => void;
+  onWikiLinkClick?: (title: string) => void;
 }
 
 export function EditorPane({
@@ -75,6 +76,7 @@ export function EditorPane({
   onCursorChange,
   onOpenFindReplace,
   onOpenHistory,
+  onWikiLinkClick,
 }: EditorPaneProps) {
   const { t } = useTranslation();
   const isMobile = platform === "android" || platform === "ios";
@@ -188,6 +190,7 @@ export function EditorPane({
               await runner.run();
             }}
             onCursorChange={onCursorChange}
+            onWikiLinkClick={onWikiLinkClick}
           />
         </div>
       </div>

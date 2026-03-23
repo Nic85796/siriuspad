@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { open as openExternal } from '@tauri-apps/plugin-shell'
 import { useTranslation } from 'react-i18next'
+import { Sparkles as SparklesIcon } from 'lucide-react'
 
 import {
   APP_CHANGELOG_URL,
@@ -253,6 +254,20 @@ export function SettingsModal({
                 void onUpdate({ autosaveDelay: Number(event.target.value) })
               }
             />
+          </Field>
+          <Field
+            label={t('settings.fields.vimMode')}
+            description={t('settings.fields.vimModeHint')}
+          >
+            <button
+              type="button"
+              className={`${controlClassName()} text-left`}
+              onClick={() => void onUpdate({ vimMode: !settings.vimMode })}
+            >
+              {settings.vimMode
+                ? t('settings.fields.enabled')
+                : t('settings.fields.disabled')}
+            </button>
           </Field>
         </div>
       </Section>
@@ -611,6 +626,21 @@ export function SettingsModal({
           </Field>
 
           <Field
+            label={t('settings.fields.gitRepoUrl')}
+            description={t('settings.fields.gitRepoUrlHint')}
+          >
+            <input
+              className={controlClassName()}
+              type="text"
+              placeholder="https://github.com/seu-usuario/suas-notas.git"
+              value={settings.gitRepoUrl || ''}
+              onChange={(event) =>
+                void onUpdate({ gitRepoUrl: event.target.value })
+              }
+            />
+          </Field>
+
+          <Field
             label={t('settings.fields.aiApiKey')}
             description={t('settings.fields.aiApiKeyHint')}
           >
@@ -623,6 +653,20 @@ export function SettingsModal({
                 void onUpdate({ aiApiKey: event.target.value })
               }
             />
+            <div className="mt-1.5 flex justify-end">
+              <button
+                type="button"
+                onClick={() => void onUpdate({
+                  aiBaseUrl: 'http://localhost:11434/v1',
+                  aiApiKey: 'ollama',
+                  aiModel: 'llama3.2'
+                })}
+                className="text-[10px] font-medium text-accent hover:underline flex items-center gap-1"
+              >
+                <SparklesIcon size={10} />
+                {t('settings.fields.useOllama')}
+              </button>
+            </div>
           </Field>
 
           <Field

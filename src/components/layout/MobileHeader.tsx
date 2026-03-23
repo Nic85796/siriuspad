@@ -34,10 +34,10 @@ export function MobileHeader({
   const { t } = useTranslation();
 
   const buttonClassName =
-    "inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-elevated text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary";
+    "inline-flex h-11 w-11 items-center justify-center rounded-md border border-border bg-elevated text-text-secondary transition-colors duration-200 hover:border-focus hover:bg-hover hover:text-text-primary";
 
   const activeButtonClassName =
-    "inline-flex h-11 w-11 items-center justify-center rounded-md border border-accent/35 bg-accent/10 text-text-primary transition hover:border-accent/50 hover:bg-accent/15";
+    "inline-flex h-11 w-11 items-center justify-center rounded-md border border-accent/35 bg-accent/10 text-text-primary transition-colors duration-200 hover:border-accent/50 hover:bg-accent/15";
 
   return (
     <header
@@ -49,6 +49,7 @@ export function MobileHeader({
       }}
     >
       <div className="flex items-start gap-2.5">
+        {/* Botão Sidebar: gira o ícone quando aberto */}
         <button
           type="button"
           className={sidebarOpen ? activeButtonClassName : buttonClassName}
@@ -56,7 +57,10 @@ export function MobileHeader({
           title={t("sidebar.notes")}
           aria-label={t("sidebar.notes")}
         >
-          <PanelLeftOpen className="h-4 w-4" />
+          <PanelLeftOpen
+            className="h-4 w-4 transition-transform duration-300 ease-in-out"
+            style={{ transform: sidebarOpen ? 'scaleX(-1)' : 'scaleX(1)' }}
+          />
         </button>
 
         <div className="min-w-0 flex-1 self-center px-1">
@@ -79,6 +83,7 @@ export function MobileHeader({
             <Plus className="h-4 w-4" />
           </button>
 
+          {/* Botão Inspector: gira quando aberto */}
           <button
             type="button"
             className={inspectorOpen ? activeButtonClassName : buttonClassName}
@@ -86,7 +91,10 @@ export function MobileHeader({
             title={t("rightPanel.noteTools")}
             aria-label={t("rightPanel.noteTools")}
           >
-            <SlidersHorizontal className="h-4 w-4" />
+            <SlidersHorizontal
+              className="h-4 w-4 transition-transform duration-300 ease-in-out"
+              style={{ transform: inspectorOpen ? 'scaleX(-1)' : 'scaleX(1)' }}
+            />
           </button>
 
           <button

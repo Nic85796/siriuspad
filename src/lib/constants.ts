@@ -23,6 +23,7 @@ export const DEFAULT_SETTINGS: Settings = {
   autosave: true,
   autosaveDelay: 800,
   showLineNumbers: true,
+  vimMode: false,
   defaultWorkspace: DEFAULT_WORKSPACE_ID,
   githubToken: '',
   aiApiKey: '',
@@ -34,6 +35,7 @@ export const DEFAULT_SETTINGS: Settings = {
   useSystemLanguage: true,
   supabaseUrl: '',
   supabaseAnonKey: '',
+  gitRepoUrl: '',
 }
 
 export const DEFAULT_WORKSPACE: Workspace = {

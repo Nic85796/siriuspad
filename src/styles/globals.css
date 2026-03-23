@@ -352,12 +352,18 @@ button:disabled {
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none !important;
-    transition: none !important;
-    scroll-behavior: auto !important;
-  }
+/* Technical Scrollbar for DevTools */
+.scrollbar-technical::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.scrollbar-technical::-webkit-scrollbar-track {
+  background: #0a0a0a;
+}
+.scrollbar-technical::-webkit-scrollbar-thumb {
+  background: #222;
+  border-radius: 3px;
+}
+.scrollbar-technical::-webkit-scrollbar-thumb:hover {
+  background: #333;
 }

@@ -1,5 +1,5 @@
+import { vim } from '@replit/codemirror-vim'
 import {
-  autocompletion,
   closeBrackets,
   closeBracketsKeymap,
   completionKeymap,
@@ -57,6 +57,7 @@ import { tags } from '@lezer/highlight'
 import { invoke } from '@tauri-apps/api/core'
 
 import { withAlpha } from '@/lib/color'
+import { slashCommandCompletion } from '@/lib/slashCommands'
 import type { CursorInfo, Settings } from '@/types'
 
 const variableDecoration = Decoration.mark({
@@ -237,8 +238,9 @@ class ListMarkerWidget extends WidgetType {
 
 // ─── Link & Media widgets ──────────────────────────────────────────────────────
 
-const IMAGE_PATTERN = /(?:!\[([^\]\n]*)\]\(([^)\n]+)\))/g
-const LINK_PATTERN  = /(?:(?<!!)\[([^\]\n]+)\]\(([^)\n]+)\))/g
+const IMAGE_PATTERN    = /(?:!\[([^\]\n]*)\]\(([^)\n]+)\))/g
+const LINK_PATTERN     = /(?:(?<!!)\[([^\]\n]+)\]\(([^)\n]+)\))/g
+const WIKILINK_PATTERN = /\[\[([^\]\n]+)\]\]/g
 const RAW_URL_PATTERN = /(?:\b(https?:\/\/[^\s<"']+\.(?:png|jpe?g|gif|webp|mp4|webm|mov|mkv)(?:\?[^\s<"']*)?))/gi
 
 function openExternalUrl(url: string) {
@@ -284,6 +286,57 @@ class LinkWidget extends WidgetType {
 
   eq(other: LinkWidget) {
     return other.text === this.text && other.url === this.url
+  }
+
+  ignoreEvent(event: Event) {
+    return event.type !== 'click' && event.type !== 'keydown'
+  }
+}
+
+/** Renders [[Note Title]] as a styled wikilink chip. Ctrl/Cmd+Click triggers navigation. */
+class WikiLinkWidget extends WidgetType {
+  private readonly title: string
+
+  constructor(title: string) {
+    super()
+    this.title = title
+  }
+
+  toDOM() {
+    const span = document.createElement('span')
+    span.className = 'cm-md-wikilink'
+    span.textContent = this.title
+    span.title = `Ctrl+Click para abrir: ${this.title}`
+    span.setAttribute('role', 'link')
+    span.setAttribute('tabindex', '0')
+    span.addEventListener('click', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        e.preventDefault()
+        e.stopPropagation()
+        span.dispatchEvent(
+          new CustomEvent('wikilink-click', {
+            detail: { title: this.title },
+            bubbles: true,
+          }),
+        )
+      }
+    })
+    span.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        span.dispatchEvent(
+          new CustomEvent('wikilink-click', {
+            detail: { title: this.title },
+            bubbles: true,
+          }),
+        )
+      }
+    })
+    return span
+  }
+
+  eq(other: WikiLinkWidget) {
+    return other.title === this.title
   }
 
   ignoreEvent(event: Event) {
@@ -351,6 +404,43 @@ class ImageWidget extends WidgetType {
   ignoreEvent() { return true }
 }
 
+
+function createWikiLinkDecorations(view: EditorView) {
+  const builder = new RangeSetBuilder<Decoration>()
+  const { selection, doc } = view.state
+  const cursorFrom = selection.main.from
+  const cursorTo   = selection.main.to
+  let activeCodeFence = false
+
+  for (let lineNum = 1; lineNum <= doc.lines; lineNum++) {
+    const line = doc.line(lineNum)
+    const text = line.text
+
+    if (CODE_FENCE_PATTERN.test(text)) {
+      activeCodeFence = !activeCodeFence
+      continue
+    }
+    if (activeCodeFence) continue
+
+    WIKILINK_PATTERN.lastIndex = 0
+    for (const m of text.matchAll(WIKILINK_PATTERN)) {
+      const absStart = line.from + (m.index ?? 0)
+      const absEnd   = line.from + (m.index ?? 0) + m[0].length
+      // Show raw text when cursor is inside the link
+      if (cursorFrom <= absEnd && cursorTo >= absStart) continue
+      builder.add(
+        absStart,
+        absEnd,
+        Decoration.replace({
+          widget: new WikiLinkWidget(m[1]),
+          inclusive: false,
+        }),
+      )
+    }
+  }
+
+  return builder.finish()
+}
 
 function createMediaDecorations(view: EditorView) {
   const builder = new RangeSetBuilder<Decoration>()
@@ -439,6 +529,21 @@ const mediaDecorations = ViewPlugin.fromClass(
     update(update: ViewUpdate) {
       if (update.docChanged || update.viewportChanged || update.selectionSet) {
         this.decorations = createMediaDecorations(update.view)
+      }
+    }
+  },
+  { decorations: (instance) => instance.decorations },
+)
+
+const wikiLinkDecorations = ViewPlugin.fromClass(
+  class {
+    decorations
+    constructor(view: EditorView) {
+      this.decorations = createWikiLinkDecorations(view)
+    }
+    update(update: ViewUpdate) {
+      if (update.docChanged || update.viewportChanged || update.selectionSet) {
+        this.decorations = createWikiLinkDecorations(update.view)
       }
     }
   },
@@ -987,6 +1092,25 @@ export const siriusPadEditorTheme = EditorView.theme({
     overflow: 'hidden',
     verticalAlign: 'baseline',
   },
+  // ── WikiLink styles ──────────────────────────────────────────
+  '.cm-md-wikilink': {
+    display: 'inline-flex',
+    alignItems: 'center',
+    padding: '1px 8px',
+    borderRadius: '999px',
+    backgroundColor: 'color-mix(in srgb, var(--accent) 12%, transparent)',
+    border: '1px solid color-mix(in srgb, var(--accent) 35%, transparent)',
+    color: 'var(--accent)',
+    fontSize: '0.88em',
+    fontWeight: '500',
+    cursor: 'pointer',
+    textDecoration: 'none',
+    transition: 'background-color 0.15s, border-color 0.15s',
+  },
+  '.cm-md-wikilink:hover': {
+    backgroundColor: 'color-mix(in srgb, var(--accent) 20%, transparent)',
+    borderColor: 'color-mix(in srgb, var(--accent) 55%, transparent)',
+  },
 })
 
 export const siriusPadHighlightStyle = HighlightStyle.define([
@@ -1039,6 +1163,7 @@ interface EditorHandlers {
   onSave: () => void | Promise<void>
   onRun?: () => void | Promise<void>
   onCursorChange?: (cursorInfo: CursorInfo) => void
+  onWikiLinkClick?: (title: string) => void
 }
 
 export interface EditorCompartments {
@@ -1046,6 +1171,7 @@ export interface EditorCompartments {
   wordWrap: Compartment
   tabSize: Compartment
   readOnly: Compartment
+  vimMode: Compartment
 }
 
 export function createEditorCompartments(): EditorCompartments {
@@ -1054,6 +1180,7 @@ export function createEditorCompartments(): EditorCompartments {
     wordWrap: new Compartment(),
     tabSize: new Compartment(),
     readOnly: new Compartment(),
+    vimMode: new Compartment(),
   }
 }
 
@@ -1117,6 +1244,10 @@ function taskToggleExtension(): Extension {
   })
 }
 
+function vimModeExtension(enabled: boolean): Extension {
+  return enabled ? vim() : []
+}
+
 export function createEditorExtensions(
   settings: Settings,
   handlers: EditorHandlers,
@@ -1132,7 +1263,6 @@ export function createEditorExtensions(
       base: markdownLanguage,
       codeLanguages,
     }),
-    autocompletion(),
     closeBrackets(),
     bracketMatching(),
     highlightActiveLine(),
@@ -1141,14 +1271,25 @@ export function createEditorExtensions(
     syntaxHighlighting(siriusPadHighlightStyle, { fallback: true }),
     siriusPadEditorTheme,
     compartments.readOnly.of(EditorState.readOnly.of(handlers.readOnly ?? false)),
+    compartments.vimMode.of(vimModeExtension(settings.vimMode ?? false)),
     taskToggleExtension(),
     variableDecorations,
     mediaDecorations,
+    wikiLinkDecorations,
     inlineFormattingDecorations,
     inlineCodeDecorations,
     markdownLineDecorations,
     compartments.lineNumbers.of(lineNumberExtension(settings.showLineNumbers)),
     compartments.wordWrap.of(wordWrapExtension(settings.wordWrap)),
+    slashCommandCompletion(),
+    // Wiki-link click handler
+    EditorView.domEventHandlers({
+      'wikilink-click'(event) {
+        const detail = (event as CustomEvent<{ title: string }>).detail
+        handlers.onWikiLinkClick?.(detail.title)
+        return true
+      },
+    }),
     keymap.of([
       { key: 'Mod-s', run: () => (handlers.onSave(), true), preventDefault: true },
       { key: 'Ctrl-Enter', run: () => (handlers.onRun?.(), true), preventDefault: true },
@@ -1198,6 +1339,13 @@ export function reconfigureReadOnly(
   readOnly: boolean,
 ) {
   return compartments.readOnly.reconfigure(EditorState.readOnly.of(readOnly))
+}
+
+export function reconfigureVimMode(
+  compartments: EditorCompartments,
+  enabled: boolean,
+) {
+  return compartments.vimMode.reconfigure(enabled ? vim() : [])
 }
 
 export function getCursorInfo(view: EditorView) {

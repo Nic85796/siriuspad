@@ -90,6 +90,7 @@ export interface Settings {
   autosave: boolean
   autosaveDelay: number
   showLineNumbers: boolean
+  vimMode?: boolean
   defaultWorkspace: string
   githubToken: string
   variables: Record<string, string>
@@ -100,6 +101,7 @@ export interface Settings {
   aiModel: string
   supabaseUrl?: string
   supabaseAnonKey?: string
+  gitRepoUrl?: string
   initialSyncDone?: boolean
 }
 

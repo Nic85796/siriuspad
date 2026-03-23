@@ -2,6 +2,7 @@ import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { useEffect, useState } from 'react'
 
+import { APP_VERSION } from '@/lib/constants'
 import type { UpdateInfo } from '@/types'
 
 export interface UpdateState {
@@ -26,6 +27,11 @@ const INITIAL_STATE: UpdateState = {
   error: null,
 }
 
+// Detecção simples de Android para o updater.
+const isAndroid = () => 
+  typeof navigator !== 'undefined' && 
+  navigator.userAgent.toLowerCase().includes('android')
+
 export function useUpdater(enabled = true) {
   const [state, setState] = useState<UpdateState>(INITIAL_STATE)
 
@@ -38,7 +44,28 @@ export function useUpdater(enabled = true) {
 
     const checkForUpdates = async () => {
       try {
-        const update = await invoke<UpdateInfo | null>('check_for_update')
+        let update: UpdateInfo | null = null
+
+        if (isAndroid()) {
+          // No Android, buscamos o latest.json manualmente.
+          // O updater nativo do Tauri foca em desktop.
+          const response = await fetch('https://github.com/SiriusXofc/siriuspad/releases/latest/download/latest.json')
+          if (response.ok) {
+            const data = await response.json()
+            // Compara versões de forma simplificada.
+            if (data.version !== APP_VERSION) {
+              update = {
+                version: data.version,
+                body: data.notes || data.body || null,
+                date: data.pub_date || data.date || null
+              }
+            }
+          }
+        } else {
+          // Desktop usa o comando nativo do Tauri.
+          update = await invoke<UpdateInfo | null>('check_for_update')
+        }
+
         if (!update || disposed) {
           return
         }
@@ -112,6 +139,12 @@ export function useUpdater(enabled = true) {
 
   const startDownload = async () => {
     if (!state.available) {
+      return
+    }
+
+    // No Android, não baixamos silenciosamente, apenas redirecionamos.
+    // O UpdateModal lida com o botão de download.
+    if (isAndroid()) {
       return
     }
 

@@ -2,7 +2,6 @@ import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { getCurrentWebviewWindow } from "@tauri-apps/api/webviewWindow";
 import {
-  isRegistered as isShortcutRegistered,
   register as registerGlobalShortcut,
   unregister as unregisterGlobalShortcut,
 } from "@tauri-apps/plugin-global-shortcut";
@@ -13,9 +12,8 @@ import { syncAllNotes } from "@/lib/sync";
 import { useNotes } from "@/hooks/useNotes";
 import { useRunner } from "@/hooks/useRunner";
 import { useSearch } from "@/hooks/useSearch";
-import { useUpdater, type UpdateState } from "@/hooks/useUpdater";
+import { useUpdater } from "@/hooks/useUpdater";
 import {
-  APP_VERSION,
   DEFAULT_WORKSPACE_ID,
   UI_ZOOM_MAX,
   UI_ZOOM_BASELINE,
@@ -62,6 +60,8 @@ import type {
   CursorInfo,
   Note,
 } from "@/types";
+import { DevTools } from "@/components/ui/DevTools";
+import { MobileFAB } from "@/components/ui/MobileFAB";
 import {
   useEffect,
   useRef,
@@ -80,39 +80,6 @@ function clampUiZoom(value: number) {
 
 function getEffectiveUiZoom(uiZoom: number) {
   return Number((uiZoom * UI_ZOOM_BASELINE).toFixed(3));
-}
-
-function getPreviewUpdateVersion(version: string) {
-  const match = version.match(/^(\d+)\.(\d+)\.(\d+)$/);
-  if (!match) {
-    return `${version}-preview`;
-  }
-
-  const major = Number(match[1]);
-  const minor = Number(match[2]);
-  const patch = Number(match[3]) + 1;
-  return `${major}.${minor}.${patch}`;
-}
-
-function createPreviewUpdateState(): UpdateState {
-  return {
-    available: {
-      version: getPreviewUpdateVersion(APP_VERSION),
-      body: [
-        "Prévia local da tela de atualização do SiriusPad.",
-        "",
-        "Destaques desta versão:",
-        "- layout do modal validado sem depender de uma release real",
-        "- fluxo de download e instalação pode ser simulado localmente",
-        "- útil para revisar cópia, contraste e espaçamento do updater",
-      ].join("\n"),
-      date: new Date().toISOString(),
-    },
-    downloading: false,
-    downloadProgress: 0,
-    readyToInstall: false,
-    error: null,
-  };
 }
 
 function buildAssistantSystemPrompt(language: string) {
@@ -169,9 +136,6 @@ export default function App() {
   const [assistantMessages, setAssistantMessages] = useState<AiChatMessage[]>([]);
   const [assistantBusy, setAssistantBusy] = useState(false);
   const [assistantError, setAssistantError] = useState<string | null>(null);
-  const [previewUpdateState, setPreviewUpdateState] = useState<UpdateState | null>(
-    null,
-  );
 
   const bootstrappedRef = useRef(false);
   const allowWindowCloseRef = useRef(false);
@@ -235,7 +199,6 @@ export default function App() {
     activeNoteDirectory,
   );
   const updater = useUpdater(settingsState.ready && !isMobile);
-  const effectiveUpdaterState = previewUpdateState ?? updater.state;
 
   const workspaceScopedNotes = notes.notes.filter((note) => {
     const matchesWorkspace = workspaceState.activeWorkspaceId
@@ -420,16 +383,6 @@ export default function App() {
   };
 
   const installPendingUpdate = async () => {
-    if (previewUpdateState) {
-      uiState.pushToast({
-        kind: "success",
-        title: t("updater.previewInstalled"),
-        description: t("updater.previewInstalledBody"),
-      });
-      setPreviewUpdateState(null);
-      return;
-    }
-
     try {
       await useNotesStore.getState().saveAllDirtyTabs();
       allowWindowCloseRef.current = true;
@@ -506,61 +459,6 @@ export default function App() {
 
   const saveCurrentNote = async () => {
     await notes.saveActiveNote();
-  };
-
-  const openUpdaterPreview = () => {
-    setPreviewUpdateState(createPreviewUpdateState());
-  };
-
-  const dismissUpdaterModal = () => {
-    if (previewUpdateState) {
-      setPreviewUpdateState(null);
-      return;
-    }
-
-    updater.dismiss();
-  };
-
-  const startPreviewDownload = async () => {
-    setPreviewUpdateState((current) => {
-      const base = current ?? createPreviewUpdateState();
-      return {
-        ...base,
-        downloading: true,
-        downloadProgress: 12,
-        readyToInstall: false,
-        error: null,
-      };
-    });
-
-    for (const progress of [28, 46, 63, 81, 100]) {
-      await new Promise((resolve) => window.setTimeout(resolve, 180));
-      setPreviewUpdateState((current) =>
-        current
-          ? {
-              ...current,
-              downloading: progress < 100,
-              downloadProgress: progress,
-              readyToInstall: progress >= 100,
-              error: null,
-            }
-          : current,
-      );
-    }
-  };
-
-  const retryUpdater = async () => {
-    if (previewUpdateState) {
-      if (previewUpdateState.readyToInstall) {
-        await installPendingUpdate();
-        return;
-      }
-
-      await startPreviewDownload();
-      return;
-    }
-
-    await updater.retry();
   };
 
   const createNote = async (workspaceId?: string) => {
@@ -1106,14 +1004,6 @@ export default function App() {
       },
     },
     {
-      id: "app:update-preview",
-      label: t("commands.previewUpdate"),
-      group: t("commands.groups.app"),
-      perform: async () => {
-        openUpdaterPreview();
-      },
-    },
-    {
       id: "app:line-numbers",
       label: t("commands.toggleLineNumbers"),
       group: t("commands.groups.app"),
@@ -1315,13 +1205,17 @@ export default function App() {
 
     const setupShortcut = async () => {
       try {
-        const alreadyRegistered = await isShortcutRegistered(shortcut);
-        if (!alreadyRegistered) {
-          await registerGlobalShortcut(shortcut, () => {
-            useUiStore.getState().setCommandPaletteOpen(true);
-          });
-          registered = true;
+        // Always try to unregister first to avoid "already registered" error during HMR
+        try {
+          await unregisterGlobalShortcut(shortcut);
+        } catch {
+          // Ignore error if it wasn't registered
         }
+
+        await registerGlobalShortcut(shortcut, () => {
+          useUiStore.getState().setCommandPaletteOpen(true);
+        });
+        registered = true;
       } catch (error) {
         console.warn("Global shortcut unavailable", error);
       }
@@ -1335,6 +1229,20 @@ export default function App() {
       }
     };
   }, [isMobile]);
+
+  const [isDevToolsOpen, setIsDevToolsOpen] = useState(false);
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "F12") {
+        e.preventDefault();
+        setIsDevToolsOpen((prev) => !prev);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
 
   useEffect(() => {
     if (isMobile) {
@@ -1684,6 +1592,8 @@ export default function App() {
         <TitleBar
           platform={uiState.platform}
           isFullscreen={uiState.isFullscreen}
+          sidebarOpen={sidebarVisible}
+          rightPanelOpen={rightPanelVisible}
           onFocusSearch={() => uiState.focusSearch()}
           onOpenSettings={() => uiState.setSettingsOpen(true)}
           onOpenAssistant={() => setAssistantOpen(true)}
@@ -1693,6 +1603,7 @@ export default function App() {
           onToggleFullscreen={() => void toggleFullscreen()}
         />
       ) : null}
+
 
       {showMobileHeader ? (
         <MobileHeader
@@ -1735,6 +1646,7 @@ export default function App() {
             workspaces={workspaceState.workspaces}
             activeWorkspaceId={workspaceState.activeWorkspaceId}
             notes={visibleNotes}
+            totalNotes={workspaceScopedNotes.length}
             activeNoteId={notes.activeNoteId}
             activeTag={notes.activeTag}
             searchResults={searchState.results}
@@ -1777,6 +1689,7 @@ export default function App() {
                 workspaces={workspaceState.workspaces}
                 activeWorkspaceId={workspaceState.activeWorkspaceId}
                 notes={visibleNotes}
+                totalNotes={workspaceScopedNotes.length}
                 activeNoteId={notes.activeNoteId}
                 activeTag={notes.activeTag}
                 searchResults={searchState.results}
@@ -1843,6 +1756,19 @@ export default function App() {
                 setFindReplaceNonce((current) => current + 1)
               }
               onOpenHistory={() => uiState.setHistoryPanelOpen(true)}
+              onWikiLinkClick={async (title) => {
+                const match = notes.notes.find(
+                  (n) => n.title.trim().toLowerCase() === title.trim().toLowerCase(),
+                )
+                if (match) {
+                  await openNoteFromNavigation(match.id)
+                } else {
+                  uiState.pushToast({
+                    kind: 'warning',
+                    title: t('note.wikilinkNotFound', { title }),
+                  })
+                }
+              }}
             />
           )}
 
@@ -1957,13 +1883,13 @@ export default function App() {
         onCancel={uiState.closePrompt}
       />
 
-      {!isMobile || previewUpdateState ? (
+      {(!isMobile || uiState.platform === "android") ? (
         <UpdateModal
-          state={effectiveUpdaterState}
-          onDismiss={dismissUpdaterModal}
-          onDownload={previewUpdateState ? startPreviewDownload : updater.startDownload}
+          state={updater.state}
+          onDismiss={updater.dismiss}
+          onDownload={updater.startDownload}
           onInstall={installPendingUpdate}
-          onRetry={retryUpdater}
+          onRetry={updater.retry}
         />
       ) : null}
 
@@ -2008,6 +1934,17 @@ export default function App() {
       ) : null}
 
       <ToastViewport />
+      <DevTools
+        open={isDevToolsOpen}
+        onClose={() => setIsDevToolsOpen(false)}
+      />
+      
+      {isMobile && (
+        <MobileFAB 
+          onCreateNote={() => notes.createNote({ title: t("common.untitled") })} 
+          onOpenAi={() => setAssistantOpen(true)}
+        />
+      )}
     </div>
   );
 }

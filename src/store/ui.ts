@@ -51,6 +51,8 @@ interface UiState {
   updateAvailable: UpdateInfo | null
   confirm: (ConfirmDialogOptions & { open: boolean }) | null
   prompt: (PromptDialogOptions & { open: boolean }) | null
+  syncStatus: 'idle' | 'syncing' | 'synced' | 'error'
+  setSyncStatus: (status: 'idle' | 'syncing' | 'synced' | 'error') => void
   initialize: () => Promise<void>
   setCommandPaletteOpen: (open: boolean) => void
   setSettingsOpen: (open: boolean) => void
@@ -93,6 +95,17 @@ export const useUiStore = create<UiState>((set, get) => ({
   updateAvailable: null,
   confirm: null,
   prompt: null,
+  syncStatus: 'idle',
+  setSyncStatus(status) {
+    set({ syncStatus: status })
+    if (status === 'synced') {
+      setTimeout(() => {
+        if (get().syncStatus === 'synced') {
+          set({ syncStatus: 'idle' })
+        }
+      }, 3000)
+    }
+  },
   async initialize() {
     const store = await getAppStore()
     const commandHistory =

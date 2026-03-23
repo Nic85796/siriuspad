@@ -14,6 +14,7 @@ interface SidebarProps {
   workspaces: Workspace[]
   activeWorkspaceId: string | null
   notes: NoteMetadata[]
+  totalNotes: number
   activeNoteId: string | null
   activeTag: string | null
   searchResults: SearchResult[]
@@ -41,6 +42,7 @@ export function Sidebar({
   workspaces,
   activeWorkspaceId,
   notes,
+  totalNotes,
   activeNoteId,
   activeTag,
   searchResults,
@@ -136,6 +138,7 @@ export function Sidebar({
       ) : (
         <NoteList
           notes={notes}
+          totalNotes={totalNotes}
           activeNoteId={activeNoteId}
           activeTag={activeTag}
           onOpenNote={onOpenNote}

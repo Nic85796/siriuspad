@@ -3,6 +3,8 @@ import {
   ArrowRight,
   CheckCircle2,
   Download,
+  ExternalLink,
+  type LucideIcon,
   LoaderCircle,
   RefreshCw,
   Sparkles,
@@ -10,10 +12,8 @@ import {
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
-import {
-  APP_REPOSITORY_URL,
-  APP_VERSION,
-} from '@/lib/constants'
+import { APP_REPOSITORY_URL, APP_VERSION } from '@/lib/constants'
+import { useUiStore } from '@/store/ui'
 import type { UpdateState } from '@/hooks/useUpdater'
 
 interface UpdateModalProps {
@@ -25,110 +25,96 @@ interface UpdateModalProps {
 }
 
 interface ParsedReleaseBody {
-  summary: string | null
   highlights: string[]
+  fallbackItems: string[]
 }
 
 function parseReleaseBody(body: string | null): ParsedReleaseBody {
-  if (!body?.trim()) {
-    return {
-      summary: null,
-      highlights: [],
-    }
-  }
+  if (!body) return { highlights: [], fallbackItems: [] }
 
   const lines = body
-    .replace(/\r/g, '')
     .split('\n')
-    .map((line) => line.replace(/^#+\s*/, '').trim())
-
-  let summary: string | null = null
+    .map((l) => l.trim())
+    .filter(Boolean)
   const highlights: string[] = []
+  const fallbackItems: string[] = []
+
   let insideHighlights = false
 
-  for (const rawLine of lines) {
-    const line = rawLine.replace(/`/g, '').trim()
-
-    if (!line) {
-      continue
-    }
-
-    if (!summary && !/^[-*]\s+/.test(line) && !/^destaques/i.test(line)) {
-      summary = line
-    }
-
-    if (/^destaques/i.test(line)) {
+  for (const line of lines) {
+    if (
+      line.toLowerCase().includes('destaque') ||
+      line.toLowerCase().includes('highlight') ||
+      line.toLowerCase().includes('novidade')
+    ) {
       insideHighlights = true
       continue
     }
 
-    if (/^distribuição oficial/i.test(line) || /^consulte/i.test(line)) {
-      break
-    }
-
-    if (/^[-*]\s+/.test(line)) {
-      const item = line.replace(/^[-*]\s+/, '').trim()
-      if (!item) {
-        continue
-      }
-
-      if (insideHighlights) {
-        highlights.push(item)
+    if (line.startsWith('-') || line.startsWith('*')) {
+      const cleanLine = line.replace(/^[-*]\s*/, '')
+      if (insideHighlights && highlights.length < 3) {
+        highlights.push(cleanLine)
+      } else {
+        fallbackItems.push(cleanLine)
       }
     }
   }
 
-  if (!highlights.length) {
-    const fallbackItems = lines
-      .map((line) => line.replace(/^[-*]\s+/, '').replace(/`/g, '').trim())
-      .filter(
-        (line) =>
-          line &&
-          !/^destaques/i.test(line) &&
-          !/^distribuição oficial/i.test(line) &&
-          !/^consulte/i.test(line) &&
-          line !== summary,
-      )
-      .slice(0, 4)
-
-    return {
-      summary,
-      highlights: fallbackItems,
-    }
+  // Se não achou destaques marcados, pega os primeiros itens
+  if (highlights.length === 0) {
+    highlights.push(...fallbackItems.slice(0, 3))
   }
 
-  return {
-    summary,
-    highlights: highlights.slice(0, 4),
-  }
+  return { highlights, fallbackItems: fallbackItems.slice(highlights.length === 0 ? 3 : 0) }
 }
 
-function getStepState(input: {
+interface Step {
+  id: string
+  label: string
+  done: boolean
+  active: boolean
+  progress: number
+  icon: LucideIcon
+}
+
+function getStepState({
+  downloading,
+  readyToInstall,
+  installing,
+  progress,
+}: {
   downloading: boolean
   readyToInstall: boolean
   installing: boolean
   progress: number
-}) {
+}): Step[] {
   return [
     {
-      key: 'download',
+      id: 'download',
+      label: 'updater.stepDownload',
+      done: readyToInstall || (progress === 100 && !downloading),
+      active: downloading,
+      progress: progress,
       icon: Download,
-      progress: input.readyToInstall ? 100 : input.progress,
-      done: input.readyToInstall || input.progress >= 100,
     },
     {
-      key: 'install',
+      id: 'install',
+      label: 'updater.stepInstall',
+      done: false, // Só fica pronto quando termina tudo
+      active: readyToInstall || installing,
+      progress: installing ? 100 : 0,
       icon: RefreshCw,
-      progress: input.readyToInstall || input.installing ? 100 : 0,
-      done: input.readyToInstall || input.installing,
     },
     {
-      key: 'restart',
+      id: 'restart',
+      label: 'updater.stepRestart',
+      done: false,
+      active: false,
+      progress: 0,
       icon: ArrowRight,
-      progress: input.installing ? 100 : 0,
-      done: input.installing,
     },
-  ] as const
+  ]
 }
 
 export function UpdateModal({
@@ -139,6 +125,8 @@ export function UpdateModal({
   onRetry,
 }: UpdateModalProps) {
   const { t, i18n } = useTranslation()
+  const { platform } = useUiStore()
+  const isAndroid = platform === 'android'
   const [installing, setInstalling] = useState(false)
 
   if (!state.available && !state.error) {
@@ -190,129 +178,140 @@ export function UpdateModal({
   })
 
   return (
-    <div className="modal-backdrop absolute inset-0 z-[85] overflow-y-auto bg-black/80 px-4 py-5 sm:px-6 sm:py-8">
-      <div className="flex min-h-full items-start justify-center">
-        <div className="modal-panel w-full max-w-[760px] overflow-hidden rounded-[12px] border border-accent/35 bg-surface">
-          <div className="border-b border-border bg-base px-5 py-5">
-            <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_220px]">
-              <div className="min-w-0 space-y-3">
-                <span className="accent-pulse inline-flex items-center gap-2 rounded-md border border-accent/35 bg-accent/10 px-3 py-1 text-[11px] uppercase tracking-[0.18em] text-accent">
+    <div className="modal-backdrop absolute inset-0 z-[85] overflow-y-auto bg-black/85 px-4 py-8 backdrop-blur-md sm:px-6">
+      <div className="flex min-h-full items-center justify-center">
+        <div className="modal-panel motion-fade-up w-full max-w-[800px] overflow-hidden rounded-2xl border border-white/[0.08] bg-surface shadow-[0_32px_128px_rgba(0,0,0,0.8)]">
+          {/* Header com Gradiente */}
+          <div className="relative border-b border-border bg-base/50 p-6 sm:p-8">
+            <div className="pointer-events-none absolute inset-0 bg-gradient-to-br from-accent/15 via-transparent to-transparent opacity-50" />
+            
+            <div className="relative grid gap-6 lg:grid-cols-[1fr_240px]">
+              <div className="space-y-4">
+                <div className="motion-fade-up inline-flex items-center gap-2 rounded-full border border-accent/30 bg-accent/5 px-4 py-1.5 text-[11px] font-bold uppercase tracking-[0.2em] text-accent">
                   <Sparkles className="h-3.5 w-3.5" />
                   {t('updater.newVersionBadge')}
-                </span>
-                <h2 className="max-w-2xl break-words text-[28px] font-semibold leading-tight tracking-tight text-text-primary sm:text-[32px]">
+                </div>
+                
+                <h2 className="text-[32px] font-bold leading-[1.1] tracking-tight text-white sm:text-[40px]">
                   {state.available
-                    ? t('updater.available', { version: state.available.version })
+                    ? t('updater.available', { version: state.available?.version })
                     : t('updater.installFailed')}
                 </h2>
-                <p className="max-w-2xl text-sm leading-7 text-text-secondary">
+                
+                <p className="max-w-[480px] text-sm leading-relaxed text-text-secondary">
                   {state.error ? state.error : t('updater.description')}
                 </p>
-                <div className="flex flex-wrap gap-2 text-xs">
-                  <span className="rounded-md border border-border bg-surface px-3 py-1.5 text-text-secondary">
+
+                <div className="flex flex-wrap gap-2 pt-2">
+                  <div className="flex items-center gap-2 rounded-lg border border-border bg-elevated/50 px-3 py-1.5 text-[11px] text-text-secondary">
+                    <div className={`h-1.5 w-1.5 rounded-full ${state.error ? 'bg-red' : 'bg-accent accent-pulse'}`} />
                     {statusLabel}
-                  </span>
-                  {releaseDate ? (
-                    <span className="rounded-md border border-border bg-surface px-3 py-1.5 text-text-secondary">
-                      {t('updater.releaseDate')}: {releaseDate}
-                    </span>
-                  ) : null}
+                  </div>
+                  {releaseDate && (
+                    <div className="flex items-center gap-2 rounded-lg border border-border bg-elevated/50 px-3 py-1.5 text-[11px] text-text-secondary">
+                      <LoaderCircle className="h-3 w-3" />
+                      {releaseDate}
+                    </div>
+                  )}
                 </div>
               </div>
 
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-                <div className="motion-fade-up surface-hover rounded-lg border border-border bg-surface px-4 py-4">
-                  <div className="text-[10px] uppercase tracking-[0.16em] text-text-muted">
+              {/* Version Comparison Card */}
+              <div className="hidden flex-col justify-center gap-3 rounded-2xl border border-white/[0.05] bg-white/[0.02] p-6 lg:flex">
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-text-muted">
                     {t('updater.currentVersion')}
                   </div>
-                  <div className="mt-2 text-2xl font-semibold text-text-primary">
-                    {currentVersion}
-                  </div>
+                  <div className="font-mono text-lg text-text-secondary">{currentVersion}</div>
                 </div>
-                <div
-                  className="motion-fade-up surface-hover rounded-lg border border-accent/35 bg-accent/10 px-4 py-4"
-                  style={{ animationDelay: '60ms' }}
-                >
-                  <div className="text-[10px] uppercase tracking-[0.16em] text-accent">
+                <div className="flex justify-center py-1">
+                  <ArrowRight className="text-text-muted/30" size={20} />
+                </div>
+                <div className="space-y-1">
+                  <div className="text-[10px] font-bold uppercase tracking-wider text-accent">
                     {t('updater.nextVersion')}
                   </div>
-                  <div className="mt-2 text-2xl font-semibold text-text-primary">
-                    {nextVersion}
-                  </div>
+                  <div className="font-mono text-2xl font-bold text-white">{nextVersion}</div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="grid gap-5 px-5 py-5 lg:grid-cols-[minmax(0,1fr)_260px]">
-            <div className="space-y-5">
-              <div className="motion-fade-up rounded-lg border border-border bg-base p-4">
-                <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-text-primary">
-                  <Sparkles className="h-4 w-4 text-accent" />
-                  {t('updater.releaseNotes')}
-                </div>
+          <div className="grid gap-0 lg:grid-cols-[1fr_300px]">
+            {/* Release Notes Section */}
+            <div className="max-h-[400px] overflow-y-auto bg-base/20 p-6 sm:p-8">
+              <h3 className="mb-6 flex items-center gap-2 text-sm font-bold text-text-primary">
+                <Sparkles size={16} className="text-accent" />
+                {t('updater.releaseNotes')}
+              </h3>
 
-                {release.summary ? (
-                  <p className="rounded-md border border-border bg-surface px-3 py-3 text-sm leading-7 text-text-secondary">
-                    {release.summary}
-                  </p>
-                ) : null}
+              <div className="grid gap-4">
+                {release.highlights.map((item, idx) => (
+                  <div 
+                    key={idx}
+                    className="group flex gap-4 rounded-xl border border-transparent bg-elevated/30 p-4 transition-all hover:border-white/[0.05] hover:bg-elevated/50"
+                  >
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg bg-accent/10 text-accent transition-colors group-hover:bg-accent group-hover:text-white">
+                      <Sparkles size={14} />
+                    </div>
+                    <p className="text-sm leading-relaxed text-text-primary">{item}</p>
+                  </div>
+                ))}
 
-                {release.highlights.length ? (
-                  <div className="mt-3 grid gap-2">
-                    {release.highlights.map((item) => (
-                      <div
-                        key={item}
-                        className="motion-fade-up flex items-start gap-3 rounded-md border border-border bg-surface px-3 py-3 text-sm leading-6 text-text-secondary"
-                      >
-                        <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-accent" />
-                        <span className="min-w-0">{item}</span>
-                      </div>
-                    ))}
+                {release.highlights.length === 0 && (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <div className="mb-4 rounded-full bg-elevated p-4 text-text-muted">
+                      <Sparkles size={32} />
+                    </div>
+                    <p className="text-sm text-text-muted">{t('updater.releaseNotesEmpty')}</p>
                   </div>
-                ) : !release.summary ? (
-                  <div className="rounded-md border border-dashed border-border bg-surface px-3 py-3 text-sm text-text-secondary">
-                    {t('updater.releaseNotesEmpty')}
-                  </div>
-                ) : null}
+                )}
               </div>
+            </div>
 
-              <div
-                className="motion-fade-up rounded-lg border border-border bg-base p-4"
-                style={{ animationDelay: '90ms' }}
-              >
-                <div className="mb-3 text-sm font-semibold text-text-primary">
-                  {t('updater.actionHint')}
-                </div>
-                <div className="grid gap-2">
-                  {steps.map((item, index) => {
+            {/* Progress and Steps Section */}
+            <div className="border-l border-border bg-surface p-6 sm:p-8">
+              <div className="mb-8 space-y-6">
+                <h3 className="text-xs font-bold uppercase tracking-widest text-text-muted">
+                  {t('updater.progressLabel')}
+                </h3>
+
+                <div className="space-y-6">
+                  {steps.map((item) => {
                     const Icon = item.icon
                     return (
-                      <div
-                        key={item.key}
-                        className="motion-fade-up flex items-center gap-3 rounded-md border border-border bg-surface px-3 py-3"
-                        style={{ animationDelay: `${120 + index * 40}ms` }}
-                      >
-                        <span
-                          className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md border text-xs font-semibold ${
-                            item.done
-                              ? 'border-accent/35 bg-accent/10 text-accent'
-                              : 'border-border bg-base text-text-secondary'
-                          }`}
-                        >
-                          {item.done ? (
-                            <CheckCircle2 className="h-4 w-4" />
-                          ) : (
-                            `${index + 1}`
-                          )}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2 text-[11px] uppercase tracking-[0.16em] text-text-muted">
-                            <Icon className="h-3.5 w-3.5" />
-                            {t(`updater.step${item.key.charAt(0).toUpperCase()}${item.key.slice(1)}`)}
+                      <div key={item.id} className="relative">
+                        <div className="flex items-center gap-4">
+                          <div className={`relative flex h-10 w-10 items-center justify-center rounded-xl border transition-all duration-500 ${
+                            item.done 
+                              ? 'border-green/30 bg-green/10 text-green scale-110' 
+                              : item.active
+                                ? 'border-accent/50 bg-accent/10 text-accent accent-pulse'
+                                : 'border-border bg-base/50 text-text-muted'
+                          }`}>
+                            {item.done ? <CheckCircle2 size={18} /> : <Icon size={18} />}
                           </div>
-                          <div className="mt-1 text-sm text-text-primary">
-                            {item.done ? '100%' : item.progress ? `${item.progress}%` : '—'}
+                          
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between mb-1.5">
+                              <span className={`text-[13px] font-bold ${item.active || item.done ? 'text-text-primary' : 'text-text-muted'}`}>
+                                {t(item.label)}
+                              </span>
+                              {item.active && (
+                                <span className="text-[11px] font-mono font-bold text-accent">
+                                  {Math.round(item.progress)}%
+                                </span>
+                              )}
+                            </div>
+                            
+                            <div className="h-1 overflow-hidden rounded-full bg-base">
+                              <div 
+                                className={`h-full transition-all duration-700 ease-out ${
+                                  item.done ? 'bg-green' : 'bg-accent'
+                                }`}
+                                style={{ width: `${item.progress}%` }}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -320,112 +319,87 @@ export function UpdateModal({
                   })}
                 </div>
               </div>
-            </div>
 
-            <div className="space-y-5">
-              <div
-                className="motion-fade-up rounded-lg border border-border bg-base p-4"
-                style={{ animationDelay: '140ms' }}
-              >
-                <div className="text-[11px] uppercase tracking-[0.16em] text-text-muted">
-                  {t('updater.updateActionLabel')}
-                </div>
-                <div className="mt-3 text-sm leading-7 text-text-primary">
-                  {t('updater.actionCopy')}
-                </div>
-              </div>
-
-              {state.downloading ? (
-                <div className="motion-fade-up rounded-lg border border-accent/35 bg-accent/10 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-3">
-                    <p className="text-sm font-semibold text-text-primary">
-                      {t('updater.downloading', { progress: state.downloadProgress })}
+              {/* Status Especial */}
+              <div className="motion-fade-up space-y-4" style={{ animationDelay: '500ms' }}>
+                {state.downloading && (
+                  <div className="rounded-xl border border-accent/30 bg-accent/5 p-4 text-center">
+                    <p className="text-xs text-text-secondary">
+                      {t('updater.backgroundDownload')}
                     </p>
-                    <span className="text-xs uppercase tracking-[0.16em] text-text-secondary">
-                      {t('updater.progressLabel')}
-                    </span>
                   </div>
-                  <div className="progress-shimmer mt-4 h-3 overflow-hidden rounded-full border border-border bg-base">
-                    <div
-                      className="h-full bg-accent transition-[width] duration-200"
-                      style={{ width: `${state.downloadProgress}%` }}
-                    />
-                  </div>
-                  <div className="mt-4 text-xs leading-6 text-text-secondary">
-                    {t('updater.backgroundDownload')}
-                  </div>
-                </div>
-              ) : null}
+                )}
 
-              {state.readyToInstall && state.available ? (
-                <div className="motion-fade-up rounded-lg border border-accent/35 bg-accent/10 p-4">
-                  <p className="text-base font-semibold text-text-primary">
-                    {t('updater.readyToInstall')}
-                  </p>
-                  <p className="mt-2 text-sm leading-7 text-text-secondary">
-                    {t('updater.restartNotice')}
-                  </p>
-                </div>
-              ) : null}
+                {state.readyToInstall && !state.error && (
+                  <div className="rounded-xl border border-green/30 bg-green/5 p-4 text-center">
+                    <p className="text-xs font-bold text-green">
+                      {t('updater.readyToInstall')}
+                    </p>
+                  </div>
+                )}
 
-              {state.error ? (
-                <div className="motion-fade-up rounded-lg border border-red/30 bg-red/10 p-4">
-                  <div className="text-sm font-semibold text-red">
-                    {t('updater.installFailed')}
+                {state.error && (
+                  <div className="rounded-xl border border-red/30 bg-red/5 p-4 text-center">
+                    <p className="text-xs font-bold text-red">
+                      {t('updater.installFailed')}
+                    </p>
                   </div>
-                  <div className="mt-2 text-sm leading-7 text-red">
-                    {state.error}
-                  </div>
-                </div>
-              ) : null}
+                )}
+              </div>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2 border-t border-border px-5 py-4">
-            {state.error ? (
-              <button
-                type="button"
-                className="interactive-lift rounded-md border border-border bg-elevated px-4 py-2.5 text-sm text-text-primary transition hover:border-focus hover:bg-hover"
-                onClick={() => void onRetry()}
-              >
-                {state.readyToInstall
-                  ? t('updater.installAndRestart')
-                  : t('updater.tryAgain')}
-              </button>
-            ) : state.readyToInstall ? (
-              <button
-                type="button"
-                className="interactive-lift inline-flex items-center gap-2 rounded-md border border-accent/35 bg-accent/10 px-4 py-2.5 text-sm text-text-primary transition hover:border-accent/50 hover:bg-accent/15 disabled:opacity-50"
-                onClick={() => void handleInstall()}
-                disabled={installing}
-              >
-                {installing ? (
-                  <LoaderCircle className="h-4 w-4 animate-spin" />
-                ) : null}
-                {t('updater.installAndRestart')}
-              </button>
-            ) : state.available ? (
-              <>
+          <div className="flex items-center justify-between border-t border-border bg-base/50 px-6 py-6 sm:px-8">
+            <div className="flex gap-3">
+              {state.error ? (
                 <button
                   type="button"
-                  className="interactive-lift rounded-md border border-accent/35 bg-accent/10 px-4 py-2.5 text-sm text-text-primary transition hover:border-accent/50 hover:bg-accent/15"
-                  onClick={() => void onDownload()}
+                  className="interactive-lift flex items-center gap-2 rounded-xl bg-red/10 px-6 py-3 text-[13px] font-bold text-red transition hover:bg-red/20"
+                  onClick={() => void onRetry()}
                 >
-                  {t('updater.updateNow')}
+                  <RefreshCw size={14} />
+                  {state.readyToInstall ? t('updater.installAndRestart') : t('updater.tryAgain')}
                 </button>
+              ) : state.readyToInstall ? (
                 <button
                   type="button"
-                  className="interactive-lift rounded-md border border-border bg-transparent px-4 py-2.5 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
-                  onClick={() => void open(releaseUrl)}
+                  className="interactive-lift flex items-center gap-2 rounded-xl bg-accent px-6 py-3 text-[13px] font-bold text-white transition hover:bg-accent-hover disabled:opacity-50"
+                  onClick={() => void handleInstall()}
+                  disabled={installing}
                 >
-                  {t('updater.viewRelease')}
+                  {installing ? <LoaderCircle size={14} className="animate-spin" /> : <RefreshCw size={14} />}
+                  {t('updater.installAndRestart')}
                 </button>
-              </>
-            ) : null}
+              ) : state.available ? (
+                <>
+                  <button
+                    type="button"
+                    className="interactive-lift flex items-center gap-2 rounded-xl bg-accent px-6 py-3 text-[13px] font-bold text-white transition hover:bg-accent-hover"
+                    onClick={() => {
+                      if (isAndroid) {
+                        void open(`${APP_REPOSITORY_URL}/releases/latest`)
+                      } else {
+                        void onDownload()
+                      }
+                    }}
+                  >
+                    {isAndroid ? <ExternalLink size={14} /> : <Download size={14} />}
+                    {t('updater.updateNow')}
+                  </button>
+                  <button
+                    type="button"
+                    className="interactive-lift rounded-xl border border-border bg-elevated/50 px-6 py-3 text-[13px] font-bold text-text-primary transition hover:border-focus hover:bg-hover"
+                    onClick={() => void open(releaseUrl)}
+                  >
+                    {t('updater.viewRelease')}
+                  </button>
+                </>
+              ) : null}
+            </div>
 
             <button
               type="button"
-              className="interactive-lift ml-auto rounded-md border border-border bg-transparent px-4 py-2.5 text-sm text-text-secondary transition hover:border-focus hover:bg-hover hover:text-text-primary"
+              className="text-[13px] font-bold text-text-muted transition hover:text-text-primary"
               onClick={onDismiss}
             >
               {state.downloading ? t('updater.continueLater') : t('updater.later')}

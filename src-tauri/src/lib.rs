@@ -2,7 +2,7 @@ mod commands;
 mod models;
 mod storage;
 
-use commands::{ai, fs, history, platform, runner, search, terminal, updater};
+use commands::{ai, fs, git, history, platform, runner, search, terminal, updater};
 #[cfg(mobile)]
 use tauri::Manager;
 
@@ -58,6 +58,11 @@ pub fn run() {
             fs::create_workspace,
             fs::rename_workspace,
             fs::delete_workspace,
+            git::git_is_installed,
+            git::git_is_repo,
+            git::git_init,
+            git::git_set_remote,
+            git::git_sync,
             history::list_note_history,
             history::read_note_version,
             history::restore_note_version,

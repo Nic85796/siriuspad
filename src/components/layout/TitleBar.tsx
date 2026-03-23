@@ -18,6 +18,8 @@ import type { AppPlatform } from '@/types'
 interface TitleBarProps {
   platform: AppPlatform
   isFullscreen: boolean
+  sidebarOpen: boolean
+  rightPanelOpen: boolean
   onFocusSearch: () => void
   onOpenSettings: () => void
   onOpenAssistant: () => void
@@ -136,6 +138,8 @@ async function runWindowAction(
 export function TitleBar({
   platform,
   isFullscreen,
+  sidebarOpen,
+  rightPanelOpen,
   onFocusSearch,
   onOpenSettings,
   onOpenAssistant,
@@ -158,12 +162,15 @@ export function TitleBar({
       <div className="relative z-10 flex items-center pl-2">
         <button
           type="button"
-          className="interactive-lift flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-text-secondary transition hover:border-border hover:bg-hover hover:text-text-primary"
+          className="interactive-lift flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-text-secondary transition-colors duration-200 hover:border-border hover:bg-hover hover:text-text-primary"
           onClick={onToggleSidebar}
           title={t('titlebar.toggleSidebar')}
           aria-label={t('titlebar.toggleSidebar')}
         >
-          <PanelLeftOpen className="h-4 w-4" />
+          <PanelLeftOpen
+            className="h-4 w-4 transition-transform duration-300 ease-in-out"
+            style={{ transform: sidebarOpen ? 'scaleX(-1)' : 'scaleX(1)' }}
+          />
         </button>
       </div>
 
@@ -223,12 +230,15 @@ export function TitleBar({
         </button>
         <button
           type="button"
-          className="interactive-lift flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-text-secondary transition hover:border-border hover:bg-hover hover:text-text-primary ml-1"
+          className="interactive-lift flex h-7 w-7 items-center justify-center rounded-md border border-transparent text-text-secondary transition-colors duration-200 hover:border-border hover:bg-hover hover:text-text-primary ml-1"
           onClick={onToggleRightPanel}
           title={t('titlebar.toggleRightPanel', 'Ajustes da Nota')}
           aria-label={t('titlebar.toggleRightPanel', 'Ajustes da Nota')}
         >
-          <PanelRightOpen className="h-4 w-4" />
+          <PanelRightOpen
+            className="h-4 w-4 transition-transform duration-300 ease-in-out"
+            style={{ transform: rightPanelOpen ? 'scaleX(-1)' : 'scaleX(1)' }}
+          />
         </button>
       </div>
 

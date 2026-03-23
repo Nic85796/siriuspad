@@ -1,7 +1,24 @@
-import { createClient } from '@supabase/supabase-js'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { invoke } from '@tauri-apps/api/core'
+
 import { useSettingsStore } from '@/store/settings'
+import { useUiStore } from '@/store/ui'
 import type { Note, NoteMetadata } from '@/types'
+
+const supabaseClients = new Map<string, SupabaseClient>()
+
+function getSupabaseClient(url: string, key: string): SupabaseClient {
+  const cacheKey = `${url}::${key}`
+  const cached = supabaseClients.get(cacheKey)
+
+  if (cached) {
+    return cached
+  }
+
+  const client = createClient(url, key)
+  supabaseClients.set(cacheKey, client)
+  return client
+}
 
 export async function syncNote(note: Note) {
   const settings = useSettingsStore.getState().settings
@@ -9,7 +26,8 @@ export async function syncNote(note: Note) {
   // Supabase Backup
   if (settings.supabaseUrl && settings.supabaseAnonKey) {
     try {
-      const supabase = createClient(settings.supabaseUrl, settings.supabaseAnonKey)
+      useUiStore.getState().setSyncStatus('syncing')
+      const supabase = getSupabaseClient(settings.supabaseUrl, settings.supabaseAnonKey)
       
       const { error } = await supabase
         .from('notes_backup')
@@ -23,11 +41,19 @@ export async function syncNote(note: Note) {
 
       if (error) {
         console.error('Supabase sync error:', error)
+        useUiStore.getState().setSyncStatus('error')
+        useUiStore.getState().pushToast({
+          kind: 'error',
+          title: 'Erro na Nuvem (Supabase)',
+          description: error.message || JSON.stringify(error),
+        })
       } else {
         console.log('Synced note to Supabase:', note.title)
+        useUiStore.getState().setSyncStatus('synced')
       }
     } catch (err) {
       console.error('Failed to sync to Supabase:', err)
+      useUiStore.getState().setSyncStatus('error')
     }
   }
 }
@@ -38,7 +64,7 @@ export async function deleteNoteSync(id: string) {
   // Supabase Deletion
   if (settings.supabaseUrl && settings.supabaseAnonKey) {
     try {
-      const supabase = createClient(settings.supabaseUrl, settings.supabaseAnonKey)
+      const supabase = getSupabaseClient(settings.supabaseUrl, settings.supabaseAnonKey)
       await supabase.from('notes_backup').delete().eq('id', id)
       console.log('Deleted note from Supabase:', id)
     } catch (err) {

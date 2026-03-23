@@ -1,10 +1,11 @@
 import { Command } from 'cmdk'
-import { Search } from 'lucide-react'
+import { Search, X } from 'lucide-react'
 import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { useTranslation } from 'react-i18next'
 
 import type { CommandItem } from '@/types'
+import { useUiStore } from '@/store/ui'
 
 interface CommandPaletteProps {
   open: boolean
@@ -22,6 +23,8 @@ export function CommandPalette({
   onCommandRun,
 }: CommandPaletteProps) {
   const { t } = useTranslation()
+  const uiState = useUiStore()
+  const isMobile = uiState.platform === 'android' || uiState.platform === 'ios'
 
   useEffect(() => {
     if (!open) {
@@ -64,11 +67,15 @@ export function CommandPalette({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[60] flex items-start justify-center bg-black/70 px-4 pt-24 backdrop-blur-sm"
+      className={`fixed inset-0 z-[60] flex items-start justify-center bg-black/70 backdrop-blur-sm ${
+        isMobile ? 'p-0' : 'px-4 pt-24'
+      }`}
       onMouseDown={() => onOpenChange(false)}
     >
       <div
-        className="w-full max-w-2xl overflow-hidden rounded-xl border border-border bg-surface"
+        className={`overflow-hidden border-border bg-surface ${
+          isMobile ? 'h-full w-full rounded-none' : 'w-full max-w-2xl rounded-xl border shadow-2xl'
+        }`}
         onMouseDown={(event) => event.stopPropagation()}
       >
         <Command
@@ -77,7 +84,7 @@ export function CommandPalette({
           className="overflow-hidden"
         >
           <div className="border-b border-border px-4 py-4">
-            <div className="mb-3 flex items-center justify-between gap-3">
+            <div className="mb-3 flex items-start justify-between gap-3">
               <div>
                 <p className="text-[11px] uppercase tracking-[0.18em] text-text-muted">
                   {t('commands.commandPalette')}
@@ -86,20 +93,31 @@ export function CommandPalette({
                   {t('searchPanel.commandHelp')}
                 </p>
               </div>
-              <span className="rounded-md border border-border bg-elevated px-2 py-1 text-[11px] text-text-secondary">
-                Ctrl+K
-              </span>
+              {isMobile ? (
+                <button
+                  type="button"
+                  onClick={() => onOpenChange(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full bg-hover text-text-secondary active:scale-95"
+                  aria-label={t('common.close')}
+                >
+                  <X size={16} />
+                </button>
+              ) : (
+                <span className="rounded-md border border-border bg-elevated px-2 py-1 text-[11px] text-text-secondary">
+                  Ctrl+K
+                </span>
+              )}
             </div>
-            <div className="flex items-center gap-3 rounded-lg border border-border bg-base px-3 py-3">
+            <div className="flex items-center gap-3 rounded-lg border border-border bg-base px-3 py-3 focus-within:border-accent">
               <Search className="h-4 w-4 text-text-secondary" />
               <Command.Input
                 autoFocus
                 placeholder={t('searchPanel.placeholder')}
-                className="w-full bg-transparent text-sm text-text-primary outline-none placeholder:text-text-muted"
+                className="w-full bg-transparent text-base sm:text-sm text-text-primary outline-none placeholder:text-text-muted"
               />
             </div>
           </div>
-          <Command.List className="max-h-[60vh] overflow-y-auto p-2">
+          <Command.List className={`${isMobile ? 'max-h-none flex-1' : 'max-h-[60vh]'} overflow-y-auto p-2`}>
             <Command.Empty className="px-3 py-6 text-sm text-text-secondary">
               {t('searchPanel.empty')}
             </Command.Empty>
@@ -172,11 +190,14 @@ export function CommandPalette({
               ) : null,
             )}
           </Command.List>
-          <div className="flex items-center justify-between gap-3 border-t border-border bg-base px-4 py-3 text-[11px] text-text-secondary">
-            <span>{t('searchPanel.hints.navigate')}</span>
-            <span>{t('searchPanel.hints.execute')}</span>
-            <span>{t('searchPanel.hints.close')}</span>
-          </div>
+          
+          {!isMobile && (
+            <div className="flex items-center justify-between gap-3 border-t border-border bg-base px-4 py-3 text-[11px] text-text-secondary">
+              <span>{t('searchPanel.hints.navigate')}</span>
+              <span>{t('searchPanel.hints.execute')}</span>
+              <span>{t('searchPanel.hints.close')}</span>
+            </div>
+          )}
         </Command>
       </div>
     </div>,

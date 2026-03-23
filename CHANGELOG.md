@@ -7,19 +7,26 @@ e este projeto adere ao [Versionamento Semântico](https://semver.org/lang/pt-BR
 
 ## [Não lançado]
 
-## [1.0.30] - 2026-03-22
+## [1.0.31] - 2026-03-22
 
 ### Added
 
-- paleta de comandos agora tem uma ação para simular a tela de atualização localmente, sem depender de release remota
+- Git Sync nativo agora tem backend real no Tauri, com checagem de `git`, inicialização do repositório das notas, configuração de remoto e fluxo de sync por `pull --rebase` + `push`
+- integrações ganharam campo próprio para a URL do repositório Git, sem esconder a novidade atrás de configuração incompleta
 
 ### Changed
 
-- a prévia local do updater pode ser aberta também no mobile para revisar o layout do modal
+- cliente de backup do Supabase passou a reutilizar instâncias por URL/chave, evitando conexões duplicadas e deixando o sync mais previsível
+- status bar agora reage ao estado real do sync na nuvem e só oferece Git Sync onde isso faz sentido
+- DevTools interno continua no app, mas agora mascara segredos locais como token do GitHub, chave da IA e chave pública do Supabase
+- release notes e workflow ficaram alinhados com o pacote atual do SiriusPad, incluindo desktop, AppImage e beta Android
 
 ### Fixed
 
-- fluxo de validação da UI de update ficou mais simples para testes rápidos antes de publicar versão nova
+- traduções novas de Git Sync, Vim mode, updater, wikilinks e comandos móveis foram alinhadas entre `pt-BR`, `en` e `es`
+- paleta de comandos voltou a respeitar as regras de hooks do React em todos os estados de abertura/fechamento
+- lint volta a fechar sem erros, mantendo apenas os warnings antigos de `react-hooks/exhaustive-deps`
+- build frontend voltou a passar com a dependência de Vim realmente instalada no projeto
 
 ## [1.0.29] - 2026-03-21
 

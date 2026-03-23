@@ -99,11 +99,11 @@ jobs:
             Nova versão pública do SiriusPad.
 
             Destaques desta versão:
-            - Sirius AI voltou ao app com chave configurável nas integrações e chamada real feita pelo backend do Tauri
-            - botão dedicado da IA entrou no desktop e no mobile, além da entrada na paleta de comandos
-            - menu global de clique direito saiu do caminho e o fluxo ficou só com os menus corretos de nota e espaço
-            - integrações agora agrupam GitHub Gist e IA com endpoint compatível com OpenAI/Groq e modelo configurável
-            - traduções `pt-BR`, `en` e `es` foram alinhadas com as novas chaves da IA e da interface
+            - Git Sync nativo agora funciona de verdade no desktop, com backend Tauri para iniciar repo, configurar remoto e sincronizar as notas
+            - integrações ganharam o campo da URL Git sem remover nenhuma das novidades recentes de IA, updater e mobile
+            - traduções `pt-BR`, `en` e `es` foram alinhadas para Git Sync, Vim mode, updater, wikilinks e comandos móveis
+            - status bar, DevTools e sync do Supabase foram estabilizados sem cortar o fluxo novo do app
+            - build, lint e cargo check foram validados juntos antes desta release
 
             Distribuição oficial:
             - `.deb` para Linux

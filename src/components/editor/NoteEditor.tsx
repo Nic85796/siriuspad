@@ -12,6 +12,8 @@ import {
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { useTranslation } from 'react-i18next'
 import { FormatToolbar } from '@/components/ui/FormatToolbar'
+import { MobileFormatBar } from '@/components/ui/MobileFormatBar'
+import { useUiStore } from '@/store/ui'
 
 import {
   NOTE_LANGUAGES,
@@ -26,6 +28,7 @@ import {
   reconfigureLineNumbers,
   reconfigureReadOnly,
   reconfigureTabSize,
+  reconfigureVimMode,
   reconfigureWordWrap,
 } from '@/lib/codemirror'
 import { TagPill } from '@/components/ui/TagPill'
@@ -61,6 +64,7 @@ interface NoteEditorProps {
   onSave: () => void | Promise<void>
   onRun: () => void | Promise<void>
   onCursorChange?: (cursorInfo: CursorInfo) => void
+  onWikiLinkClick?: (title: string) => void
 }
 
 function controlClassName() {
@@ -314,17 +318,21 @@ export function NoteEditor({
   onSave,
   onRun,
   onCursorChange,
+  onWikiLinkClick,
 }: NoteEditorProps) {
   const hostRef = useRef<HTMLDivElement | null>(null)
   const viewRef = useRef<EditorView | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
   const compartmentsRef = useRef(createEditorCompartments())
-  const handlersRef = useRef({ onChange, onSave, onRun, onCursorChange })
+  const handlersRef = useRef({ onChange, onSave, onRun, onCursorChange, onWikiLinkClick })
   const [editorView, setEditorView] = useState<EditorView | null>(null)
+  const [editorFocused, setEditorFocused] = useState(false)
+  const platform = useUiStore((s) => s.platform)
+  const isMobile = platform === 'android' || platform === 'ios'
 
   useEffect(() => {
-    handlersRef.current = { onChange, onSave, onRun, onCursorChange }
-  }, [onChange, onCursorChange, onRun, onSave])
+    handlersRef.current = { onChange, onSave, onRun, onCursorChange, onWikiLinkClick }
+  }, [onChange, onCursorChange, onRun, onSave, onWikiLinkClick])
 
   useEffect(() => {
     if (!hostRef.current) {
@@ -343,6 +351,7 @@ export function NoteEditor({
           onSave: () => handlersRef.current.onSave(),
           onRun: () => handlersRef.current.onRun(),
           onCursorChange: (cursorInfo) => handlersRef.current.onCursorChange?.(cursorInfo),
+          onWikiLinkClick: (title) => handlersRef.current.onWikiLinkClick?.(title),
         },
         compartmentsRef.current,
       ),
@@ -405,6 +414,17 @@ export function NoteEditor({
       return
     }
 
+    view.dispatch({
+      effects: reconfigureVimMode(compartmentsRef.current, settings.vimMode ?? false),
+    })
+  }, [settings.vimMode])
+
+  useEffect(() => {
+    const view = viewRef.current
+    if (!view) {
+      return
+    }
+
     const contentTitle = value.split('\n')[0].replace(/^#\s+/, '').trim()
     const isNoteReadonly = ["Bem-vindo ao SiriusPad", "Bienvenido a SiriusPad", "Welcome to SiriusPad"].includes(contentTitle)
 
@@ -442,6 +462,20 @@ export function NoteEditor({
     openEditorSearchPanel(view)
   }, [findReplaceNonce])
 
+  // Detectar foco/blur do editor para exibir MobileFormatBar
+  useEffect(() => {
+    const container = containerRef.current
+    if (!container) return
+    const onFocus = () => setEditorFocused(true)
+    const onBlur = () => setEditorFocused(false)
+    container.addEventListener('focusin', onFocus)
+    container.addEventListener('focusout', onBlur)
+    return () => {
+      container.removeEventListener('focusin', onFocus)
+      container.removeEventListener('focusout', onBlur)
+    }
+  }, [])
+
   return (
     <div
       ref={containerRef}
@@ -453,8 +487,12 @@ export function NoteEditor({
           '--editor-padding-top': compact ? '1rem' : '1.2rem',
           '--editor-padding-side': compact ? '1rem' : '1.7rem',
           '--editor-padding-bottom': compact
-            ? 'calc(env(safe-area-inset-bottom, 0px) + 8rem)'
-            : '5.6rem',
+            ? isMobile && editorFocused
+              ? 'calc(env(safe-area-inset-bottom, 0px) + 5rem)'
+              : 'calc(env(safe-area-inset-bottom, 0px) + 8rem)'
+            : isMobile && editorFocused
+              ? 'calc(env(safe-area-inset-bottom, 0px) + 4.5rem)'
+              : '5.6rem',
           boxShadow: accentColor ? `inset 3px 0 0 ${accentColor}` : undefined,
           backgroundImage: withAlpha(accentColor, 0.05)
             ? `linear-gradient(180deg, ${withAlpha(accentColor, 0.05)}, transparent 55%)`
@@ -463,7 +501,8 @@ export function NoteEditor({
       }
     >
       <div ref={hostRef} className="h-full min-h-0 overflow-hidden" />
-      <FormatToolbar editorView={editorView} containerRef={containerRef} />
+      {!isMobile && <FormatToolbar editorView={editorView} containerRef={containerRef} />}
+      {isMobile && <MobileFormatBar editorView={editorView} visible={editorFocused} />}
     </div>
   )
 }

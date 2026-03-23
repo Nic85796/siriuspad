@@ -1,5 +1,6 @@
 pub mod ai;
 pub mod fs;
+pub mod git;
 pub mod history;
 pub mod platform;
 pub mod runner;

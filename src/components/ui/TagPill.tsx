@@ -18,12 +18,11 @@ export function TagPill({
   onRemove,
 }: TagPillProps) {
   const palette = getTagPalette(tag)
-  const Component = onClick ? 'button' : 'span'
+  const Component = 'div'
 
   return (
     <Component
-      type={Component === 'button' ? 'button' : undefined}
-      className={`inline-flex items-center gap-1 rounded-full border font-medium transition ${
+      className={`inline-flex items-center gap-1 rounded-full border font-medium transition cursor-pointer ${
         compact ? 'px-2 py-0.5 text-[10px]' : 'px-2.5 py-1 text-[11px]'
       } ${active ? 'ring-1 ring-[var(--accent)]' : ''}`}
       style={{
@@ -31,22 +30,34 @@ export function TagPill({
         borderColor: palette.border,
         color: palette.color,
       }}
-      onClick={onClick}
+      onClick={(e) => {
+        if (onClick) {
+          e.stopPropagation()
+          onClick()
+        }
+      }}
       title={tag}
     >
       <span className="truncate">{tag}</span>
       {onRemove ? (
-        <button
-          type="button"
+        <span
+          role="button"
+          tabIndex={0}
           className="inline-flex h-3.5 w-3.5 items-center justify-center rounded-full border border-current/20 bg-transparent p-0 opacity-80 transition hover:opacity-100"
           onClick={(event) => {
             event.stopPropagation()
             onRemove()
           }}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.stopPropagation()
+              onRemove()
+            }
+          }}
           aria-label={`Remover tag ${tag}`}
         >
           <X className="h-2.5 w-2.5" />
-        </button>
+        </span>
       ) : null}
     </Component>
   )
